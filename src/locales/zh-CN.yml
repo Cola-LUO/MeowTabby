@@ -14,13 +14,13 @@ billing:
     sessionExpired: 登录已过期，请重新登录
     generic: 请求失败，请稍后重试
   account:
-    title: 账户
+    title: " "
     description: 登录、注册并管理翻译余额
     balance: 余额
     recharge: 充值
     rechargeGuide: 请联系管理员为你的账户充值，后续版本将支持自助支付。
     notLoggedIn: 未登录
-    loginOrRegister: 登录或注册后使用内置 AI 翻译
+    loginOrRegister: " "
   login:
     title: 登录
     email: 邮箱
@@ -129,8 +129,8 @@ errorRecovery:
     cancel: 取消
 options:
   account:
-    title: 账户
-    description: 登录、注册并管理余额
+    title: 账户登录
+    description: "注册 / 登录 / 充值后，使用内置 AI 翻译服务。\n无需包月，用多少算多少，余额可退。"
   batchSavings:
     savedCost: 约省 $1% API 费用
   commandPalette:
@@ -141,41 +141,13 @@ options:
     toggle: 切换侧边栏
     settings: 设置
     features: 功能
-    product: 产品
   tools:
     translationHub: 翻译中心
-  product:
-    roadmap: 路线图
-  helpAndCommunity:
-    title: 帮助与社区
-    pageDescription: 了解怎么使用陪读蛙、向团队寻求帮助，或者加入社区和其他用户交流。
-    help:
-      title: 帮助
-    tutorial:
-      title: 使用教程
-      description: 阅读文档，了解怎么使用陪读蛙
-    email:
-      title: 邮件联系
-      description: 通过 contact@readfrog.app 直接联系团队
-    featureRequest:
-      title: 功能建议
-      description: 提出想法，并为团队接下来要做的功能投票
-    bugReport:
-      title: 报告问题
-      description: 提交工单，并跟进直到问题解决
-    community:
-      title: 社区
-    discord:
-      title: Discord
-      description: 与团队和其他用户实时交流
-    wechat:
-      title: 微信群
-      description: 扫描二维码进入微信讨论群
-      qrCodeAlt: 微信二维码
+
   apiProviders:
     title: API 提供商
-    pageDescription: 接入 Read Frog 调用的 AI 服务，并为每项功能指定使用哪一个。
-    description: 添加 Read Frog 可以调用的提供商。内置 20 多个，也可以添加兼容 Chat Completions 的自定义 API 和 Open Responses 自定义 API。
+    pageDescription: 自定义接入 MeowTabby 调用的 AI 大模型，每项翻译功能可分别指定。
+    description: 添加 MeowTabby 可以调用的提供商。内置 20 多个，也可以添加兼容 Chat Completions 的自定义 API 和 Open Responses 自定义 API。
     configTitle: 提供商配置
     addProvider: 添加提供商
     builtInProvider: 内置提供商
@@ -281,8 +253,8 @@ options:
         customChatComplete: 自定义 Chat Complete
         customResponses: 自定义 Responses
       attribution:
-        builtInAi: 由 Read Frog 托管的普通模型。非 Ultra 用户仅支持在自定义 AI 指令使用，Ultra 用户支持在更多功能上使用。
-        builtInAiAdvance: 由 Read Frog 托管的高级模型，Ultra 会员专属。网页翻译、自定义 AI 指令等全部内置 AI 功能均可使用，共享每周额度，额度消耗比标准模型更快。
+        builtInAi: 由 MeowTabby 托管的普通模型。非 Ultra 用户仅支持在自定义 AI 指令使用，Ultra 用户支持在更多功能上使用。
+        builtInAiAdvance: 由 MeowTabby 托管的高级模型，Ultra 会员专属。网页翻译、自定义 AI 指令等全部内置 AI 功能均可使用，共享每周额度，额度消耗比标准模型更快。
       description:
         openai: 提供 GPT-4o 等模型
         azure: 通过 Azure 部署使用 OpenAI 模型
@@ -508,8 +480,8 @@ options:
         description: 开启可能还不稳定的实验性功能
       analytics:
         title: 帮助改进用户体验
-        tooltip: 开启后，Read Frog 会发送匿名的产品使用信号，用于发现 bug、验证功能是否稳定、优化性能与交互细节，并帮助我们决定接下来优先投入的方向。
-        description: 通过帮助我们定位 bug、优化界面布局等改善 Read Frog
+        tooltip: 开启后，MeowTabby 会发送匿名的产品使用信号，用于发现 bug、验证功能是否稳定、优化性能与交互细节，并帮助我们决定接下来优先投入的方向。
+        description: 通过帮助我们定位 bug、优化界面布局等改善 MeowTabby
   shortcuts:
     title: 快捷键
     pageDescription: 设置阅读时触发翻译的按键。
@@ -866,7 +838,7 @@ options:
         duplicateFieldKey: 字段名不能重复
   contextMenu:
     title: 右键菜单
-    pageDescription: 控制浏览器右键菜单里的 Read Frog 选项。
+    pageDescription: 控制浏览器右键菜单里的 MeowTabby 选项。
     demoImageAlt: 右键菜单演示
     enable:
       title: 启用右键翻译
@@ -1084,7 +1056,7 @@ options:
         title: 语言语音
         description: 先选择一种语言，再挑选朗读它时使用的语音。重置会换回陪读蛙为该语言选定的语音。
         reset: 重置
-        previewSample: 来自 Read Frog 的问候！这是我朗读时的声音。
+        previewSample: 来自 MeowTabby 的问候！这是我朗读时的声音。
       fallback:
         title: 兜底语音
         description: 你还没有单独指定语音的语言，都用这个语音朗读。
@@ -1195,7 +1167,7 @@ options:
   rateUs:
     title: 好评支持
   configMigration:
-    versionTooNew: 导入的配置版本较新，请升级 Read Frog 到最新版本
+    versionTooNew: 导入的配置版本较新，请升级 MeowTabby 到最新版本
     validationError: 配置验证失败
 side:
   sourceLang: 来源语言
@@ -1307,7 +1279,7 @@ subtitles:
     downloadTranslatedComplete: 翻译字幕已下载
     downloadSource: 下载原字幕
   state:
-    loading: Read Frog 字幕加载中
+    loading: MeowTabby 字幕加载中
     translating: 翻译中…
     error: 发生错误
   errors:

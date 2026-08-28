@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "Register, log in, then recharge to use the built-in AI translation service.\nNo monthly plan — pay only for what you use, balance refundable."
   batchSavings:
     savedCost: Saved approx. $1% on API costs
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: Toggle sidebar
     settings: Settings
     features: Features
-    product: Product
   tools:
     translationHub: Translation Hub
-  product:
-    roadmap: Roadmap
-  helpAndCommunity:
-    title: Help & Community
-    pageDescription: Learn how to use Read Frog, get help from the team, or join other users in the community.
-    help:
-      title: Help
-    tutorial:
-      title: Tutorial
-      description: Read the docs and learn how to use Read Frog
-    email:
-      title: Email us
-      description: Reach the team directly at contact@readfrog.app
-    featureRequest:
-      title: Feature request
-      description: Suggest an idea and vote on what the team builds next
-    bugReport:
-      title: Report a bug
-      description: Open a support ticket and follow it until it is fixed
-    community:
-      title: Community
-    discord:
-      title: Discord
-      description: Chat with the team and other users in real time
-    wechat:
-      title: WeChat group
-      description: Scan the QR code to join the WeChat discussion group
-      qrCodeAlt: WeChat QR code
+
   apiProviders:
     title: API Providers
     pageDescription: Connect the AI services Read Frog calls, then choose which one runs each feature.

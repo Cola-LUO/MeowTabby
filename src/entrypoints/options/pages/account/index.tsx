@@ -61,7 +61,7 @@ function LoginForm({
         login.mutate()
       }}
     >
-      <h3 className="text-sm font-medium">{i18n.t("billing.login.title")}</h3>
+      <h3 className="text-2xl font-medium">{i18n.t("billing.login.title")}</h3>
       <div className="grid gap-1.5">
         <Label htmlFor="billing-login-email">{i18n.t("billing.login.email")}</Label>
         <Input
@@ -135,7 +135,7 @@ function RegisterForm({
         register.mutate()
       }}
     >
-      <h3 className="text-sm font-medium">{i18n.t("billing.register.title")}</h3>
+      <h3 className="text-2xl font-medium">{i18n.t("billing.register.title")}</h3>
       <div className="grid gap-1.5">
         <Label htmlFor="billing-register-name">{i18n.t("billing.register.displayName")}</Label>
         <Input
@@ -369,25 +369,13 @@ function AccountAuthForms({ onSession }: { onSession: (session: BillingSession) 
       <p className="text-sm text-muted-foreground">{i18n.t("billing.account.loginOrRegister")}</p>
       {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
       {view === "login" && (
-        <div className="grid max-w-sm gap-8">
-          <LoginForm
-            onSession={onSession}
-            onSwitchView={(next) => {
-              setNotice(null)
-              setView(next)
-            }}
-          />
-          <RegisterForm
-            onRegistered={(pending) => {
-              setPendingRegistration(pending)
-              setView("verify")
-            }}
-            onSwitchView={(next) => {
-              setNotice(null)
-              setView(next)
-            }}
-          />
-        </div>
+        <LoginForm
+          onSession={onSession}
+          onSwitchView={(next) => {
+            setNotice(null)
+            setView(next)
+          }}
+        />
       )}
       {view === "register" && (
         <RegisterForm
@@ -499,7 +487,9 @@ export function AccountPage() {
   return (
     <PageLayout
       title={i18n.t("options.account.title")}
-      description={i18n.t("options.account.description")}
+      description={
+        <span className="whitespace-pre-line">{i18n.t("options.account.description")}</span>
+      }
     >
       {session ? (
         <AccountOverview session={session} />

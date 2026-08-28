@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "Зарегистрируйтесь, войдите и пополните баланс, чтобы использовать встроенный ИИ-перевод.\nБез абонентской платы: платите за использование, остаток возвращается."
   batchSavings:
     savedCost: Сэкономлено примерно $1% расходов на API
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: Переключить боковую панель
     settings: Настройки
     features: Функции
-    product: Продукт
   tools:
     translationHub: Центр переводов
-  product:
-    roadmap: Дорожная карта
-  helpAndCommunity:
-    title: Помощь и сообщество
-    pageDescription: Узнайте, как пользоваться Read Frog, обратитесь за помощью к команде или присоединяйтесь к сообществу.
-    help:
-      title: Помощь
-    tutorial:
-      title: Руководство
-      description: Прочитайте документацию и узнайте, как пользоваться Read Frog
-    email:
-      title: Написать нам
-      description: Свяжитесь с командой напрямую по адресу contact@readfrog.app
-    featureRequest:
-      title: Предложить функцию
-      description: Предложите идею и голосуйте за то, что команда сделает дальше
-    bugReport:
-      title: Сообщить об ошибке
-      description: Создайте обращение в поддержку и следите за ним до решения
-    community:
-      title: Сообщество
-    discord:
-      title: Discord
-      description: Общайтесь с командой и другими пользователями в реальном времени
-    wechat:
-      title: Группа в WeChat
-      description: Отсканируйте QR-код, чтобы вступить в группу обсуждения в WeChat
-      qrCodeAlt: QR-код WeChat
+
   apiProviders:
     title: API-провайдеры
     pageDescription: Подключите ИИ-сервисы, которые вызывает Read Frog, и выберите провайдера для каждой функции.

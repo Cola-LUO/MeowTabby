@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "登録・ログイン後、チャージして内蔵のAI翻訳サービスを利用。\n月額制は不要。使った分だけ課金、残高は返金可能。"
   batchSavings:
     savedCost: API コストを約 $1% 削減
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: サイドバーを切り替え
     settings: 設定
     features: 機能
-    product: 製品
   tools:
     translationHub: 翻訳ハブ
-  product:
-    roadmap: ロードマップ
-  helpAndCommunity:
-    title: ヘルプとコミュニティ
-    pageDescription: Read Frog の使い方を学び、チームに相談したり、コミュニティで他のユーザーと交流したりできます。
-    help:
-      title: ヘルプ
-    tutorial:
-      title: 使い方ガイド
-      description: ドキュメントを読んで Read Frog の使い方を学べます
-    email:
-      title: メールで問い合わせ
-      description: contact@readfrog.app からチームに直接連絡できます
-    featureRequest:
-      title: 機能リクエスト
-      description: アイデアを提案し、次に開発する機能に投票できます
-    bugReport:
-      title: 不具合を報告
-      description: サポートチケットを作成し、解決までの状況を追えます
-    community:
-      title: コミュニティ
-    discord:
-      title: Discord
-      description: チームや他のユーザーとリアルタイムで交流できます
-    wechat:
-      title: WeChat グループ
-      description: QR コードをスキャンして WeChat のディスカッショングループに参加
-      qrCodeAlt: WeChat QR コード
+
   apiProviders:
     title: APIプロバイダー
     pageDescription: Read Frog が呼び出す AI サービスを接続し、各機能で使うものを選びます。

@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "Đăng ký, đăng nhập, nạp tiền để dùng dịch vụ AI dịch tích hợp.\nKhông cần gói tháng, trả tiền theo mức dùng, hoàn tiền dư không dùng."
   batchSavings:
     savedCost: Tiết kiệm khoảng $1% chi phí API
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: Bật/tắt thanh bên
     settings: Cài đặt
     features: Tính năng
-    product: Sản phẩm
   tools:
     translationHub: Trung tâm Dịch thuật
-  product:
-    roadmap: Lộ trình
-  helpAndCommunity:
-    title: Trợ giúp và cộng đồng
-    pageDescription: Tìm hiểu cách dùng Read Frog, nhờ nhóm hỗ trợ, hoặc tham gia cộng đồng cùng những người dùng khác.
-    help:
-      title: Trợ giúp
-    tutorial:
-      title: Hướng dẫn
-      description: Đọc tài liệu để biết cách sử dụng Read Frog
-    email:
-      title: Gửi email cho chúng tôi
-      description: Liên hệ trực tiếp với nhóm qua contact@readfrog.app
-    featureRequest:
-      title: Đề xuất tính năng
-      description: Đề xuất ý tưởng và bình chọn cho tính năng nhóm sẽ làm tiếp theo
-    bugReport:
-      title: Báo lỗi
-      description: Mở phiếu hỗ trợ và theo dõi cho đến khi được khắc phục
-    community:
-      title: Cộng đồng
-    discord:
-      title: Discord
-      description: Trò chuyện trực tiếp với nhóm và những người dùng khác
-    wechat:
-      title: Nhóm WeChat
-      description: Quét mã QR để tham gia nhóm thảo luận trên WeChat
-      qrCodeAlt: Mã QR WeChat
+
   apiProviders:
     title: Nhà cung cấp API
     pageDescription: Kết nối các dịch vụ AI mà Read Frog sử dụng và chọn dịch vụ cho từng tính năng.

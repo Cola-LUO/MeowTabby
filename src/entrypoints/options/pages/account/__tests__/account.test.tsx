@@ -42,13 +42,18 @@ beforeEach(() => {
 })
 
 describe("AccountPage", () => {
-  it("shows login and register entries when signed out", async () => {
+  it("shows only login form when signed out, register appears after clicking register link", async () => {
     vi.mocked(getBillingSession).mockResolvedValue(null)
     renderPage()
     await waitFor(() => {
       expect(screen.getByText("billing.login.title")).toBeTruthy()
     })
-    expect(screen.getByText("billing.register.switchToLogin")).toBeTruthy()
+    // 初始仅登录框：注册框的「display name」字段不应存在
+    expect(screen.queryByLabelText("billing.register.displayName")).toBeNull()
+    // 点击登录框内的「注册新账号」
+    fireEvent.click(screen.getByText("billing.login.switchToRegister"))
+    // 跳转后注册框出现
+    expect(screen.getByLabelText("billing.register.displayName")).toBeTruthy()
   })
 
   it("logs in and stores the session", async () => {

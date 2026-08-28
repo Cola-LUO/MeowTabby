@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "Regístrate, inicia sesión y recarga para usar el servicio de traducción IA integrado.\nSin mensualidad: pagas solo lo que usas y el saldo es reembolsable."
   batchSavings:
     savedCost: Ahorro aprox. del $1% en costes de API
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: Alternar barra lateral
     settings: Configuración
     features: Funciones
-    product: Producto
   tools:
     translationHub: Centro de traducción
-  product:
-    roadmap: Hoja de ruta
-  helpAndCommunity:
-    title: Ayuda y comunidad
-    pageDescription: Aprende a usar Read Frog, pide ayuda al equipo o únete a otros usuarios en la comunidad.
-    help:
-      title: Ayuda
-    tutorial:
-      title: Tutorial
-      description: Lee la documentación y aprende a usar Read Frog
-    email:
-      title: Escríbenos
-      description: Contacta directamente con el equipo en contact@readfrog.app
-    featureRequest:
-      title: Sugerir una función
-      description: Propón una idea y vota lo que el equipo construirá a continuación
-    bugReport:
-      title: Informar de un fallo
-      description: Abre un ticket de soporte y síguelo hasta que se resuelva
-    community:
-      title: Comunidad
-    discord:
-      title: Discord
-      description: Habla en tiempo real con el equipo y con otros usuarios
-    wechat:
-      title: Grupo de WeChat
-      description: Escanea el código QR para unirte al grupo de discusión de WeChat
-      qrCodeAlt: Código QR de WeChat
+
   apiProviders:
     title: Proveedores de API
     pageDescription: Conecta los servicios de IA que usa Read Frog y elige cuál se encarga de cada función.

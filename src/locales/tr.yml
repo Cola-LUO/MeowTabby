@@ -14,13 +14,13 @@ billing:
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
   account:
-    title: Account
+    title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
-    loginOrRegister: Log in or register to use built-in AI translation
+    loginOrRegister: " "
   login:
     title: Log in
     email: Email
@@ -130,7 +130,7 @@ errorRecovery:
 options:
   account:
     title: Account
-    description: Log in, register, and manage your balance
+    description: "Kayıt olun, giriş yapın ve yerleşik AI çeviri hizmetini kullanmak için bakiye yükleyin.\nAylık paket yok; yalnızca kullandığınız kadar ödersiniz, bakiye iade edilebilir."
   batchSavings:
     savedCost: API maliyetlerinde yaklaşık %$1 tasarruf
   commandPalette:
@@ -141,37 +141,9 @@ options:
     toggle: Kenar çubuğunu aç/kapat
     settings: Ayarlar
     features: Özellikler
-    product: Ürün
   tools:
     translationHub: Çeviri Merkezi
-  product:
-    roadmap: Yol Haritası
-  helpAndCommunity:
-    title: Yardım ve topluluk
-    pageDescription: Read Frog'u nasıl kullanacağınızı öğrenin, ekipten yardım alın ya da toplulukta diğer kullanıcılara katılın.
-    help:
-      title: Yardım
-    tutorial:
-      title: Rehber
-      description: Belgeleri okuyun ve Read Frog'u nasıl kullanacağınızı öğrenin
-    email:
-      title: Bize e-posta gönderin
-      description: Ekibe doğrudan contact@readfrog.app adresinden ulaşın
-    featureRequest:
-      title: Özellik önerisi
-      description: Bir fikir önerin ve ekibin sırada ne geliştireceğini oylayın
-    bugReport:
-      title: Hata bildir
-      description: Destek talebi açın ve çözülene kadar takip edin
-    community:
-      title: Topluluk
-    discord:
-      title: Discord
-      description: Ekiple ve diğer kullanıcılarla anlık olarak sohbet edin
-    wechat:
-      title: WeChat grubu
-      description: WeChat tartışma grubuna katılmak için QR kodu tarayın
-      qrCodeAlt: WeChat QR kodu
+
   apiProviders:
     title: API Sağlayıcıları
     pageDescription: Read Frog'un çağırdığı yapay zekâ servislerini bağlayın ve her özelliğin hangisini kullanacağını seçin.

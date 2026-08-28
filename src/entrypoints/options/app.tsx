@@ -41,9 +41,6 @@ const TextToSpeechPage = lazy(() =>
 const AccountPage = lazy(() =>
   import("./pages/account").then((module) => ({ default: module.AccountPage })),
 )
-const HelpAndCommunityPage = lazy(() =>
-  import("./pages/help-and-community").then((module) => ({ default: module.HelpAndCommunityPage })),
-)
 const CustomCssPage = lazy(() =>
   import("./pages/translation/translation-style/custom-css").then((module) => ({
     default: module.CustomCssPage,
@@ -119,7 +116,6 @@ const ROUTE_COMPONENTS: Record<RoutePath, ComponentType> = {
   "/input-translation": InputTranslationPage,
   "/tts": TextToSpeechPage,
   "/account": AccountPage,
-  "/help-and-community": HelpAndCommunityPage,
   "/preference/config-backup": ConfigBackupPage,
   "/preference/extension-activation": ExtensionActivationPage,
   "/page-translation/custom-css": CustomCssPage,
