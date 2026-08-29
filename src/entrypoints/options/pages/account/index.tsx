@@ -120,6 +120,7 @@ function RegisterForm({
   const [displayName, setDisplayName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
 
   const register = useMutation({
@@ -134,6 +135,10 @@ function RegisterForm({
       onSubmit={(event) => {
         event.preventDefault()
         setError(null)
+        if (password !== confirmPassword) {
+          setError(i18n.t("billing.errors.passwordMismatch"))
+          return
+        }
         register.mutate()
       }}
     >
@@ -166,6 +171,19 @@ function RegisterForm({
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-register-password-confirm">
+          {i18n.t("billing.register.confirmPassword")}
+        </Label>
+        <Input
+          id="billing-register-password-confirm"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
           required
         />
       </div>
@@ -265,6 +283,7 @@ function ResetPasswordForm({ initialEmail, onDone }: { initialEmail: string; onD
   const [email, setEmail] = useState(initialEmail)
   const [code, setCode] = useState("")
   const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [codeSent, setCodeSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -289,6 +308,10 @@ function ResetPasswordForm({ initialEmail, onDone }: { initialEmail: string; onD
       onSubmit={(event) => {
         event.preventDefault()
         setError(null)
+        if (newPassword !== confirmPassword) {
+          setError(i18n.t("billing.errors.passwordMismatch"))
+          return
+        }
         reset.mutate()
       }}
     >
@@ -341,6 +364,19 @@ function ResetPasswordForm({ initialEmail, onDone }: { initialEmail: string; onD
           required
         />
       </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-reset-password-confirm">
+          {i18n.t("billing.reset.confirmPassword")}
+        </Label>
+        <Input
+          id="billing-reset-password-confirm"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          required
+        />
+      </div>
       <ErrorText message={error} />
       <Button type="submit" disabled={reset.isPending || code.length !== 6}>
         {i18n.t("billing.reset.submit")}
@@ -362,6 +398,7 @@ function ChangePasswordForm({
 }) {
   const [code, setCode] = useState("")
   const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [codeSent, setCodeSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -391,6 +428,10 @@ function ChangePasswordForm({
       onSubmit={(event) => {
         event.preventDefault()
         setError(null)
+        if (newPassword !== confirmPassword) {
+          setError(i18n.t("billing.errors.passwordMismatch"))
+          return
+        }
         change.mutate()
       }}
     >
@@ -433,6 +474,19 @@ function ChangePasswordForm({
           minLength={8}
           value={newPassword}
           onChange={(event) => setNewPassword(event.target.value)}
+          required
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-changepw-password-confirm">
+          {i18n.t("billing.changePassword.confirmPassword")}
+        </Label>
+        <Input
+          id="billing-changepw-password-confirm"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
           required
         />
       </div>

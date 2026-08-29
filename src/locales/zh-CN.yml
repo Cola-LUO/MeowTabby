@@ -13,6 +13,7 @@ billing:
     balanceInsufficient: 余额不足，请充值
     sessionExpired: 登录已过期，请重新登录
     generic: 请求失败，请稍后重试
+    passwordMismatch: 两次输入的新密码不一致，请重新输入
   account:
     title: " "
     description: 登录、注册并管理翻译余额
@@ -35,6 +36,7 @@ billing:
     displayName: 昵称
     email: 邮箱
     password: 密码
+    confirmPassword: 确认密码
     submit: 注册
     switchToLogin: 已有账号？去登录
     codeTitle: 输入验证码
@@ -52,6 +54,7 @@ billing:
     codeSent: 验证码已发送至 $1
     code: 验证码
     newPassword: 新密码
+    confirmPassword: 确认新密码
     submit: 重置密码
     backToLogin: 返回登录
     success: 密码已重置，请使用新密码登录
@@ -59,6 +62,7 @@ billing:
     description: 将向你的登录邮箱 $1 发送验证码，验证后即可设置新密码。
     code: 验证码
     newPassword: 新密码
+    confirmPassword: 确认新密码
     submit: 提交
     success: 密码已修改
     cancel: 取消

@@ -13,6 +13,7 @@ billing:
     balanceInsufficient: Balance insufficient. Please recharge.
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
+    passwordMismatch: The two passwords do not match.
   account:
     title: " "
     description: Log in, register, and manage your translation balance
@@ -35,6 +36,7 @@ billing:
     displayName: Nickname
     email: Email
     password: Password
+    confirmPassword: Confirm password
     submit: Register
     switchToLogin: Already have an account? Log in
     codeTitle: Enter verification code
@@ -52,6 +54,7 @@ billing:
     codeSent: A verification code has been sent to $1
     code: Verification code
     newPassword: New password
+    confirmPassword: Confirm new password
     submit: Reset password
     backToLogin: Back to login
     success: Password reset. Please log in with your new password.
@@ -59,6 +62,7 @@ billing:
     description: We will send a verification code to your sign-in email ($1). Once verified, you can set a new password.
     code: Verification code
     newPassword: New password
+    confirmPassword: Confirm new password
     submit: Submit
     success: Password changed
     cancel: Cancel

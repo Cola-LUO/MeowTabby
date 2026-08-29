@@ -61,6 +61,7 @@ describe("AccountPage", () => {
     fireEvent.click(screen.getByText("billing.login.switchToRegister"))
     // 跳转后注册框出现
     expect(screen.getByLabelText("billing.register.displayName")).toBeTruthy()
+    expect(screen.getByLabelText("billing.register.confirmPassword")).toBeTruthy()
   })
 
   it("logs in and stores the session", async () => {
@@ -107,6 +108,9 @@ describe("AccountPage", () => {
     fireEvent.change(screen.getByLabelText("billing.register.password"), {
       target: { value: "password1" },
     })
+    fireEvent.change(screen.getByLabelText("billing.register.confirmPassword"), {
+      target: { value: "password1" },
+    })
     fireEvent.click(screen.getByText("billing.register.submit"))
     await waitFor(() => screen.getByLabelText("billing.register.code"))
     fireEvent.change(screen.getByLabelText("billing.register.code"), {
@@ -124,6 +128,45 @@ describe("AccountPage", () => {
     })
   })
 
+  it("register: mismatched confirm password blocks submission, matching one submits", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue(null)
+    vi.mocked(billingRegister).mockResolvedValue({ message: "ok", user_id: "u1", mail_sent: true })
+    renderPage()
+    await waitFor(() => screen.getByText("billing.login.switchToRegister"))
+    fireEvent.click(screen.getByText("billing.login.switchToRegister"))
+    fireEvent.change(screen.getByLabelText("billing.register.displayName"), {
+      target: { value: "喵" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.register.email"), {
+      target: { value: "a@b.c" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.register.password"), {
+      target: { value: "password1" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.register.confirmPassword"), {
+      target: { value: "password2" },
+    })
+    fireEvent.click(screen.getByText("billing.register.submit"))
+    // 两次密码不一致：前端拦截，显示错误且不请求后端
+    await waitFor(() => {
+      expect(screen.getByText("billing.errors.passwordMismatch")).toBeTruthy()
+    })
+    expect(billingRegister).not.toHaveBeenCalled()
+    // 改成一致后放行，进入验证码视图
+    fireEvent.change(screen.getByLabelText("billing.register.confirmPassword"), {
+      target: { value: "password1" },
+    })
+    fireEvent.click(screen.getByText("billing.register.submit"))
+    await waitFor(() => {
+      expect(billingRegister).toHaveBeenCalledWith({
+        email: "a@b.c",
+        password: "password1",
+        displayName: "喵",
+      })
+    })
+    await waitFor(() => screen.getByLabelText("billing.register.code"))
+  })
+
   it("shows back-to-login link in the verify view", async () => {
     vi.mocked(getBillingSession).mockResolvedValue(null)
     vi.mocked(billingRegister).mockResolvedValue({ message: "ok", user_id: "u1", mail_sent: true })
@@ -137,6 +180,9 @@ describe("AccountPage", () => {
       target: { value: "a@b.c" },
     })
     fireEvent.change(screen.getByLabelText("billing.register.password"), {
+      target: { value: "password1" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.register.confirmPassword"), {
       target: { value: "password1" },
     })
     fireEvent.click(screen.getByText("billing.register.submit"))
@@ -153,10 +199,11 @@ describe("AccountPage", () => {
     renderPage()
     await waitFor(() => screen.getByText("billing.login.forgotPassword"))
     fireEvent.click(screen.getByText("billing.login.forgotPassword"))
-    // 单页式：进入找回密码后，邮箱、验证码、新密码三个输入框应同时出现
+    // 单页式：进入找回密码后，邮箱、验证码、新密码、确认新密码四个输入框应同时出现
     expect(screen.getByLabelText("billing.reset.email")).toBeTruthy()
     expect(screen.getByLabelText("billing.reset.code")).toBeTruthy()
     expect(screen.getByLabelText("billing.reset.newPassword")).toBeTruthy()
+    expect(screen.getByLabelText("billing.reset.confirmPassword")).toBeTruthy()
   })
 
   it("forgot password: carries login email, sends code, then resets password", async () => {
@@ -180,6 +227,9 @@ describe("AccountPage", () => {
     fireEvent.change(screen.getByLabelText("billing.reset.newPassword"), {
       target: { value: "newpass1" },
     })
+    fireEvent.change(screen.getByLabelText("billing.reset.confirmPassword"), {
+      target: { value: "newpass1" },
+    })
     fireEvent.click(screen.getByText("billing.reset.submit"))
     await waitFor(() => {
       expect(billingResetPassword).toHaveBeenCalledWith({
@@ -191,6 +241,45 @@ describe("AccountPage", () => {
     // 成功后回到登录页
     await waitFor(() => {
       expect(screen.getByText("billing.login.title")).toBeTruthy()
+    })
+  })
+
+  it("forgot password: mismatched confirm password blocks submission, matching one submits", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue(null)
+    vi.mocked(billingForgotPassword).mockResolvedValue({ message: "ok" })
+    vi.mocked(billingResetPassword).mockResolvedValue({ message: "ok" })
+    renderPage()
+    await waitFor(() => screen.getByLabelText("billing.login.email"))
+    fireEvent.click(screen.getByText("billing.login.forgotPassword"))
+    fireEvent.change(screen.getByLabelText("billing.reset.email"), {
+      target: { value: "a@b.c" },
+    })
+    fireEvent.click(screen.getByText("billing.reset.sendCode"))
+    await waitFor(() => screen.getByText("billing.reset.resend"))
+    fireEvent.change(screen.getByLabelText("billing.reset.code"), { target: { value: "123456" } })
+    fireEvent.change(screen.getByLabelText("billing.reset.newPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.reset.confirmPassword"), {
+      target: { value: "newpass2" },
+    })
+    fireEvent.click(screen.getByText("billing.reset.submit"))
+    // 两次新密码不一致：前端拦截，显示错误且不请求后端
+    await waitFor(() => {
+      expect(screen.getByText("billing.errors.passwordMismatch")).toBeTruthy()
+    })
+    expect(billingResetPassword).not.toHaveBeenCalled()
+    // 改成一致后放行
+    fireEvent.change(screen.getByLabelText("billing.reset.confirmPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.click(screen.getByText("billing.reset.submit"))
+    await waitFor(() => {
+      expect(billingResetPassword).toHaveBeenCalledWith({
+        email: "a@b.c",
+        code: "123456",
+        newPassword: "newpass1",
+      })
     })
   })
 
@@ -248,10 +337,11 @@ describe("AccountPage", () => {
     })
     renderPage()
     await waitFor(() => screen.getByText("billing.account.infoTitle"))
-    // 打开修改密码表单：验证码、新密码输入框同页可见
+    // 打开修改密码表单：验证码、新密码、确认新密码输入框同页可见
     fireEvent.click(screen.getByText("billing.account.changePassword"))
     expect(screen.getByLabelText("billing.changePassword.code")).toBeTruthy()
     expect(screen.getByLabelText("billing.changePassword.newPassword")).toBeTruthy()
+    expect(screen.getByLabelText("billing.changePassword.confirmPassword")).toBeTruthy()
     // 发送验证码（到登录邮箱），按钮变为「重新发送」
     fireEvent.click(screen.getByText("billing.reset.sendCode"))
     await waitFor(() => {
@@ -263,6 +353,9 @@ describe("AccountPage", () => {
       target: { value: "123456" },
     })
     fireEvent.change(screen.getByLabelText("billing.changePassword.newPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.changePassword.confirmPassword"), {
       target: { value: "newpass1" },
     })
     fireEvent.click(screen.getByText("billing.changePassword.submit"))
@@ -283,5 +376,43 @@ describe("AccountPage", () => {
     await waitFor(() => {
       expect(screen.getByText("billing.changePassword.success")).toBeTruthy()
     })
+  })
+
+  it("change password: mismatched confirm password blocks submission", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue({
+      sessionId: "sess-1",
+      email: "a@b.c",
+      displayName: "喵",
+      signedInAt: 1,
+    })
+    vi.mocked(billingMe).mockResolvedValue({
+      user_id: "u1",
+      email: "a@b.c",
+      display_name: "喵",
+      email_verified: true,
+      balance: "3.1400",
+      total_recharged: "5.0000",
+      total_spent: "1.8600",
+      total_tokens: 123,
+      recent_calls: [],
+    })
+    renderPage()
+    await waitFor(() => screen.getByText("billing.account.infoTitle"))
+    fireEvent.click(screen.getByText("billing.account.changePassword"))
+    fireEvent.change(screen.getByLabelText("billing.changePassword.code"), {
+      target: { value: "123456" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.changePassword.newPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.changePassword.confirmPassword"), {
+      target: { value: "different1" },
+    })
+    fireEvent.click(screen.getByText("billing.changePassword.submit"))
+    // 两次新密码不一致：前端拦截，显示错误且不请求后端
+    await waitFor(() => {
+      expect(screen.getByText("billing.errors.passwordMismatch")).toBeTruthy()
+    })
+    expect(billingResetPassword).not.toHaveBeenCalled()
   })
 })
