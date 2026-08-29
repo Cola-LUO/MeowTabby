@@ -1,10 +1,7 @@
 import type { ProvidersConfig } from "@/types/config/provider"
 import { createStore } from "jotai"
 import { describe, expect, it, vi } from "vitest"
-import {
-  BUILT_IN_AI_ADVANCE_PROVIDER_ID,
-  BUILT_IN_AI_PROVIDER_ID,
-} from "@/utils/constants/provider-ids"
+import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { selectedProviderIdsAtom } from "../atoms"
 
@@ -36,14 +33,15 @@ const LOCAL_DISABLED = {
 } as const
 
 describe("selectedProviderIdsAtom", () => {
-  it("defaults to enabled local translate providers plus both built-in AI ids", () => {
+  it("defaults to enabled local translate providers plus the visible built-in AI id", () => {
     const store = createStore()
     void store.set(configFieldsAtomMap.providersConfig, [LOCAL_ENABLED, LOCAL_DISABLED])
 
+    // The advance tier is hidden from the hub's default card list — billing
+    // serves one model, so a second built-in card would be a duplicate.
     expect(store.get(selectedProviderIdsAtom)).toEqual([
       LOCAL_ENABLED.id,
       BUILT_IN_AI_PROVIDER_ID,
-      BUILT_IN_AI_ADVANCE_PROVIDER_ID,
     ])
   })
 
@@ -54,7 +52,7 @@ describe("selectedProviderIdsAtom", () => {
     ])
 
     const ids = store.get(selectedProviderIdsAtom)
-    expect(ids).toEqual([BUILT_IN_AI_PROVIDER_ID, BUILT_IN_AI_ADVANCE_PROVIDER_ID])
+    expect(ids).toEqual([BUILT_IN_AI_PROVIDER_ID])
   })
 
   it("still honors an explicit override over the default", () => {

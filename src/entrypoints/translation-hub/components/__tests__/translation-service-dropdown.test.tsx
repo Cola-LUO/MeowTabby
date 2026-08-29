@@ -160,20 +160,21 @@ describe("TranslationServiceDropdown", () => {
     mockHostedStatus(true)
   })
 
-  it("renders a built-in AI group with both tiers after the local groups", () => {
+  it("renders a built-in AI group after the local groups with the advance tier hidden", () => {
     render(<TranslationServiceDropdown />)
 
     expect(screen.getByText("translateService.builtInModels")).toBeInTheDocument()
     const normal = screen.getByRole("option", {
       name: "icon:options.apiProviders.providers.name.builtInAi",
     })
-    const advance = screen.getByRole("option", {
-      name: "icon:options.apiProviders.providers.name.builtInAiAdvance",
-    })
+    // The advance tier is hidden from pickers: billing serves one model at one
+    // price, so a second built-in option would be a duplicate.
+    expect(
+      screen.queryByText("options.apiProviders.providers.name.builtInAiAdvance"),
+    ).not.toBeInTheDocument()
     // The built-in group closes the list: the user's own providers stay first.
     const localItem = screen.getByRole("option", { name: "icon:OpenAI" })
     expect(localItem.compareDocumentPosition(normal) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(normal.compareDocumentPosition(advance) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it("keeps the local LLM and normal translator groups rendering", () => {
@@ -185,17 +186,16 @@ describe("TranslationServiceDropdown", () => {
     expect(screen.getByRole("option", { name: "icon:Microsoft Translator" })).toBeInTheDocument()
   })
 
-  it("grays both built-in items out and shows login guidance when signed out", () => {
+  it("grays the built-in item out and shows login guidance when signed out", () => {
     mockHostedStatus(false)
 
     render(<TranslationServiceDropdown />)
 
-    for (const name of [
-      "icon:options.apiProviders.providers.name.builtInAi",
-      "icon:options.apiProviders.providers.name.builtInAiAdvance",
-    ]) {
-      expect(screen.getByRole("option", { name })).toHaveAttribute("data-disabled", "true")
-    }
+    expect(
+      screen.getByRole("option", {
+        name: "icon:options.apiProviders.providers.name.builtInAi",
+      }),
+    ).toHaveAttribute("data-disabled", "true")
     expect(screen.getByText("hostedAi.availability.authenticationRequired")).toBeInTheDocument()
     expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
 
@@ -218,9 +218,10 @@ describe("TranslationServiceDropdown", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("names the Ultra wall when only the advance tier is Ultra-gated", () => {
-    // Signed-in non-Ultra account: the normal tier stays runnable, the advance
-    // tier is walled by the plan — the hint must not tell this user to log in.
+  it("shows no wall hint for a hidden Ultra-gated advance tier", () => {
+    // Signed-in non-Ultra account: the visible normal tier stays runnable. The
+    // advance tier reports ultra_required but is hidden from pickers, so no
+    // option carries the wall and the hint must stay silent.
     mockHostedAiStatus(
       hostedStatus({
         normal: AVAILABLE_TIER,
@@ -239,12 +240,7 @@ describe("TranslationServiceDropdown", () => {
     expect(
       screen.getByRole("option", { name: "icon:options.apiProviders.providers.name.builtInAi" }),
     ).not.toHaveAttribute("data-disabled")
-    expect(
-      screen.getByRole("option", {
-        name: "icon:options.apiProviders.providers.name.builtInAiAdvance",
-      }),
-    ).toHaveAttribute("data-disabled", "true")
-    expect(screen.getByText("hostedAi.availability.ultraRequired")).toBeInTheDocument()
+    expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
     expect(screen.queryByText("hostedAi.availability.authenticationRequired")).not.toBeInTheDocument()
   })
 

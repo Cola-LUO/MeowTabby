@@ -40,6 +40,7 @@ import {
   BUILT_IN_AI_ADVANCE_PROVIDER_ID,
   getBuiltInAiProviderName,
   isBuiltInAiProviderId,
+  isHiddenBuiltInAiProviderId,
 } from "@/utils/providers/provider-registry"
 import { ConfigItem } from "../../../components/config-item"
 import { EntityEditor } from "../../../components/entity-editor"
@@ -332,9 +333,11 @@ function BuiltInProviderSection() {
         {i18n.t("options.apiProviders.builtInProvider" as never)}
       </h3>
       <div className="flex flex-col gap-4 pt-2">
-        {BUILT_IN_AI_PROVIDER_IDS.map((providerId) => (
-          <BuiltInProviderCard key={providerId} providerId={providerId} />
-        ))}
+        {BUILT_IN_AI_PROVIDER_IDS.filter((providerId) => !isHiddenBuiltInAiProviderId(providerId)).map(
+          (providerId) => (
+            <BuiltInProviderCard key={providerId} providerId={providerId} />
+          ),
+        )}
       </div>
     </section>
   )

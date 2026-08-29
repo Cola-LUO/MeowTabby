@@ -10,3 +10,14 @@ export const BUILT_IN_AI_PROVIDER_IDS = [
 export type BuiltInAiProviderId = (typeof BUILT_IN_AI_PROVIDER_IDS)[number]
 // Re-exported from the contract so a tier added server-side surfaces here.
 export type { HostedAiModelTier } from "@read-frog/api-contract"
+
+/**
+ * Tiers kept resolvable but hidden from every picker. The billing backend
+ * serves a single model at a single price and never receives the tier, so the
+ * advance entry duplicates the normal one; existing selections keep working
+ * through resolveProviderRefForCapability. Clear this list when the backend
+ * gains a real second tier.
+ */
+export const HIDDEN_BUILT_IN_AI_PROVIDER_IDS: readonly BuiltInAiProviderId[] = [
+  BUILT_IN_AI_ADVANCE_PROVIDER_ID,
+]

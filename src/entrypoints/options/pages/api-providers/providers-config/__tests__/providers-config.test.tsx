@@ -290,13 +290,13 @@ describe("ProvidersConfig", () => {
     }
   })
 
-  it("lists both built-in provider cards", () => {
+  it("lists only the normal built-in provider card", () => {
     renderProvidersConfig()
 
     expect(screen.getByText("options.apiProviders.providers.name.builtInAi")).toBeInTheDocument()
     expect(
-      screen.getByText("options.apiProviders.providers.name.builtInAiAdvance"),
-    ).toBeInTheDocument()
+      screen.queryByText("options.apiProviders.providers.name.builtInAiAdvance"),
+    ).not.toBeInTheDocument()
   })
 
   it("renders the Ultra editor with its own attribution and all three feature assignments", () => {
@@ -378,24 +378,17 @@ describe("ProvidersConfig", () => {
 
   it("counts default assignments on the free Built-in AI card badge", () => {
     // Note suggestion defaults to the OpenAI provider, so only the built-in
-    // Dictionary action counts on the free card; the Ultra card has nothing
-    // assigned and shows no badge.
+    // Dictionary action counts on the card badge.
     const { container } = renderProvidersConfig()
 
     const freeCard = container.querySelector(`[data-provider-id="${BUILT_IN_AI_PROVIDER_ID}"]`)
-    const ultraCard = container.querySelector(
-      `[data-provider-id="${BUILT_IN_AI_ADVANCE_PROVIDER_ID}"]`,
-    )
-    if (!(freeCard instanceof HTMLElement) || !(ultraCard instanceof HTMLElement)) {
-      throw new Error("Built-in provider cards not rendered")
+    if (!(freeCard instanceof HTMLElement)) {
+      throw new Error("Built-in provider card not rendered")
     }
 
     expect(
       within(freeCard).getByText("options.apiProviders.badges.featureCount:1"),
     ).toBeInTheDocument()
-    expect(
-      within(ultraCard).queryByText(/options\.apiProviders\.badges\.featureCount/),
-    ).not.toBeInTheDocument()
   })
 
   it("counts language detection on the assigned Built-in AI card badge", () => {

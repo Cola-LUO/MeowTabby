@@ -92,15 +92,12 @@ describe("feature providers", () => {
     it("marks registry-backed system providers for selector grouping", () => {
       const providers = getSelectableProvidersForCapability("customAction", [])
 
+      // Only the normal tier is selectable; the advance tier is hidden from
+      // pickers (billing serves one model) while staying resolvable.
       expect(providers).toEqual([
         expect.objectContaining({
           kind: "system",
           id: "read-frog-free-ai",
-          logo: expect.any(Function),
-        }),
-        expect.objectContaining({
-          kind: "system",
-          id: "read-frog-advance-ai",
           logo: expect.any(Function),
         }),
       ])

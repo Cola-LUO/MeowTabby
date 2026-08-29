@@ -12,6 +12,7 @@ import {
   BUILT_IN_AI_PROVIDER_ID,
   BUILT_IN_AI_PROVIDER_IDS,
   BUILT_IN_AI_ADVANCE_PROVIDER_ID,
+  HIDDEN_BUILT_IN_AI_PROVIDER_IDS,
   type BuiltInAiProviderId,
   type HostedAiModelTier,
 } from "@/utils/constants/provider-ids"
@@ -171,6 +172,10 @@ export function isSystemProviderId(providerId: string): boolean {
   return !!getSystemProviderDef(providerId)
 }
 
+export function isHiddenBuiltInAiProviderId(providerId: string): boolean {
+  return (HIDDEN_BUILT_IN_AI_PROVIDER_IDS as readonly string[]).includes(providerId)
+}
+
 export function getLocalProviderPredicateForCapability<C extends ProviderCapability>(
   capability: C,
 ): ProviderConfigPredicate<ProviderConfigForCapability<C>> {
@@ -231,6 +236,7 @@ export function getSelectableProvidersForCapability(
   providersConfig: ProvidersConfig,
 ): ProviderSelectorOption[] {
   const systemProviders = getSystemProviderDefs()
+    .filter((def) => !isHiddenBuiltInAiProviderId(def.id))
     .filter((def) => def.capabilities.includes(capability))
     .map(createSystemProviderSelectorItem)
 

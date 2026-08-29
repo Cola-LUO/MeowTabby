@@ -27,7 +27,7 @@ const PROVIDERS_CONFIG: ProvidersConfig = [
 ]
 
 describe("provider-registry translationHub capability", () => {
-  it("lists both built-in AI providers for translationHub", () => {
+  it("enumerates both built-in AI providers for translationHub (validation still sees the hidden tier)", () => {
     expect(getSystemProviderIdsForCapability("translationHub")).toEqual([
       BUILT_IN_AI_PROVIDER_ID,
       BUILT_IN_AI_ADVANCE_PROVIDER_ID,
@@ -37,11 +37,11 @@ describe("provider-registry translationHub capability", () => {
   it("offers the system providers plus enabled local translate providers as selectable", () => {
     const options = getSelectableProvidersForCapability("translationHub", PROVIDERS_CONFIG)
 
+    // The advance tier is hidden from every picker (billing backend serves a
+    // single model at a single price, so the tiers are identical), while its
+    // definition stays resolvable for existing selections.
     const systemOptions = options.filter((option) => "kind" in option && option.kind === "system")
-    expect(systemOptions.map((option) => option.id)).toEqual([
-      BUILT_IN_AI_PROVIDER_ID,
-      BUILT_IN_AI_ADVANCE_PROVIDER_ID,
-    ])
+    expect(systemOptions.map((option) => option.id)).toEqual([BUILT_IN_AI_PROVIDER_ID])
 
     const localIds = options
       .filter((option) => !("kind" in option && option.kind === "system"))
