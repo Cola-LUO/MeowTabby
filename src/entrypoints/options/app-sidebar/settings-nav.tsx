@@ -31,6 +31,17 @@ export function SettingsNav() {
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              render={<Link to="/model-selection" />}
+              isActive={pathname === "/model-selection"}
+              tooltip={i18n.t("options.modelSelection.title")}
+            >
+              <Icon icon="tabler:brain" />
+              <span>{i18n.t("options.modelSelection.title")}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
               render={<Link to="/preference" />}
               isActive={pathname.startsWith("/preference")}
               tooltip={i18n.t("options.preference.title")}
