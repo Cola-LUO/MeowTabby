@@ -50,6 +50,18 @@ export function TranslationServiceDropdown() {
     ),
   )
   const builtInUnavailable = builtInProviders.some(isProviderSelectorOptionDisabled)
+  // One hint line names the wall the group is behind. An Ultra gate only ever
+  // blocks the advance tier, so it only speaks when no item is walled by
+  // sign-in — a sign-in wall blocks every tier and is the message that covers
+  // the group (and the first step an Ultra-gated visitor takes anyway).
+  const builtInUltraGated =
+    builtInUnavailable &&
+    !builtInProviders.some(
+      (item) =>
+        isProviderSelectorOptionDisabled(item) &&
+        isSystemProviderSelectorItem(item) &&
+        item.requiresUltra !== true,
+    )
 
   const handleConfigureAPI = async () => {
     try {
@@ -128,7 +140,11 @@ export function TranslationServiceDropdown() {
               ))}
               {builtInUnavailable && (
                 <p className="px-2 py-1 text-xs text-muted-foreground">
-                  {i18n.t("hostedAi.availability.authenticationRequired")}
+                  {i18n.t(
+                    builtInUltraGated
+                      ? "hostedAi.availability.ultraRequired"
+                      : "hostedAi.availability.authenticationRequired",
+                  )}
                 </p>
               )}
             </SelectGroup>

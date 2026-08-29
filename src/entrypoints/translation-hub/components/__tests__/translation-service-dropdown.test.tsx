@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { ReactNode } from "react"
+import type { HostedAiStatus, HostedAiTierStatus } from "@/utils/hosted-ai/types"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { TranslationServiceDropdown } from "@/entrypoints/translation-hub/components/translation-service-dropdown"
@@ -116,11 +117,39 @@ vi.mock("@/components/ui/base-ui/select", async () => {
   }
 })
 
-function mockHostedStatus(signedIn: boolean) {
-  hostedAiStatusMock.current = {
-    status: buildHostedAiStatusFromBilling(signedIn),
-    isSignedIn: signedIn,
+const AVAILABLE_TIER: HostedAiTierStatus = {
+  accessAllowed: true,
+  available: true,
+  unavailableReason: null,
+  requiresUltra: false,
+  modelRevision: "billing-v1",
+}
+
+/** A HostedAiStatus where every feature is available except selectionTranslation's tiers. */
+function hostedStatus(selectionTranslation: {
+  normal: HostedAiTierStatus
+  advance: HostedAiTierStatus
+}): HostedAiStatus {
+  return {
+    credits: [],
+    features: {
+      pageTranslation: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+      customAction: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+      noteSuggestion: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+      selectionTranslation,
+      videoSubtitles: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+      inputTranslation: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+      languageDetection: { normal: AVAILABLE_TIER, advance: AVAILABLE_TIER },
+    },
   }
+}
+
+function mockHostedAiStatus(status: HostedAiStatus, isSignedIn = true) {
+  hostedAiStatusMock.current = { status, isSignedIn }
+}
+
+function mockHostedStatus(signedIn: boolean) {
+  mockHostedAiStatus(buildHostedAiStatusFromBilling(signedIn), signedIn)
 }
 
 describe("TranslationServiceDropdown", () => {
@@ -168,6 +197,7 @@ describe("TranslationServiceDropdown", () => {
       expect(screen.getByRole("option", { name })).toHaveAttribute("data-disabled", "true")
     }
     expect(screen.getByText("hostedAi.availability.authenticationRequired")).toBeInTheDocument()
+    expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
 
     // Local providers are unaffected by the hosted status.
     expect(screen.getByRole("option", { name: "icon:OpenAI" })).not.toHaveAttribute(
@@ -186,6 +216,62 @@ describe("TranslationServiceDropdown", () => {
     expect(
       screen.queryByText("hostedAi.availability.authenticationRequired"),
     ).not.toBeInTheDocument()
+  })
+
+  it("names the Ultra wall when only the advance tier is Ultra-gated", () => {
+    // Signed-in non-Ultra account: the normal tier stays runnable, the advance
+    // tier is walled by the plan — the hint must not tell this user to log in.
+    mockHostedAiStatus(
+      hostedStatus({
+        normal: AVAILABLE_TIER,
+        advance: {
+          accessAllowed: false,
+          available: false,
+          unavailableReason: "ultra_required",
+          requiresUltra: true,
+          modelRevision: "billing-v1",
+        },
+      }),
+    )
+
+    render(<TranslationServiceDropdown />)
+
+    expect(
+      screen.getByRole("option", { name: "icon:options.apiProviders.providers.name.builtInAi" }),
+    ).not.toHaveAttribute("data-disabled")
+    expect(
+      screen.getByRole("option", {
+        name: "icon:options.apiProviders.providers.name.builtInAiAdvance",
+      }),
+    ).toHaveAttribute("data-disabled", "true")
+    expect(screen.getByText("hostedAi.availability.ultraRequired")).toBeInTheDocument()
+    expect(screen.queryByText("hostedAi.availability.authenticationRequired")).not.toBeInTheDocument()
+  })
+
+  it("prefers the sign-in wall when sign-in and Ultra walls coexist", () => {
+    mockHostedAiStatus(
+      hostedStatus({
+        normal: {
+          accessAllowed: false,
+          available: false,
+          unavailableReason: "authentication_required",
+          requiresUltra: false,
+          modelRevision: "billing-v1",
+        },
+        advance: {
+          accessAllowed: false,
+          available: false,
+          unavailableReason: "ultra_required",
+          requiresUltra: true,
+          modelRevision: "billing-v1",
+        },
+      }),
+    )
+
+    render(<TranslationServiceDropdown />)
+
+    expect(screen.getByText("hostedAi.availability.authenticationRequired")).toBeInTheDocument()
+    expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
   })
 
   it("writes built-in selections through the existing selectedProviderIds setter", () => {
