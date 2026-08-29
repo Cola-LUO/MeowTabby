@@ -274,3 +274,39 @@ export async function translateTextForInput(
     preserveLineBreaks: true,
   })
 }
+
+/**
+ * Translation hub — the extension page's multi-provider text translation. The
+ * caller resolves the ref (a local row or a built-in AI system ref) via
+ * `resolveProviderRefForCapability("translationHub", …)` and hands it in; the
+ * variant only owns language handling and the core dispatch.
+ *
+ * An extension page has no webpage context, so none is attached, and the
+ * request runs as plain text. There is no `translationHub` route in the
+ * hosted-feature contract, so a system provider bills against the
+ * user-initiated text-translation route, `selectionTranslation`.
+ */
+export async function translateTextForHub(
+  text: string,
+  sourceCode: LangCodeISO6393 | "auto",
+  targetCode: LangCodeISO6393,
+  providerRef: UnwrappedProviderRef,
+): Promise<string> {
+  if (sourceCode !== "auto" && sourceCode === targetCode) {
+    return ""
+  }
+
+  const config = await getConfigOrThrow()
+
+  return translateTextCore({
+    text,
+    langConfig: {
+      sourceCode,
+      targetCode,
+      level: config.language.level,
+    },
+    providerConfig: providerRef,
+    hostedFeature: "selectionTranslation",
+    textFormat: "plain",
+  })
+}
