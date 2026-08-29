@@ -160,26 +160,27 @@ export const SEARCH_ITEMS: SearchItem[] = [
     descriptionKey: "options.apiProviders.description",
     pageKey: "options.apiProviders.title",
   },
+  // Model Selection page
   {
     sectionId: "feature-providers",
-    route: "/api-providers",
+    route: "/model-selection",
     titleKey: "options.apiProviders.featureProviders.title",
     descriptionKey: "options.apiProviders.featureProviders.description",
-    pageKey: "options.apiProviders.title",
+    pageKey: "options.modelSelection.title",
   },
   {
     sectionId: "language-detection",
-    route: "/api-providers",
+    route: "/model-selection",
     titleKey: "options.apiProviders.languageDetection.title",
     descriptionKey: "options.apiProviders.languageDetection.description",
-    pageKey: "options.apiProviders.title",
+    pageKey: "options.modelSelection.title",
   },
   {
     sectionId: "ai-content-aware",
-    route: "/api-providers",
+    route: "/model-selection",
     titleKey: "options.apiProviders.aiContentAware.title",
     descriptionKey: "options.apiProviders.aiContentAware.description",
-    pageKey: "options.apiProviders.title",
+    pageKey: "options.modelSelection.title",
   },
 
   // Custom Actions page
