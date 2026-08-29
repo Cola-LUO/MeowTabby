@@ -145,27 +145,12 @@ options:
     translationHub: 翻訳ハブ
 
   apiProviders:
-    title: APIプロバイダー
-    pageDescription: Read Frog が呼び出す AI サービスを接続し、各機能で使うものを選びます。
+    title: カスタムAPI
+    pageDescription: Read Frog が呼び出す AI サービスを接続します。
     description: Read Frog が呼び出せるプロバイダーを追加します。20 以上を内蔵し、Chat Completions 互換 API と Open Responses API をカスタム追加できます。
     configTitle: プロバイダー設定
     addProvider: プロバイダーを追加
     builtInProvider: 組み込みプロバイダー
-    builtInAiUsage:
-      title: 組み込み AI クォータ
-      remaining: "残り $1%"
-      supportedFeatures: "$1 つの機能に対応"
-      resetsAt: "$1 にリセット"
-      daily: 日次クォータ
-      weekly: 週間クォータ
-      features:
-        pageTranslation: ページ翻訳
-        customAction: カスタム AI アクション
-        noteSuggestion: ノートの提案
-        selectionTranslation: 選択範囲の翻訳
-        videoSubtitles: 動画字幕
-        inputTranslation: 入力翻訳
-        languageDetection: 言語検出
     sponsorCta: 高速で高コスパのAIを入手
     sponsorCtaJalapenoCloud: GLM 5.2 を 50% オフで入手
     setApiKeyWarning:

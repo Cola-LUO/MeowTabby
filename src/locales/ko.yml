@@ -145,27 +145,12 @@ options:
     translationHub: 번역 허브
 
   apiProviders:
-    title: API 제공업체
-    pageDescription: Read Frog가 호출하는 AI 서비스를 연결하고, 각 기능에 사용할 서비스를 선택하세요.
+    title: 커스텀 API
+    pageDescription: Read Frog가 호출하는 AI 서비스를 연결하세요.
     description: Read Frog가 호출할 수 있는 제공업체를 추가합니다. 20개 이상이 내장되어 있으며, Chat Completions 호환 API와 Open Responses API를 사용자 정의로 추가할 수 있습니다.
     configTitle: 제공업체 구성
     addProvider: 제공업체 추가
     builtInProvider: 내장 제공업체
-    builtInAiUsage:
-      title: 내장 AI 할당량
-      remaining: "$1% 남음"
-      supportedFeatures: "$1개 기능 지원"
-      resetsAt: "$1에 초기화"
-      daily: 일일 할당량
-      weekly: 주간 할당량
-      features:
-        pageTranslation: 페이지 번역
-        customAction: 사용자 지정 AI 작업
-        noteSuggestion: 노트 제안
-        selectionTranslation: 선택 영역 번역
-        videoSubtitles: 비디오 자막
-        inputTranslation: 입력 번역
-        languageDetection: 언어 감지
     sponsorCta: 빠르고 가성비 좋은 AI 받기
     sponsorCtaJalapenoCloud: GLM 5.2 50% 할인 받기
     setApiKeyWarning:

@@ -145,27 +145,12 @@ options:
     translationHub: Центр переводов
 
   apiProviders:
-    title: API-провайдеры
-    pageDescription: Подключите ИИ-сервисы, которые вызывает Read Frog, и выберите провайдера для каждой функции.
+    title: Свой API
+    pageDescription: Подключите ИИ-сервисы, которые вызывает Read Frog.
     description: Добавьте провайдеров, которых может вызывать Read Frog. Более 20 встроено; также можно добавить пользовательские API, совместимые с Chat Completions, и API Open Responses.
     configTitle: Настройка провайдеров
     addProvider: Добавить провайдера
     builtInProvider: Встроенный провайдер
-    builtInAiUsage:
-      title: Квота встроенного ИИ
-      remaining: "Осталось $1%"
-      supportedFeatures: "Поддерживает функций: $1"
-      resetsAt: "Сброс: $1"
-      daily: Дневная квота
-      weekly: Недельная квота
-      features:
-        pageTranslation: Перевод страницы
-        customAction: Пользовательские AI-действия
-        noteSuggestion: Подсказки для заметок
-        selectionTranslation: Перевод выделения
-        videoSubtitles: Субтитры видео
-        inputTranslation: Перевод ввода
-        languageDetection: Определение языка
     sponsorCta: Получить быстрый и выгодный ИИ
     sponsorCtaJalapenoCloud: Получить GLM 5.2 со скидкой 50 %
     setApiKeyWarning:

@@ -145,27 +145,12 @@ options:
     translationHub: Çeviri Merkezi
 
   apiProviders:
-    title: API Sağlayıcıları
-    pageDescription: Read Frog'un çağırdığı yapay zekâ servislerini bağlayın ve her özelliğin hangisini kullanacağını seçin.
+    title: Özel API
+    pageDescription: Read Frog'un çağırdığı yapay zekâ servislerini bağlayın.
     description: Read Frog'un çağırabileceği sağlayıcıları ekleyin. 20'den fazlası yerleşik gelir; ayrıca Chat Completions uyumlu ve Open Responses API'lerini özel olarak ekleyebilirsiniz.
     configTitle: Sağlayıcı yapılandırması
     addProvider: Sağlayıcı ekle
     builtInProvider: Yerleşik sağlayıcı
-    builtInAiUsage:
-      title: Yerleşik AI kotası
-      remaining: "%$1 kaldı"
-      supportedFeatures: "$1 özelliği destekler"
-      resetsAt: "$1 tarihinde sıfırlanır"
-      daily: Günlük kota
-      weekly: Haftalık kota
-      features:
-        pageTranslation: Sayfa çevirisi
-        customAction: Özel AI eylemleri
-        noteSuggestion: Not önerileri
-        selectionTranslation: Seçim çevirisi
-        videoSubtitles: Video altyazıları
-        inputTranslation: Giriş çevirisi
-        languageDetection: Dil algılama
     sponsorCta: Hızlı ve uygun maliyetli yapay zekâ al
     sponsorCtaJalapenoCloud: GLM 5.2ʼde %50 indirim al
     setApiKeyWarning:
