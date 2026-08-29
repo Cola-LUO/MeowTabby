@@ -21,6 +21,8 @@ billing:
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
     loginOrRegister: " "
+    infoTitle: Account info
+    changePassword: Change password
   login:
     title: Log in
     email: Email
@@ -43,14 +45,23 @@ billing:
     resendSuccess: A new verification code has been sent
   reset:
     title: Reset password
+    email: Email
     requestDescription: Enter your account email and we will send you a verification code.
     sendCode: Send code
+    resend: Resend code
     codeSent: A verification code has been sent to $1
     code: Verification code
     newPassword: New password
     submit: Reset password
     backToLogin: Back to login
     success: Password reset. Please log in with your new password.
+  changePassword:
+    description: We will send a verification code to your sign-in email ($1). Once verified, you can set a new password.
+    code: Verification code
+    newPassword: New password
+    submit: Submit
+    success: Password changed
+    cancel: Cancel
 dataTypes:
   string: 文字
   number: 數字

@@ -35,9 +35,11 @@ function ErrorText({ message }: { message: string | null }) {
 function LoginForm({
   onSession,
   onSwitchView,
+  onForgotPassword,
 }: {
   onSession: (session: BillingSession) => void
   onSwitchView: (view: AuthView) => void
+  onForgotPassword: (email: string) => void
 }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -92,7 +94,7 @@ function LoginForm({
         <button
           type="button"
           className="cursor-pointer text-primary"
-          onClick={() => onSwitchView("reset-request")}
+          onClick={() => onForgotPassword(email)}
         >
           {i18n.t("billing.login.forgotPassword")}
         </button>
@@ -259,19 +261,17 @@ function VerifyCodeForm({
   )
 }
 
-function ResetPasswordForms({ onDone }: { onDone: () => void }) {
-  const [stage, setStage] = useState<"request" | "confirm">("request")
-  const [email, setEmail] = useState("")
+function ResetPasswordForm({ initialEmail, onDone }: { initialEmail: string; onDone: () => void }) {
+  const [email, setEmail] = useState(initialEmail)
   const [code, setCode] = useState("")
   const [newPassword, setNewPassword] = useState("")
-  const [notice, setNotice] = useState<string | null>(null)
+  const [codeSent, setCodeSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const sendCode = useMutation({
     mutationFn: () => billingForgotPassword(email),
     onSuccess: () => {
-      setStage("confirm")
-      setNotice(i18n.t("billing.reset.codeSent", [email]))
+      setCodeSent(true)
       setError(null)
     },
     onError: (err: Error) => setError(err.message),
@@ -283,37 +283,6 @@ function ResetPasswordForms({ onDone }: { onDone: () => void }) {
     onError: (err: Error) => setError(err.message),
   })
 
-  if (stage === "request") {
-    return (
-      <form
-        className="grid max-w-sm gap-3"
-        onSubmit={(event) => {
-          event.preventDefault()
-          setError(null)
-          sendCode.mutate()
-        }}
-      >
-        <p className="text-sm text-muted-foreground">
-          {i18n.t("billing.reset.requestDescription")}
-        </p>
-        <div className="grid gap-1.5">
-          <Label htmlFor="billing-reset-email">{i18n.t("billing.login.email")}</Label>
-          <Input
-            id="billing-reset-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
-        <ErrorText message={error} />
-        <Button type="submit" disabled={sendCode.isPending}>
-          {i18n.t("billing.reset.sendCode")}
-        </Button>
-      </form>
-    )
-  }
-
   return (
     <form
       className="grid max-w-sm gap-3"
@@ -323,17 +292,42 @@ function ResetPasswordForms({ onDone }: { onDone: () => void }) {
         reset.mutate()
       }}
     >
-      {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
+      <p className="text-sm text-muted-foreground">{i18n.t("billing.reset.requestDescription")}</p>
+      {codeSent && (
+        <p className="text-sm text-muted-foreground">{i18n.t("billing.reset.codeSent", [email])}</p>
+      )}
       <div className="grid gap-1.5">
-        <Label htmlFor="billing-reset-code">{i18n.t("billing.reset.code")}</Label>
+        <Label htmlFor="billing-reset-email">{i18n.t("billing.reset.email")}</Label>
         <Input
-          id="billing-reset-code"
-          inputMode="numeric"
-          maxLength={6}
-          value={code}
-          onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+          id="billing-reset-email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
           required
         />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-reset-code">{i18n.t("billing.reset.code")}</Label>
+        <div className="flex gap-2">
+          <Input
+            id="billing-reset-code"
+            className="min-w-0 flex-1"
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+            required
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={sendCode.isPending || !email}
+            onClick={() => sendCode.mutate()}
+          >
+            {i18n.t(codeSent ? "billing.reset.resend" : "billing.reset.sendCode")}
+          </Button>
+        </div>
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="billing-reset-password">{i18n.t("billing.reset.newPassword")}</Label>
@@ -355,6 +349,108 @@ function ResetPasswordForms({ onDone }: { onDone: () => void }) {
   )
 }
 
+function ChangePasswordForm({
+  email,
+  displayName,
+  onDone,
+  onCancel,
+}: {
+  email: string
+  displayName: string | null
+  onDone: () => void
+  onCancel: () => void
+}) {
+  const [code, setCode] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [codeSent, setCodeSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const sendCode = useMutation({
+    mutationFn: () => billingForgotPassword(email),
+    onSuccess: () => {
+      setCodeSent(true)
+      setError(null)
+    },
+    onError: (err: Error) => setError(err.message),
+  })
+
+  // /reset-password 成功会吊销该用户全部旧会话（含当前会话）：改完立即用新密码重登刷新本地会话
+  const change = useMutation({
+    mutationFn: async () => {
+      await billingResetPassword({ email, code, newPassword })
+      const result = await billingLogin({ email, password: newPassword })
+      return setBillingSession({ sessionId: result.session_id, email, displayName })
+    },
+    onSuccess: onDone,
+    onError: (err: Error) => setError(err.message),
+  })
+
+  return (
+    <form
+      className="grid max-w-sm gap-3"
+      onSubmit={(event) => {
+        event.preventDefault()
+        setError(null)
+        change.mutate()
+      }}
+    >
+      <p className="text-sm text-muted-foreground">
+        {i18n.t("billing.changePassword.description", [email])}
+      </p>
+      {codeSent && (
+        <p className="text-sm text-muted-foreground">{i18n.t("billing.reset.codeSent", [email])}</p>
+      )}
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-changepw-code">{i18n.t("billing.changePassword.code")}</Label>
+        <div className="flex gap-2">
+          <Input
+            id="billing-changepw-code"
+            className="min-w-0 flex-1"
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+            required
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={sendCode.isPending}
+            onClick={() => sendCode.mutate()}
+          >
+            {i18n.t(codeSent ? "billing.reset.resend" : "billing.reset.sendCode")}
+          </Button>
+        </div>
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="billing-changepw-password">
+          {i18n.t("billing.changePassword.newPassword")}
+        </Label>
+        <Input
+          id="billing-changepw-password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          value={newPassword}
+          onChange={(event) => setNewPassword(event.target.value)}
+          required
+        />
+      </div>
+      <ErrorText message={error} />
+      <Button type="submit" disabled={change.isPending || code.length !== 6}>
+        {i18n.t("billing.changePassword.submit")}
+      </Button>
+      <button
+        type="button"
+        className="cursor-pointer text-left text-sm text-primary"
+        onClick={onCancel}
+      >
+        {i18n.t("billing.changePassword.cancel")}
+      </button>
+    </form>
+  )
+}
+
 function AccountAuthForms({ onSession }: { onSession: (session: BillingSession) => void }) {
   const [view, setView] = useState<AuthView>("login")
   const [pendingRegistration, setPendingRegistration] = useState<{
@@ -362,6 +458,7 @@ function AccountAuthForms({ onSession }: { onSession: (session: BillingSession) 
     email: string
     password: string
   } | null>(null)
+  const [resetEmail, setResetEmail] = useState("")
   const [notice, setNotice] = useState<string | null>(null)
 
   return (
@@ -374,6 +471,11 @@ function AccountAuthForms({ onSession }: { onSession: (session: BillingSession) 
           onSwitchView={(next) => {
             setNotice(null)
             setView(next)
+          }}
+          onForgotPassword={(email) => {
+            setNotice(null)
+            setResetEmail(email)
+            setView("reset-request")
           }}
         />
       )}
@@ -393,7 +495,8 @@ function AccountAuthForms({ onSession }: { onSession: (session: BillingSession) 
         <VerifyCodeForm pending={pendingRegistration} onSession={onSession} />
       )}
       {view === "reset-request" && (
-        <ResetPasswordForms
+        <ResetPasswordForm
+          initialEmail={resetEmail}
           onDone={() => {
             setNotice(i18n.t("billing.reset.success"))
             setView("login")
@@ -424,6 +527,9 @@ function AccountOverview({ session }: { session: BillingSession }) {
     staleTime: 60_000,
   })
 
+  const [changingPassword, setChangingPassword] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+
   const logout = useMutation({
     mutationFn: async () => {
       try {
@@ -438,6 +544,7 @@ function AccountOverview({ session }: { session: BillingSession }) {
 
   return (
     <ConfigSection id="billing-account-overview" title={i18n.t("billing.account.title")}>
+      <h3 className="text-2xl font-medium">{i18n.t("billing.account.infoTitle")}</h3>
       <div className="grid max-w-sm gap-2 text-sm">
         <div className="flex justify-between gap-4">
           <span className="text-muted-foreground">{i18n.t("billing.login.email")}</span>
@@ -450,12 +557,39 @@ function AccountOverview({ session }: { session: BillingSession }) {
           </span>
         </div>
       </div>
-      <div className="grid max-w-sm gap-3">
-        <p className="text-sm text-muted-foreground">{i18n.t("billing.account.rechargeGuide")}</p>
-        <Button variant="outline" disabled={logout.isPending} onClick={() => logout.mutate()}>
-          {i18n.t("account.logout")}
-        </Button>
-      </div>
+      {changingPassword ? (
+        <ChangePasswordForm
+          email={meQuery.data?.email ?? session.email}
+          displayName={session.displayName}
+          onDone={() => {
+            setChangingPassword(false)
+            setNotice(i18n.t("billing.changePassword.success"))
+          }}
+          onCancel={() => {
+            setChangingPassword(false)
+            setNotice(null)
+          }}
+        />
+      ) : (
+        <div className="grid max-w-sm gap-3">
+          {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
+          <p className="text-sm text-muted-foreground">{i18n.t("billing.account.rechargeGuide")}</p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setNotice(null)
+                setChangingPassword(true)
+              }}
+            >
+              {i18n.t("billing.account.changePassword")}
+            </Button>
+            <Button variant="outline" disabled={logout.isPending} onClick={() => logout.mutate()}>
+              {i18n.t("account.logout")}
+            </Button>
+          </div>
+        </div>
+      )}
     </ConfigSection>
   )
 }

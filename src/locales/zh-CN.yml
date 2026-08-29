@@ -21,6 +21,8 @@ billing:
     rechargeGuide: 请联系管理员为你的账户充值，后续版本将支持自助支付。
     notLoggedIn: 未登录
     loginOrRegister: " "
+    infoTitle: 账户信息
+    changePassword: 修改密码
   login:
     title: 登录
     email: 邮箱
@@ -43,14 +45,23 @@ billing:
     resendSuccess: 新验证码已发送
   reset:
     title: 重置密码
+    email: 邮箱
     requestDescription: 输入账号邮箱，我们将发送验证码。
     sendCode: 发送验证码
+    resend: 重新发送
     codeSent: 验证码已发送至 $1
     code: 验证码
     newPassword: 新密码
     submit: 重置密码
     backToLogin: 返回登录
     success: 密码已重置，请使用新密码登录
+  changePassword:
+    description: 将向你的登录邮箱 $1 发送验证码，验证后即可设置新密码。
+    code: 验证码
+    newPassword: 新密码
+    submit: 提交
+    success: 密码已修改
+    cancel: 取消
 dataTypes:
   string: 文本
   number: 数字

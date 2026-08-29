@@ -22,7 +22,14 @@ vi.mock("@/utils/billing/rest", () => ({
   billingMe: vi.fn<(...args: any[]) => any>(),
 }))
 
-import { billingLogin, billingMe, billingRegister, billingVerifyCode } from "@/utils/billing/rest"
+import {
+  billingForgotPassword,
+  billingLogin,
+  billingMe,
+  billingRegister,
+  billingResetPassword,
+  billingVerifyCode,
+} from "@/utils/billing/rest"
 import { getBillingSession, setBillingSession } from "@/utils/billing/session"
 import { AccountPage } from "../index"
 
@@ -141,6 +148,52 @@ describe("AccountPage", () => {
     })
   })
 
+  it("forgot password: email, code and new password fields are all visible on one page", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue(null)
+    renderPage()
+    await waitFor(() => screen.getByText("billing.login.forgotPassword"))
+    fireEvent.click(screen.getByText("billing.login.forgotPassword"))
+    // 单页式：进入找回密码后，邮箱、验证码、新密码三个输入框应同时出现
+    expect(screen.getByLabelText("billing.reset.email")).toBeTruthy()
+    expect(screen.getByLabelText("billing.reset.code")).toBeTruthy()
+    expect(screen.getByLabelText("billing.reset.newPassword")).toBeTruthy()
+  })
+
+  it("forgot password: carries login email, sends code, then resets password", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue(null)
+    vi.mocked(billingForgotPassword).mockResolvedValue({ message: "ok" })
+    vi.mocked(billingResetPassword).mockResolvedValue({ message: "ok" })
+    renderPage()
+    await waitFor(() => screen.getByLabelText("billing.login.email"))
+    fireEvent.change(screen.getByLabelText("billing.login.email"), { target: { value: "a@b.c" } })
+    fireEvent.click(screen.getByText("billing.login.forgotPassword"))
+    // 登录框已填的邮箱应自动带入找回密码表单
+    expect(screen.getByDisplayValue("a@b.c")).toBeTruthy()
+    // 发送验证码后按钮变为「重新发送」
+    fireEvent.click(screen.getByText("billing.reset.sendCode"))
+    await waitFor(() => {
+      expect(billingForgotPassword).toHaveBeenCalledWith("a@b.c")
+    })
+    await waitFor(() => screen.getByText("billing.reset.resend"))
+    // 填验证码 + 新密码提交
+    fireEvent.change(screen.getByLabelText("billing.reset.code"), { target: { value: "123456" } })
+    fireEvent.change(screen.getByLabelText("billing.reset.newPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.click(screen.getByText("billing.reset.submit"))
+    await waitFor(() => {
+      expect(billingResetPassword).toHaveBeenCalledWith({
+        email: "a@b.c",
+        code: "123456",
+        newPassword: "newpass1",
+      })
+    })
+    // 成功后回到登录页
+    await waitFor(() => {
+      expect(screen.getByText("billing.login.title")).toBeTruthy()
+    })
+  })
+
   it("shows balance and logout when signed in", async () => {
     vi.mocked(getBillingSession).mockResolvedValue({
       sessionId: "sess-1",
@@ -164,5 +217,71 @@ describe("AccountPage", () => {
       expect(screen.getByText("3.1400")).toBeTruthy()
     })
     expect(screen.getByText("a@b.c")).toBeTruthy()
+    // 邮箱/余额上方应有「账户信息」标题（与页面顶部「账户登录」同级样式）
+    expect(screen.getByText("billing.account.infoTitle")).toBeTruthy()
+  })
+
+  it("change password: sends code to login email, then resets and auto re-logs in", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue({
+      sessionId: "sess-1",
+      email: "a@b.c",
+      displayName: "喵",
+      signedInAt: 1,
+    })
+    vi.mocked(billingMe).mockResolvedValue({
+      user_id: "u1",
+      email: "a@b.c",
+      display_name: "喵",
+      email_verified: true,
+      balance: "3.1400",
+      total_recharged: "5.0000",
+      total_spent: "1.8600",
+      total_tokens: 123,
+      recent_calls: [],
+    })
+    vi.mocked(billingForgotPassword).mockResolvedValue({ message: "ok" })
+    vi.mocked(billingResetPassword).mockResolvedValue({ message: "ok" })
+    vi.mocked(billingLogin).mockResolvedValue({
+      session_id: "sess-2",
+      user_id: "u1",
+      expires_in_days: 7,
+    })
+    renderPage()
+    await waitFor(() => screen.getByText("billing.account.infoTitle"))
+    // 打开修改密码表单：验证码、新密码输入框同页可见
+    fireEvent.click(screen.getByText("billing.account.changePassword"))
+    expect(screen.getByLabelText("billing.changePassword.code")).toBeTruthy()
+    expect(screen.getByLabelText("billing.changePassword.newPassword")).toBeTruthy()
+    // 发送验证码（到登录邮箱），按钮变为「重新发送」
+    fireEvent.click(screen.getByText("billing.reset.sendCode"))
+    await waitFor(() => {
+      expect(billingForgotPassword).toHaveBeenCalledWith("a@b.c")
+    })
+    await waitFor(() => screen.getByText("billing.reset.resend"))
+    // 提交 → /reset-password → 吊销旧会话后自动用新密码重登 → 本地会话刷新
+    fireEvent.change(screen.getByLabelText("billing.changePassword.code"), {
+      target: { value: "123456" },
+    })
+    fireEvent.change(screen.getByLabelText("billing.changePassword.newPassword"), {
+      target: { value: "newpass1" },
+    })
+    fireEvent.click(screen.getByText("billing.changePassword.submit"))
+    await waitFor(() => {
+      expect(billingResetPassword).toHaveBeenCalledWith({
+        email: "a@b.c",
+        code: "123456",
+        newPassword: "newpass1",
+      })
+      expect(billingLogin).toHaveBeenCalledWith({ email: "a@b.c", password: "newpass1" })
+      expect(setBillingSession).toHaveBeenCalledWith({
+        sessionId: "sess-2",
+        email: "a@b.c",
+        displayName: "喵",
+      })
+    })
+    // 成功后回到账户信息视图并提示已修改
+    await waitFor(() => {
+      expect(screen.getByText("billing.changePassword.success")).toBeTruthy()
+    })
   })
 })
