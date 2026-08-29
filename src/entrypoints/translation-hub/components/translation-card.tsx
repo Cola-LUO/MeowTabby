@@ -8,13 +8,20 @@ import { Button } from "@/components/ui/base-ui/button"
 import { anchoredToastManager } from "@/components/ui/base-ui/toast"
 import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
 import { createFeatureUsageContext, trackFeatureAttempt } from "@/utils/analytics"
-import { classifyProviderConfig } from "@/utils/analytics-provider"
+import { classifyProviderConfig, classifyResolvedProvider } from "@/utils/analytics-provider"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { getProviderConfigById } from "@/utils/config/helpers"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
+import { translateTextForHub } from "@/utils/host/translate/translate-variants"
 import { i18n } from "@/utils/i18n"
 import { getTranslatePrompt } from "@/utils/prompts/translate"
+import {
+  BUILT_IN_AI_PROVIDER_LOGO,
+  getBuiltInAiProviderName,
+  isBuiltInAiProviderId,
+  resolveProviderRefForCapability,
+} from "@/utils/providers/provider-registry"
 import { cn } from "@/utils/styles/utils"
 import {
   selectedProviderIdsAtom,
@@ -40,8 +47,14 @@ export function TranslationCard({
   const [selectedProviderIds, setSelectedProviderIds] = useAtom(selectedProviderIdsAtom)
   const setExpandedById = useSetAtom(translationCardExpandedStateAtom)
 
+  const isBuiltInAi = isBuiltInAiProviderId(providerId)
   const provider = getProviderConfigById(providersConfig, providerId)
   const providerItem = provider ? PROVIDER_ITEMS[provider.provider] : undefined
+  // Built-in AI ids have no row in providersConfig; the registry resolves them
+  // to a system ref carrying the model tier that decides hosted billing.
+  const systemRef = isBuiltInAi
+    ? resolveProviderRefForCapability("translationHub", providersConfig, providerId)
+    : null
 
   // Track request IDs to ignore stale responses from slow providers
   const requestIdRef = useRef(0)
@@ -57,22 +70,33 @@ export function TranslationCard({
             ANALYTICS_FEATURE.TRANSLATION_HUB,
             ANALYTICS_SURFACE.TRANSLATION_HUB,
           ),
-          ...classifyProviderConfig(provider),
+          ...(systemRef ? classifyResolvedProvider(systemRef) : classifyProviderConfig(provider)),
         },
         async () => {
-          if (!provider) throw new Error("Provider not found")
-
           const myRequestId = ++requestIdRef.current
-          const result = await executeTranslate(
-            req.inputText,
-            {
-              sourceCode: req.sourceLanguage,
-              targetCode: req.targetLanguage,
-              level: language.level,
-            },
-            provider,
-            getTranslatePrompt,
-          )
+          let result: string
+          if (isBuiltInAi) {
+            if (!systemRef) throw new Error(`No translation hub provider for id "${providerId}"`)
+            result = await translateTextForHub(
+              req.inputText,
+              req.sourceLanguage,
+              req.targetLanguage,
+              systemRef.kind === "local" ? systemRef.config : systemRef,
+            )
+          } else {
+            if (!provider) throw new Error("Provider not found")
+
+            result = await executeTranslate(
+              req.inputText,
+              {
+                sourceCode: req.sourceLanguage,
+                targetCode: req.targetLanguage,
+                level: language.level,
+              },
+              provider,
+              getTranslatePrompt,
+            )
+          }
 
           // Ignore stale responses - return undefined to silently discard
           if (requestIdRef.current !== myRequestId) {
@@ -126,7 +150,7 @@ export function TranslationCard({
     })
   }
 
-  if (!provider) return null
+  if (!provider && !isBuiltInAi) return null
 
   const hasContent = mutation.isError || (mutation.data !== undefined && mutation.data !== "")
 
@@ -139,7 +163,13 @@ export function TranslationCard({
         )}
       >
         <div className="flex items-center space-x-2">
-          {providerItem ? (
+          {isBuiltInAiProviderId(providerId) ? (
+            <ProviderIcon
+              logo={BUILT_IN_AI_PROVIDER_LOGO}
+              name={getBuiltInAiProviderName(providerId)}
+              size="sm"
+            />
+          ) : provider && providerItem ? (
             <ProviderIcon logo={providerItem.logo(theme)} name={provider.name} size="sm" />
           ) : (
             <div className="flex h-5 w-5 items-center justify-center rounded bg-muted text-xs text-muted-foreground">

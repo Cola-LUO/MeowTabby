@@ -8,20 +8,27 @@ import TranslatePromptSelector from "@/entrypoints/popup/components/translate-pr
 import { PromptSelector as TranslationHubPromptSelector } from "@/entrypoints/translation-hub/components/prompt-selector"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 
-const { providerRefAtom, selectedProvidersAtom, setTranslateMock, testState, translateAtom } =
-  vi.hoisted(() => ({
-    providerRefAtom: {},
-    selectedProvidersAtom: {},
-    setTranslateMock: vi.fn<(value: Partial<Config["pageTranslation"]>) => Promise<void>>(),
-    testState: {
-      pageTranslation: null as Config["pageTranslation"] | null,
-      pageTranslationProviderRef: null as
-        | { kind: "local"; config: { provider: string } }
-        | { kind: "system"; id: string; name: string; modelTier: "normal" | "advance" }
-        | null,
-    },
-    translateAtom: {},
-  }))
+const {
+  providerRefAtom,
+  selectedProvidersAtom,
+  selectedProviderIdsAtom,
+  setTranslateMock,
+  testState,
+  translateAtom,
+} = vi.hoisted(() => ({
+  providerRefAtom: {},
+  selectedProvidersAtom: {},
+  selectedProviderIdsAtom: {},
+  setTranslateMock: vi.fn<(value: Partial<Config["pageTranslation"]>) => Promise<void>>(),
+  testState: {
+    pageTranslation: null as Config["pageTranslation"] | null,
+    pageTranslationProviderRef: null as
+      | { kind: "local"; config: { provider: string } }
+      | { kind: "system"; id: string; name: string; modelTier: "normal" | "advance" }
+      | null,
+  },
+  translateAtom: {},
+}))
 
 vi.mock("jotai", () => ({
   useAtom: (atom: object) => {
@@ -31,6 +38,7 @@ vi.mock("jotai", () => ({
   useAtomValue: (atom: object) => {
     if (atom === providerRefAtom) return testState.pageTranslationProviderRef
     if (atom === selectedProvidersAtom) return [{ provider: "mock-llm" }]
+    if (atom === selectedProviderIdsAtom) return []
     throw new Error("Unexpected atom")
   },
 }))
@@ -45,6 +53,7 @@ vi.mock("@/utils/atoms/provider", () => ({
 
 vi.mock("@/entrypoints/translation-hub/atoms", () => ({
   selectedProvidersAtom,
+  selectedProviderIdsAtom,
 }))
 
 vi.mock("@/types/config/provider", async (importOriginal) => ({

@@ -3,6 +3,7 @@ import type { TranslateProviderConfig } from "@/types/config/provider"
 import { atom } from "jotai"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { filterEnabledProvidersConfig, getTranslateProvidersConfig } from "@/utils/config/helpers"
+import { getSystemProviderIdsForCapability } from "@/utils/providers/provider-registry"
 
 // === LangCode Atoms (derive from config, local override) ===
 const sourceLangCodeOverrideAtom = atom<LangCodeISO6393 | "auto" | null>(null)
@@ -50,10 +51,12 @@ export const selectedProviderIdsAtom = atom(
   (get) => {
     const override = get(selectedProviderIdsOverrideAtom)
     if (override !== null) return override
-    // Default: all enabled translate providers' IDs
+    // Default: all enabled translate providers' IDs plus the built-in AI system
+    // providers, which have no row in providersConfig to be picked up from.
     const providersConfig = get(configFieldsAtomMap.providersConfig)
     const translateProviders = getTranslateProvidersConfig(providersConfig)
-    return filterEnabledProvidersConfig(translateProviders).map((p) => p.id)
+    const localIds = filterEnabledProvidersConfig(translateProviders).map((p) => p.id)
+    return [...new Set([...localIds, ...getSystemProviderIdsForCapability("translationHub")])]
   },
   (_get, set, ids: string[]) => set(selectedProviderIdsOverrideAtom, ids),
 )

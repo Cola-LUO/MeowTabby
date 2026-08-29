@@ -12,14 +12,20 @@ import { isLLMProvider } from "@/types/config/provider"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { DEFAULT_TRANSLATE_PROMPT_ID } from "@/utils/constants/prompt"
 import { i18n } from "@/utils/i18n"
-import { selectedProvidersAtom } from "../atoms"
+import { isBuiltInAiProviderId } from "@/utils/providers/provider-registry"
+import { selectedProviderIdsAtom, selectedProvidersAtom } from "../atoms"
 
 export function PromptSelector() {
   const selectedProviders = useAtomValue(selectedProvidersAtom)
+  const selectedProviderIds = useAtomValue(selectedProviderIdsAtom)
   const [translateConfig, setTranslateConfig] = useAtom(configFieldsAtomMap.pageTranslation)
 
-  // Only show when at least one LLM provider is selected
-  const hasLLMProvider = selectedProviders.some((p) => isLLMProvider(p.provider))
+  // Only show when at least one LLM provider is selected. Built-in AI has no
+  // local config row, so it never appears in selectedProviders — the selected
+  // ids are what reveal it, and it is a hosted LLM like any other here.
+  const hasLLMProvider =
+    selectedProviders.some((p) => isLLMProvider(p.provider)) ||
+    selectedProviderIds.some((id) => isBuiltInAiProviderId(id))
   if (!hasLLMProvider) return null
 
   const { patterns, promptId } = translateConfig.customPromptsConfig
