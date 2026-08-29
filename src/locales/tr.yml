@@ -332,6 +332,9 @@ options:
       enableDescription: Yapay zekâ çeviriden önce sayfanın ya da videonun özetini okur, böylece sözcükler bağlama oturur. LLM sağlayıcısıyla çalışan her çeviri özelliğinde geçerlidir. İlk isteğe gecikme ekler ve API maliyetini artırır.
       llmProviderConfigured: $1 için LLM sağlayıcısı seçildi
       llmProviderNotConfigured: $1 için LLM sağlayıcısı seçilmedi
+  modelSelection:
+    title: Model Seçimi
+    pageDescription: Her çeviri özelliğinin kullanacağı AI modelini ve sağlayıcıyı seçin.
   patterns:
     duplicate: Bu desen zaten listede
   preference:

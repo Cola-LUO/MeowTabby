@@ -332,6 +332,9 @@ options:
       enableDescription: AI đọc bản tóm tắt của trang hoặc video trước khi dịch, để cách dùng từ hợp ngữ cảnh. Áp dụng cho mọi tính năng dịch chạy trên nhà cung cấp LLM. Yêu cầu đầu tiên sẽ chậm hơn và làm tăng chi phí API.
       llmProviderConfigured: Đã chọn nhà cung cấp LLM cho $1
       llmProviderNotConfigured: Chưa chọn nhà cung cấp LLM cho $1
+  modelSelection:
+    title: Chọn mô hình
+    pageDescription: Chọn mô hình AI và nhà cung cấp cho từng tính năng dịch.
   patterns:
     duplicate: Mẫu này đã có trong danh sách
   preference:

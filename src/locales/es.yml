@@ -333,6 +333,9 @@ options:
       enableDescription: La IA lee un resumen de la página o el video antes de traducir, para que el vocabulario encaje con el contexto. Se aplica a todas las funciones de traducción que usan un proveedor LLM. Añade latencia en la primera solicitud y aumenta los costos de API.
       llmProviderConfigured: Proveedor LLM seleccionado para $1
       llmProviderNotConfigured: No se seleccionó ningún proveedor LLM para $1
+  modelSelection:
+    title: Selección de modelo
+    pageDescription: Elige el modelo y proveedor de IA que usa cada función de traducción.
   patterns:
     duplicate: Este patrón ya está en la lista
   preference:

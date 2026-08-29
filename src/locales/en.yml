@@ -333,6 +333,9 @@ options:
       enableDescription: The AI reads a summary of the page or video before translating, so wording fits the context. Applies to every translation feature running on an LLM provider. Adds latency on the first request and increases API costs.
       llmProviderConfigured: LLM provider selected for $1
       llmProviderNotConfigured: No LLM provider selected for $1
+  modelSelection:
+    title: Model Selection
+    pageDescription: Choose the AI model and provider used by each translation feature.
   patterns:
     duplicate: This pattern is already in the list
   preference:

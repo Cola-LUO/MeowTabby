@@ -333,6 +333,9 @@ options:
       enableDescription: AI 翻译前会先读一份网页或视频的摘要，让用词更贴合上下文。对每个使用 LLM 提供商的翻译功能都生效。首次请求会有延迟，并增加 API 费用。
       llmProviderConfigured: 已为$1选择 LLM 提供商
       llmProviderNotConfigured: 没有为$1选择 LLM 提供商
+  modelSelection:
+    title: 模型选择
+    pageDescription: 为每个翻译功能选择使用的 AI 模型与提供商。
   patterns:
     duplicate: 该模式已在列表中
   preference:

@@ -332,6 +332,9 @@ options:
       enableDescription: AI は翻訳の前にページや動画の要約を読み、文脈に合った訳語を選びます。LLM プロバイダーで動作するすべての翻訳機能に適用されます。最初のリクエストに遅延が生じ、API 費用も増えます。
       llmProviderConfigured: $1の LLM プロバイダー選択済み
       llmProviderNotConfigured: $1の LLM プロバイダー未選択
+  modelSelection:
+    title: モデル選択
+    pageDescription: 翻訳機能ごとに使用する AI モデルとプロバイダーを選択します。
   patterns:
     duplicate: このパターンは既にリストにあります
   preference:
