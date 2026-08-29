@@ -28,7 +28,11 @@ const BUILT_IN_AI_PROVIDER_FALLBACK_NAME = "Built-in AI"
 const BUILT_IN_AI_ADVANCE_PROVIDER_NAME_KEY = "options.apiProviders.providers.name.builtInAiAdvance"
 const BUILT_IN_AI_ADVANCE_PROVIDER_FALLBACK_NAME = "Advanced Built-in AI"
 
-export type ProviderCapability = FeatureKey | "customAction" | "languageDetection"
+export type ProviderCapability =
+  | FeatureKey
+  | "customAction"
+  | "languageDetection"
+  | "translationHub"
 type SystemProviderNameKey = keyof GeneratedI18nStructure
 type ProviderConfigPredicate<T extends ProviderConfig = ProviderConfig> = (
   provider: ProviderConfig,
@@ -75,6 +79,7 @@ const SYSTEM_PROVIDER_DEFS = {
       "noteSuggestion",
       "customAction",
       "languageDetection",
+      "translationHub",
     ],
     logo: () => BUILT_IN_AI_PROVIDER_LOGO,
   },
@@ -91,6 +96,7 @@ const SYSTEM_PROVIDER_DEFS = {
       "noteSuggestion",
       "customAction",
       "languageDetection",
+      "translationHub",
     ],
     logo: () => BUILT_IN_AI_PROVIDER_LOGO,
   },
@@ -105,6 +111,7 @@ const LOCAL_PROVIDER_CAPABILITY_PREDICATES = {
   videoSubtitles: isTranslateProviderConfig,
   selectionTranslation: isTranslateProviderConfig,
   inputTranslation: isTranslateProviderConfig,
+  translationHub: isTranslateProviderConfig,
   noteSuggestion: isLLMProviderConfig,
   customAction: isLLMProviderConfig,
   languageDetection: isLLMProviderConfig,

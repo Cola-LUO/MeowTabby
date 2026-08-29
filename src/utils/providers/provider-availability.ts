@@ -19,6 +19,7 @@ const CAPABILITY_HOSTED_FEATURES = {
   selectionTranslation: "selectionTranslation",
   videoSubtitles: "videoSubtitles",
   inputTranslation: "inputTranslation",
+  translationHub: "selectionTranslation",
   noteSuggestion: "noteSuggestion",
   customAction: "customAction",
   languageDetection: "languageDetection",
