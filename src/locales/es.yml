@@ -145,27 +145,12 @@ options:
     translationHub: Centro de traducción
 
   apiProviders:
-    title: Proveedores de API
-    pageDescription: Conecta los servicios de IA que usa Read Frog y elige cuál se encarga de cada función.
+    title: API personalizada
+    pageDescription: Conecta los servicios de IA que usa Read Frog.
     description: Añade los proveedores que Read Frog puede llamar. Más de 20 vienen integrados y puedes añadir API personalizadas compatibles con Chat Completions u Open Responses.
     configTitle: Configuración de proveedores
     addProvider: Añadir proveedor
     builtInProvider: Proveedor integrado
-    builtInAiUsage:
-      title: Cuota de IA integrada
-      remaining: "$1% restante"
-      supportedFeatures: "Compatible con $1 funciones"
-      resetsAt: "Se restablece el $1"
-      daily: Cuota diaria
-      weekly: Cuota semanal
-      features:
-        pageTranslation: Traducción de página
-        customAction: Acciones de IA personalizadas
-        noteSuggestion: Sugerencias de notas
-        selectionTranslation: Traducción de la selección
-        videoSubtitles: Subtítulos de video
-        inputTranslation: Traducción de entrada
-        languageDetection: Detección de idioma
     sponsorCta: Obtén IA rápida y rentable
     sponsorCtaJalapenoCloud: Obtén un 50 % de descuento en GLM 5.2
     setApiKeyWarning:
@@ -333,6 +318,9 @@ options:
       enableDescription: La IA lee un resumen de la página o el video antes de traducir, para que el vocabulario encaje con el contexto. Se aplica a todas las funciones de traducción que usan un proveedor LLM. Añade latencia en la primera solicitud y aumenta los costos de API.
       llmProviderConfigured: Proveedor LLM seleccionado para $1
       llmProviderNotConfigured: No se seleccionó ningún proveedor LLM para $1
+  modelSelection:
+    title: Selección de modelo
+    pageDescription: Elige el modelo y proveedor de IA que usa cada función de traducción.
   patterns:
     duplicate: Este patrón ya está en la lista
   preference:

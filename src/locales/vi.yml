@@ -145,27 +145,12 @@ options:
     translationHub: Trung tâm Dịch thuật
 
   apiProviders:
-    title: Nhà cung cấp API
-    pageDescription: Kết nối các dịch vụ AI mà Read Frog sử dụng và chọn dịch vụ cho từng tính năng.
+    title: API tùy chỉnh
+    pageDescription: Kết nối các dịch vụ AI mà Read Frog sử dụng.
     description: Thêm các nhà cung cấp mà Read Frog có thể gọi. Hơn 20 nhà cung cấp được tích hợp sẵn; bạn cũng có thể thêm API tùy chỉnh tương thích Chat Completions và API Open Responses.
     configTitle: Cấu hình nhà cung cấp
     addProvider: Thêm nhà cung cấp
     builtInProvider: Nhà cung cấp tích hợp
-    builtInAiUsage:
-      title: Hạn mức AI tích hợp
-      remaining: "Còn lại $1%"
-      supportedFeatures: "Hỗ trợ $1 tính năng"
-      resetsAt: "Đặt lại lúc $1"
-      daily: Hạn mức mỗi ngày
-      weekly: Hạn mức mỗi tuần
-      features:
-        pageTranslation: Dịch trang
-        customAction: Hành động AI tùy chỉnh
-        noteSuggestion: Gợi ý ghi chú
-        selectionTranslation: Dịch vùng chọn
-        videoSubtitles: Phụ đề video
-        inputTranslation: Dịch đầu vào
-        languageDetection: Phát hiện ngôn ngữ
     sponsorCta: Nhận AI nhanh, tiết kiệm chi phí
     sponsorCtaJalapenoCloud: Nhận ưu đãi giảm 50% GLM 5.2
     setApiKeyWarning:
@@ -332,6 +317,9 @@ options:
       enableDescription: AI đọc bản tóm tắt của trang hoặc video trước khi dịch, để cách dùng từ hợp ngữ cảnh. Áp dụng cho mọi tính năng dịch chạy trên nhà cung cấp LLM. Yêu cầu đầu tiên sẽ chậm hơn và làm tăng chi phí API.
       llmProviderConfigured: Đã chọn nhà cung cấp LLM cho $1
       llmProviderNotConfigured: Chưa chọn nhà cung cấp LLM cho $1
+  modelSelection:
+    title: Chọn mô hình
+    pageDescription: Chọn mô hình AI và nhà cung cấp cho từng tính năng dịch.
   patterns:
     duplicate: Mẫu này đã có trong danh sách
   preference:

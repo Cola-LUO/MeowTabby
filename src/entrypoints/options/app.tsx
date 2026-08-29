@@ -14,6 +14,9 @@ const ShortcutsPage = lazy(() =>
 const ApiProvidersPage = lazy(() =>
   import("./pages/api-providers").then((module) => ({ default: module.ApiProvidersPage })),
 )
+const ModelSelectionPage = lazy(() =>
+  import("./pages/model-selection").then((module) => ({ default: module.ModelSelectionPage })),
+)
 const CustomActionsPage = lazy(() =>
   import("./pages/custom-actions").then((module) => ({ default: module.CustomActionsPage })),
 )
@@ -107,6 +110,7 @@ const ROUTE_COMPONENTS: Record<RoutePath, ComponentType> = {
   "/preference": PreferencePage,
   "/shortcuts": ShortcutsPage,
   "/api-providers": ApiProvidersPage,
+  "/model-selection": ModelSelectionPage,
   "/custom-actions": CustomActionsPage,
   "/page-translation": TranslationPage,
   "/video-subtitles": VideoSubtitlesPage,

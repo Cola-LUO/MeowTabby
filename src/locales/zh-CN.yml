@@ -145,27 +145,12 @@ options:
     translationHub: 翻译中心
 
   apiProviders:
-    title: API 提供商
-    pageDescription: 自定义接入 MeowTabby 调用的 AI 大模型，每项翻译功能可分别指定。
+    title: 自定义API
+    pageDescription: 自定义接入 MeowTabby 调用的 AI 大模型。
     description: 添加 MeowTabby 可以调用的提供商。内置 20 多个，也可以添加兼容 Chat Completions 的自定义 API 和 Open Responses 自定义 API。
     configTitle: 提供商配置
     addProvider: 添加提供商
     builtInProvider: 内置提供商
-    builtInAiUsage:
-      title: 内置 AI 额度
-      remaining: "剩余 $1%"
-      supportedFeatures: "支持 $1 项功能"
-      resetsAt: "$1 重置"
-      daily: 每日额度
-      weekly: 每周额度
-      features:
-        pageTranslation: 网页翻译
-        customAction: 自定义 AI 指令
-        noteSuggestion: 猜你想存
-        selectionTranslation: 划词翻译
-        videoSubtitles: 视频字幕
-        inputTranslation: 输入翻译
-        languageDetection: 语言检测
     sponsorCta: 获取高速性价比 AI
     sponsorCtaJalapenoCloud: 获取 GLM 5.2 五折优惠
     setApiKeyWarning:
@@ -333,6 +318,9 @@ options:
       enableDescription: AI 翻译前会先读一份网页或视频的摘要，让用词更贴合上下文。对每个使用 LLM 提供商的翻译功能都生效。首次请求会有延迟，并增加 API 费用。
       llmProviderConfigured: 已为$1选择 LLM 提供商
       llmProviderNotConfigured: 没有为$1选择 LLM 提供商
+  modelSelection:
+    title: 模型选择
+    pageDescription: 为每个翻译功能选择使用的 AI 模型与提供商。
   patterns:
     duplicate: 该模式已在列表中
   preference:

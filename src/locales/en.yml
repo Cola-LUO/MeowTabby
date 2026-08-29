@@ -145,27 +145,12 @@ options:
     translationHub: Translation Hub
 
   apiProviders:
-    title: API Providers
-    pageDescription: Connect the AI services Read Frog calls, then choose which one runs each feature.
+    title: Custom API
+    pageDescription: Connect the AI services Read Frog calls.
     description: Add the providers Read Frog can call. Over 20 are built in, with custom support for Chat Completions-compatible and Open Responses APIs.
     configTitle: Provider config
     addProvider: Add provider
     builtInProvider: Built-in provider
-    builtInAiUsage:
-      title: Built-in AI quota
-      remaining: "$1% left"
-      supportedFeatures: "Supports $1 features"
-      resetsAt: "Resets at $1"
-      daily: Daily quota
-      weekly: Weekly quota
-      features:
-        pageTranslation: Page translation
-        customAction: Custom AI Actions
-        noteSuggestion: Note suggestions
-        selectionTranslation: Selection translation
-        videoSubtitles: Video subtitles
-        inputTranslation: Input translation
-        languageDetection: Language detection
     sponsorCta: Get fast, cost-effective AI
     sponsorCtaJalapenoCloud: Get 50% Off GLM 5.2
     setApiKeyWarning:
@@ -333,6 +318,9 @@ options:
       enableDescription: The AI reads a summary of the page or video before translating, so wording fits the context. Applies to every translation feature running on an LLM provider. Adds latency on the first request and increases API costs.
       llmProviderConfigured: LLM provider selected for $1
       llmProviderNotConfigured: No LLM provider selected for $1
+  modelSelection:
+    title: Model Selection
+    pageDescription: Choose the AI model and provider used by each translation feature.
   patterns:
     duplicate: This pattern is already in the list
   preference:

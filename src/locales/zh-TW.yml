@@ -145,27 +145,12 @@ options:
     translationHub: 翻譯中心
 
   apiProviders:
-    title: API 提供者
-    pageDescription: 接入 Read Frog 呼叫的 AI 服務，並為每項功能指定使用哪一個。
+    title: 自訂API
+    pageDescription: 接入 Read Frog 呼叫的 AI 服務。
     description: 新增 Read Frog 可以呼叫的提供者。內建 20 多個，也可以新增相容 Chat Completions 的自訂 API 和 Open Responses 自訂 API。
     configTitle: 提供者設定
     addProvider: 新增提供者
     builtInProvider: 內建提供者
-    builtInAiUsage:
-      title: 內建 AI 額度
-      remaining: "剩餘 $1%"
-      supportedFeatures: "支援 $1 項功能"
-      resetsAt: "$1 重置"
-      daily: 每日額度
-      weekly: 每週額度
-      features:
-        pageTranslation: 網頁翻譯
-        customAction: 自訂 AI 指令
-        noteSuggestion: 猜你想存
-        selectionTranslation: 選取文字翻譯
-        videoSubtitles: 影片字幕
-        inputTranslation: 輸入翻譯
-        languageDetection: 語言偵測
     sponsorCta: 取得高速高性價比 AI
     sponsorCtaJalapenoCloud: 取得 GLM 5.2 五折優惠
     setApiKeyWarning:
@@ -333,6 +318,9 @@ options:
       enableDescription: AI 翻譯前會先讀一份網頁或影片的摘要，讓用詞更貼合上下文。對每個使用 LLM 提供者的翻譯功能都生效。首次請求會有延遲，並增加 API 費用。
       llmProviderConfigured: 已為 $1 選擇 LLM 提供者
       llmProviderNotConfigured: 沒有為 $1 選擇 LLM 提供者
+  modelSelection:
+    title: 模型選擇
+    pageDescription: 為每個翻譯功能選擇使用的 AI 模型與提供商。
   patterns:
     duplicate: 該模式已在列表中
   preference:
