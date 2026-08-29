@@ -38,7 +38,7 @@ const LOCAL_DISABLED = {
 describe("selectedProviderIdsAtom", () => {
   it("defaults to enabled local translate providers plus both built-in AI ids", () => {
     const store = createStore()
-    store.set(configFieldsAtomMap.providersConfig, [LOCAL_ENABLED, LOCAL_DISABLED])
+    void store.set(configFieldsAtomMap.providersConfig, [LOCAL_ENABLED, LOCAL_DISABLED])
 
     expect(store.get(selectedProviderIdsAtom)).toEqual([
       LOCAL_ENABLED.id,
@@ -49,7 +49,7 @@ describe("selectedProviderIdsAtom", () => {
 
   it("dedupes when a local row somehow carries a built-in AI id", () => {
     const store = createStore()
-    store.set(configFieldsAtomMap.providersConfig, [
+    void store.set(configFieldsAtomMap.providersConfig, [
       { ...LOCAL_ENABLED, id: BUILT_IN_AI_PROVIDER_ID },
     ])
 
@@ -59,7 +59,7 @@ describe("selectedProviderIdsAtom", () => {
 
   it("still honors an explicit override over the default", () => {
     const store = createStore()
-    store.set(configFieldsAtomMap.providersConfig, [LOCAL_ENABLED])
+    void store.set(configFieldsAtomMap.providersConfig, [LOCAL_ENABLED])
 
     store.set(selectedProviderIdsAtom, [LOCAL_ENABLED.id])
 

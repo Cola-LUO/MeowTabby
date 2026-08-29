@@ -39,7 +39,7 @@ vi.mock("jotai", () => ({
         vi.fn<(value: unknown) => void>(),
       ]
     }
-    return [undefined, vi.fn()]
+    return [undefined, vi.fn<(value: unknown) => void>()]
   },
   useAtomValue: (atom: object) => {
     if (atom === selectedProvidersAtom) return selectedProvidersFixture.current

@@ -18,7 +18,7 @@ const {
   setSelectedIdsMock,
 } = vi.hoisted(() => ({
   // Mutable holders so each test can reshape what the mocked hooks return.
-  hostedAiStatusMock: { current: {} as { status?: unknown; isSignedIn?: boolean } },
+  hostedAiStatusMock: { current: {} },
   providersConfigFixture: { current: [] as unknown[] },
   selectedIdsFixture: { current: [] as string[] },
   // Plain sentinel atoms — the mocked jotai hooks switch on identity.
@@ -40,7 +40,7 @@ vi.mock("@/entrypoints/translation-hub/atoms", () => ({
 vi.mock("jotai", () => ({
   useAtom: (atom: object) => {
     if (atom === selectedProviderIdsAtom) return [selectedIdsFixture.current, setSelectedIdsMock]
-    return [undefined, vi.fn()]
+    return [undefined, vi.fn<(value: unknown) => void>()]
   },
   useAtomValue: (atom: object) => {
     if (atom === providersConfigAtom) return providersConfigFixture.current

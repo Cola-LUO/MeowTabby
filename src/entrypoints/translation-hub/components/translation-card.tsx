@@ -163,7 +163,7 @@ export function TranslationCard({
         )}
       >
         <div className="flex items-center space-x-2">
-          {isBuiltInAiProviderId(providerId) ? (
+          {isBuiltInAi ? (
             <ProviderIcon
               logo={BUILT_IN_AI_PROVIDER_LOGO}
               name={getBuiltInAiProviderName(providerId)}

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { BillingHostedStatus } from "@/utils/billing/types"
+import type { ProtocolMap } from "@/utils/message"
 import type { SystemProviderRef } from "@/utils/providers/provider-registry"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
@@ -9,13 +10,19 @@ import { translateTextForHub } from "@/utils/host/translate/translate-variants"
 
 // The hub variant shares the input-translation pipeline, so it gets the same
 // mock set as translate-text.test.tsx: storage config in, background messages
-// out, prompt builder and detection stubbed.
+// out, prompt builder and detection stubbed. The sendMessage mock is hoisted
+// and typed against the real ProtocolMap dispatch key so the implementation
+// below stays type-checked (mock.calls keeps the typed message type too).
+const { mockSendMessage } = vi.hoisted(() => ({
+  mockSendMessage: vi.fn<(type: keyof ProtocolMap, data?: unknown) => Promise<unknown>>(),
+}))
+
 vi.mock("@/utils/config/storage", () => ({
   getLocalConfig: vi.fn<(...args: any[]) => any>(),
 }))
 
 vi.mock("@/utils/message", () => ({
-  sendMessage: vi.fn<(...args: any[]) => any>(),
+  sendMessage: mockSendMessage,
 }))
 
 vi.mock("@/utils/prompts/translate", () => ({
@@ -35,7 +42,6 @@ vi.mock("@/utils/host/translate/webpage-summary", () => ({
 }))
 
 const mockGetLocalConfig = vi.mocked((await import("@/utils/config/storage")).getLocalConfig)
-const mockSendMessage = vi.mocked((await import("@/utils/message")).sendMessage)
 const mockGetTranslatePrompt = vi.mocked(
   (await import("@/utils/prompts/translate")).getTranslatePrompt,
 )
@@ -60,7 +66,9 @@ const SIGNED_IN: BillingHostedStatus = {
 }
 
 function enqueueReturns(text: string) {
-  mockSendMessage.mockImplementation(async (type: string) => {
+  // Params are contextually typed from the real ProtocolMap-backed sendMessage
+  // signature (type: keyof ProtocolMap), so dispatching stays type-checked.
+  mockSendMessage.mockImplementation(async (type) => {
     if (type === "getHostedAiStatus") {
       return SIGNED_IN
     }
@@ -72,7 +80,7 @@ function enqueueReturns(text: string) {
 }
 
 function enqueueCalls() {
-  return mockSendMessage.mock.calls.filter(([type]: [string]) => type === "enqueueTranslateRequest")
+  return mockSendMessage.mock.calls.filter(([type]) => type === "enqueueTranslateRequest")
 }
 
 describe("translateTextForHub", () => {

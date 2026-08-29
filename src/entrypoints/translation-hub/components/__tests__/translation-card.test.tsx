@@ -34,7 +34,7 @@ const {
   providersAtom: {},
   providersFixture: { current: [] as unknown[] },
   requestAtom: {},
-  requestFixture: { current: null as unknown },
+  requestFixture: { current: null },
   selectedProviderIdsAtom: {},
   translateTextForHubMock: vi.fn<(...args: unknown[]) => Promise<string>>(),
 }))
