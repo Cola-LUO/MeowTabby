@@ -1,6 +1,6 @@
-name: Read Frog
-extName: Read Frog - Traduce y aprende
-extDescription: Read Frog es una extensión de navegador de código abierto diseñada para ayudarte a aprender idiomas en profundidad desde cualquier sitio web.
+name: MeowTabby
+extName: MeowTabby - Traduce y aprende
+extDescription: MeowTabby es una extensión de navegador de código abierto diseñada para ayudarte a aprender idiomas en profundidad desde cualquier sitio web.
 uninstallSurveyUrl: https://tally.so/r/nPK6Ob
 account:
   login: Iniciar sesión
@@ -75,7 +75,7 @@ contextMenu:
   readAloudSelection: Leer en voz alta "%s"
   showOriginal: Mostrar original
 sidePanel:
-  firefoxUserActionHint: En Firefox, abre Read Frog desde la barra lateral del navegador.
+  firefoxUserActionHint: En Firefox, abre MeowTabby desde la barra lateral del navegador.
   firefoxUserActionHelpText: Aprende a abrir la barra lateral de Firefox
   firefoxUserActionHelpUrl: https://support.mozilla.org/en-US/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -110,7 +110,7 @@ popup:
   discord:
     tooltip: Únete a Discord para conectar con desarrolladores y obtener acceso anticipado a nuevas funciones
   blog:
-    notification: Novedades de Read Frog
+    notification: Novedades de MeowTabby
   aiSmartContext: Contexto inteligente de IA
   aiSmartContextDescription: Usa el contexto de la página web para mejorar la calidad de la traducción. Requiere un proveedor de traducción LLM.
   more:
@@ -161,8 +161,8 @@ options:
 
   apiProviders:
     title: API personalizada
-    pageDescription: Conecta los servicios de IA que usa Read Frog.
-    description: Añade los proveedores que Read Frog puede llamar. Más de 20 vienen integrados y puedes añadir API personalizadas compatibles con Chat Completions u Open Responses.
+    pageDescription: Conecta los servicios de IA que usa MeowTabby.
+    description: Añade los proveedores que MeowTabby puede llamar. Más de 20 vienen integrados y puedes añadir API personalizadas compatibles con Chat Completions u Open Responses.
     configTitle: Configuración de proveedores
     addProvider: Añadir proveedor
     builtInProvider: Proveedor integrado
@@ -253,8 +253,8 @@ options:
         customChatComplete: Personalizado Chat Complete
         customResponses: Personalizado Responses
       attribution:
-        builtInAi: Modelo estándar alojado por Read Frog. Los usuarios sin Ultra solo pueden usarlo en las acciones de IA personalizadas; los usuarios Ultra pueden usarlo en más funciones.
-        builtInAiAdvance: Modelo avanzado alojado por Read Frog, exclusivo para miembros Ultra. Funciona en todas las funciones de IA integrada — traducción de página, acciones de IA personalizadas y más — con una cuota semanal compartida. Consume la cuota más rápido que el modelo estándar.
+        builtInAi: Modelo estándar alojado por MeowTabby. Los usuarios sin Ultra solo pueden usarlo en las acciones de IA personalizadas; los usuarios Ultra pueden usarlo en más funciones.
+        builtInAiAdvance: Modelo avanzado alojado por MeowTabby, exclusivo para miembros Ultra. Funciona en todas las funciones de IA integrada — traducción de página, acciones de IA personalizadas y más — con una cuota semanal compartida. Consume la cuota más rápido que el modelo estándar.
       description:
         openai: Proporciona modelos como GPT-4o
         azure: Modelos OpenAI hospedados en Azure mediante tus implementaciones
@@ -340,12 +340,12 @@ options:
     duplicate: Este patrón ya está en la lista
   preference:
     title: Preferencias
-    pageDescription: Define la apariencia de Read Frog, dónde se ejecuta y cómo se sincroniza y respalda tu configuración.
+    pageDescription: Define la apariencia de MeowTabby, dónde se ejecuta y cómo se sincroniza y respalda tu configuración.
     appearanceAndLanguage:
       title: Apariencia e idioma
       theme:
         title: Tema
-        description: Elige un tema para Read Frog.
+        description: Elige un tema para MeowTabby.
         system: Sistema
         light: Claro
         dark: Oscuro
@@ -364,7 +364,7 @@ options:
         description: El idioma al que se traducen las páginas.
     extensionActivation:
       title: Activación de la extensión
-      description: Si Read Frog se ejecuta en todas partes salvo en los sitios que indiques, o solo en los sitios que indiques
+      description: Si MeowTabby se ejecuta en todas partes salvo en los sitios que indiques, o solo en los sitios que indiques
       manageSites: Gestionar sitios
       mode:
         title: Modo de activación
@@ -483,8 +483,8 @@ options:
         description: Activa funciones experimentales que todavía pueden ser inestables
       analytics:
         title: Ayuda a mejorar la experiencia de usuario
-        tooltip: Cuando está activado, Read Frog envía señales anónimas de uso del producto para que podamos detectar errores, verificar la fiabilidad de las funciones, mejorar el rendimiento y el acabado de la UX, y priorizar trabajos futuros.
-        description: Mejora Read Frog ayudándonos a localizar errores, pulir la interfaz y más
+        tooltip: Cuando está activado, MeowTabby envía señales anónimas de uso del producto para que podamos detectar errores, verificar la fiabilidad de las funciones, mejorar el rendimiento y el acabado de la UX, y priorizar trabajos futuros.
+        description: Mejora MeowTabby ayudándonos a localizar errores, pulir la interfaz y más
   shortcuts:
     title: Atajos
     pageDescription: Define las teclas que activan la traducción mientras lees.
@@ -537,7 +537,7 @@ options:
     demoImageAlt: Demostración del botón flotante
     enable:
       title: Activar botón flotante
-      description: Muestra el botón flotante en páginas web para acceder rápidamente a las funciones de Read Frog
+      description: Muestra el botón flotante en páginas web para acceder rápidamente a las funciones de MeowTabby
     display:
       title: Visualización
       side:
@@ -841,7 +841,7 @@ options:
         duplicateFieldKey: Los nombres de campo deben ser únicos
   contextMenu:
     title: Menú contextual
-    pageDescription: Controla las opciones de Read Frog en el menú contextual del navegador.
+    pageDescription: Controla las opciones de MeowTabby en el menú contextual del navegador.
     demoImageAlt: Demostración del menú contextual
     enable:
       title: Activar traducción en menú contextual
@@ -1057,9 +1057,9 @@ options:
       noVoicesFound: No se encontraron voces
       language:
         title: Voz por idioma
-        description: Elige un idioma y luego la voz que lo lee en voz alta. Restablecer devuelve la voz que Read Frog elige para ese idioma.
+        description: Elige un idioma y luego la voz que lo lee en voz alta. Restablecer devuelve la voz que MeowTabby elige para ese idioma.
         reset: Restablecer
-        previewSample: ¡Hola desde Read Frog! Así sonaré al leer en voz alta.
+        previewSample: ¡Hola desde MeowTabby! Así sonaré al leer en voz alta.
       fallback:
         title: Voz alternativa
         description: La voz para cualquier idioma al que no le hayas asignado una propia.
@@ -1170,7 +1170,7 @@ options:
   rateUs:
     title: Calificarnos
   configMigration:
-    versionTooNew: La versión de configuración importada es más reciente; actualiza Read Frog a la última versión
+    versionTooNew: La versión de configuración importada es más reciente; actualiza MeowTabby a la última versión
     validationError: Error de validación de configuración
 side:
   sourceLang: Idioma de origen
@@ -1238,13 +1238,13 @@ action:
   saveToNotebaseConnectExisting: Conectar Notebase existente
   saveToNotebaseGoConfigure: Configurar
   saveToNotebaseLoginConnectedTitle: ¿Iniciar sesión para guardar?
-  saveToNotebaseLoginConnectedDescription: Esta Custom Action está conectada a la cuenta de abajo. Después de iniciar sesión, Read Frog guardará en la Notebase existente si es posible, o creará una nueva Notebase para la cuenta actual.
+  saveToNotebaseLoginConnectedDescription: Esta Custom Action está conectada a la cuenta de abajo. Después de iniciar sesión, MeowTabby guardará en la Notebase existente si es posible, o creará una nueva Notebase para la cuenta actual.
   saveToNotebaseConnectionUnavailableTitle: Conexión de Notebase no disponible
   saveToNotebaseMissingNotebaseDescription: La Notebase anterior ya no existe o esta cuenta no puede abrirla. Crea una nueva Notebase y guarda este resultado, o conecta una Notebase existente en Custom AI Actions.
   saveToNotebaseAccountUnavailableDescription: La cuenta actual no coincide con la cuenta conectada de abajo. Crear y guardar reemplazará la conexión anterior y los mapeos de campos. También puedes conectar una Notebase existente en Custom AI Actions.
   saveToNotebasePendingLogin: Inicia sesión para terminar de guardar
-  saveToNotebasePendingLoginDescription: Después de iniciar sesión, Read Frog creará la Notebase y guardará este resultado automáticamente.
-  saveToNotebasePendingConnectedLoginDescription: Después de iniciar sesión, Read Frog guardará en la Notebase conectada si es posible. Si esta cuenta no puede usarla, creará una nueva Notebase y guardará este resultado.
+  saveToNotebasePendingLoginDescription: Después de iniciar sesión, MeowTabby creará la Notebase y guardará este resultado automáticamente.
+  saveToNotebasePendingConnectedLoginDescription: Después de iniciar sesión, MeowTabby guardará en la Notebase conectada si es posible. Si esta cuenta no puede usarla, creará una nueva Notebase y guardará este resultado.
   upgrade: Mejorar plan
   updatePayment: Actualizar pago
   openCustomActions: Abrir Custom AI Actions
@@ -1282,7 +1282,7 @@ subtitles:
     downloadTranslatedComplete: Subtítulos traducidos descargados
     downloadSource: Descargar subtítulos de origen
   state:
-    loading: Read Frog está cargando subtítulos
+    loading: MeowTabby está cargando subtítulos
     translating: Traduciendo…
     error: Se produjo un error
   errors:

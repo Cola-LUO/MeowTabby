@@ -75,7 +75,7 @@ contextMenu:
   readAloudSelection: 朗读”%s”
   showOriginal: 显示原文
 sidePanel:
-  firefoxUserActionHint: 在 Firefox 中，请从浏览器侧边栏打开陪读蛙。
+  firefoxUserActionHint: 在 Firefox 中，请从浏览器侧边栏打开MeowTabby。
   firefoxUserActionHelpText: 查看 Firefox 侧边栏说明
   firefoxUserActionHelpUrl: https://support.mozilla.org/zh-CN/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -110,7 +110,7 @@ popup:
   discord:
     tooltip: 加入 Discord 与开发者交流，抢先体验新功能
   blog:
-    notification: 陪读蛙更新动态
+    notification: MeowTabby更新动态
   aiSmartContext: AI 智能上下文
   aiSmartContextDescription: 结合网页上下文提升翻译效果。需要配置 LLM 翻译服务商。
   more:
@@ -340,12 +340,12 @@ options:
     duplicate: 该模式已在列表中
   preference:
     title: 偏好设置
-    pageDescription: 设置陪读蛙的外观与生效范围，以及配置的同步与备份方式。
+    pageDescription: 设置翻译喵的外观与生效范围，以及配置的同步与备份方式。
     appearanceAndLanguage:
       title: 外观与语言
       theme:
         title: 主题
-        description: 为陪读蛙选择主题。
+        description: 为MeowTabby选择主题。
         system: 跟随系统
         light: 浅色
         dark: 深色
@@ -357,7 +357,7 @@ options:
       title: 翻译语言
       sourceCode:
         title: 源语言
-        description: 网页原文的语言。选择“自动检测”则由陪读蛙从页面本身判断。
+        description: 网页原文的语言。选择“自动检测”则由MeowTabby从页面本身判断。
         auto: 自动检测
       targetCode:
         title: 目标语言
@@ -537,7 +537,7 @@ options:
     demoImageAlt: 悬浮按钮演示
     enable:
       title: 启用悬浮按钮
-      description: 在网页上显示悬浮按钮，快速访问陪读蛙功能
+      description: 在网页上显示悬浮按钮，快速访问MeowTabby功能
     display:
       title: 显示
       side:
@@ -1057,7 +1057,7 @@ options:
       noVoicesFound: 未找到语音
       language:
         title: 语言语音
-        description: 先选择一种语言，再挑选朗读它时使用的语音。重置会换回陪读蛙为该语言选定的语音。
+        description: 先选择一种语言，再挑选朗读它时使用的语音。重置会换回MeowTabby为该语言选定的语音。
         reset: 重置
         previewSample: 来自 MeowTabby 的问候！这是我朗读时的声音。
       fallback:
@@ -1243,8 +1243,8 @@ action:
   saveToNotebaseMissingNotebaseDescription: 旧笔记库不存在或当前账号无法打开。可以创建新的笔记库并保存当前结果，或去 Custom AI Actions 连接已有笔记库。
   saveToNotebaseAccountUnavailableDescription: 当前登录账号和下方已连接账号不同。选择创建并保存会替换之前的连接配置和字段映射；也可以去 Custom AI Actions 连接已有笔记库。
   saveToNotebasePendingLogin: 登录后继续保存
-  saveToNotebasePendingLoginDescription: 登录完成后，Read Frog 会自动创建笔记库并保存当前结果。
-  saveToNotebasePendingConnectedLoginDescription: 登录完成后，Read Frog 会优先保存到已连接的笔记库；如果当前账号无法使用它，会创建新的笔记库并保存当前结果。
+  saveToNotebasePendingLoginDescription: 登录完成后，翻译喵 会自动创建笔记库并保存当前结果。
+  saveToNotebasePendingConnectedLoginDescription: 登录完成后，翻译喵 会优先保存到已连接的笔记库；如果当前账号无法使用它，会创建新的笔记库并保存当前结果。
   upgrade: 升级
   updatePayment: 更新支付方式
   openCustomActions: 打开 Custom AI Actions

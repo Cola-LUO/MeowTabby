@@ -1,6 +1,6 @@
-name: 読書カエル
-extName: 読書カエル - 翻訳して学ぶ
-extDescription: 読書カエルは、あらゆるウェブサイトから言語を深く学ぶために設計されたオープンソースのブラウザ拡張機能です。
+name: MeowTabby
+extName: MeowTabby - 翻訳して学ぶ
+extDescription: MeowTabbyは、あらゆるウェブサイトから言語を深く学ぶために設計されたオープンソースのブラウザ拡張機能です。
 uninstallSurveyUrl: https://tally.so/r/nPK6Ob
 account:
   login: ログイン
@@ -75,7 +75,7 @@ contextMenu:
   readAloudSelection: 「%s」を読み上げ
   showOriginal: 原文を表示
 sidePanel:
-  firefoxUserActionHint: Firefox では、ブラウザーのサイドバーから Read Frog を開いてください。
+  firefoxUserActionHint: Firefox では、ブラウザーのサイドバーから MeowTabby を開いてください。
   firefoxUserActionHelpText: Firefox サイドバーの開き方を見る
   firefoxUserActionHelpUrl: https://support.mozilla.org/ja/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -110,7 +110,7 @@ popup:
   discord:
     tooltip: Discordに参加して開発者とつながり、新機能を先行体験しましょう
   blog:
-    notification: 読書カエルの最新情報
+    notification: MeowTabbyの最新情報
   aiSmartContext: AI スマートコンテキスト
   aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
   more:
@@ -161,8 +161,8 @@ options:
 
   apiProviders:
     title: カスタムAPI
-    pageDescription: Read Frog が呼び出す AI サービスを接続します。
-    description: Read Frog が呼び出せるプロバイダーを追加します。20 以上を内蔵し、Chat Completions 互換 API と Open Responses API をカスタム追加できます。
+    pageDescription: MeowTabby が呼び出す AI サービスを接続します。
+    description: MeowTabby が呼び出せるプロバイダーを追加します。20 以上を内蔵し、Chat Completions 互換 API と Open Responses API をカスタム追加できます。
     configTitle: プロバイダー設定
     addProvider: プロバイダーを追加
     builtInProvider: 組み込みプロバイダー
@@ -252,8 +252,8 @@ options:
         customChatComplete: カスタム Chat Complete
         customResponses: カスタム Responses
       attribution:
-        builtInAi: Read Frog がホストする標準モデル。Ultra 以外のユーザーはカスタム AI アクションでのみ利用でき、Ultra ユーザーはより多くの機能で利用できます。
-        builtInAiAdvance: Read Frog がホストする高性能モデルで、Ultra メンバー専用です。ページ翻訳やカスタム AI アクションなど、すべての組み込み AI 機能で利用でき、週間クォータを共有します。標準モデルよりクォータの消費が速くなります。
+        builtInAi: MeowTabby がホストする標準モデル。Ultra 以外のユーザーはカスタム AI アクションでのみ利用でき、Ultra ユーザーはより多くの機能で利用できます。
+        builtInAiAdvance: MeowTabby がホストする高性能モデルで、Ultra メンバー専用です。ページ翻訳やカスタム AI アクションなど、すべての組み込み AI 機能で利用でき、週間クォータを共有します。標準モデルよりクォータの消費が速くなります。
       description:
         openai: GPT-4oなどのモデルを提供
         azure: Azure のデプロイ経由で OpenAI モデルを利用
@@ -339,12 +339,12 @@ options:
     duplicate: このパターンは既にリストにあります
   preference:
     title: 環境設定
-    pageDescription: Read Frog の外観、動作する範囲、設定の同期とバックアップ方法を指定します。
+    pageDescription: MeowTabby の外観、動作する範囲、設定の同期とバックアップ方法を指定します。
     appearanceAndLanguage:
       title: 外観と言語
       theme:
         title: テーマ
-        description: Read Frog のテーマを選択します。
+        description: MeowTabby のテーマを選択します。
         system: システム
         light: ライト
         dark: ダーク
@@ -482,8 +482,8 @@ options:
         description: まだ不安定な可能性がある実験的機能を有効にします
       analytics:
         title: ユーザー体験の改善に協力する
-        tooltip: 有効にすると、Read Frog は匿名の利用シグナルを送信し、不具合の発見、機能の安定性確認、性能や UX の改善、今後優先すべき機能の判断に役立てます。
-        description: バグの特定や UI レイアウトの改善などを通じて Read Frog をより良くします
+        tooltip: 有効にすると、MeowTabby は匿名の利用シグナルを送信し、不具合の発見、機能の安定性確認、性能や UX の改善、今後優先すべき機能の判断に役立てます。
+        description: バグの特定や UI レイアウトの改善などを通じて MeowTabby をより良くします
   shortcuts:
     title: ショートカット
     pageDescription: 読みながら翻訳を実行するキーを設定します。
@@ -536,7 +536,7 @@ options:
     demoImageAlt: フローティングボタンデモ
     enable:
       title: フローティングボタンを有効化
-      description: ウェブページにフローティングボタンを表示し、Read Frog機能に素早くアクセス
+      description: ウェブページにフローティングボタンを表示し、MeowTabby機能に素早くアクセス
     display:
       title: 表示
       side:
@@ -725,7 +725,7 @@ options:
         duplicateFieldKey: フィールド名は一意である必要があります
   contextMenu:
     title: コンテキストメニュー
-    pageDescription: ブラウザーの右クリックメニューに表示される Read Frog の項目を設定します。
+    pageDescription: ブラウザーの右クリックメニューに表示される MeowTabby の項目を設定します。
     demoImageAlt: コンテキストメニューデモ
     enable:
       title: 右クリック翻訳を有効化
@@ -941,9 +941,9 @@ options:
       noVoicesFound: ボイスが見つかりません
       language:
         title: 言語別ボイス
-        description: 言語を選び、その言語を読み上げるボイスを指定します。リセットすると Read Frog がその言語に選ぶボイスに戻ります。
+        description: 言語を選び、その言語を読み上げるボイスを指定します。リセットすると MeowTabby がその言語に選ぶボイスに戻ります。
         reset: リセット
-        previewSample: Read Frog からこんにちは！朗読するときはこのように聞こえます。
+        previewSample: MeowTabby からこんにちは！朗読するときはこのように聞こえます。
       fallback:
         title: フォールバックボイス
         description: 個別にボイスを指定していない言語は、このボイスで読み上げます。
@@ -1054,7 +1054,7 @@ options:
   rateUs:
     title: レビューを書く
   configMigration:
-    versionTooNew: インポートされた設定のバージョンが新しいため、Read Frogを最新バージョンにアップグレードしてください
+    versionTooNew: インポートされた設定のバージョンが新しいため、MeowTabbyを最新バージョンにアップグレードしてください
     validationError: 設定の検証に失敗しました
 side:
   sourceLang: ソース言語
@@ -1127,8 +1127,8 @@ action:
   saveToNotebaseMissingNotebaseDescription: 以前の Notebase は存在しないか、このアカウントでは開けません。新しい Notebase を作成して保存するか、Custom AI Actions で既存の Notebase に接続してください。
   saveToNotebaseAccountUnavailableDescription: ログイン中のアカウントが下の接続済みアカウントと一致しません。作成して保存すると、以前の接続設定とフィールドマッピングが置き換えられます。Custom AI Actions で既存の Notebase に接続することもできます。
   saveToNotebasePendingLogin: ログイン後に保存を完了
-  saveToNotebasePendingLoginDescription: ログイン後、Read Frog が Notebase を作成し、この結果を自動で保存します。
-  saveToNotebasePendingConnectedLoginDescription: ログイン後、Read Frog は可能であれば接続済み Notebase に保存します。このアカウントで利用できない場合は、新しい Notebase を作成して保存します。
+  saveToNotebasePendingLoginDescription: ログイン後、MeowTabby が Notebase を作成し、この結果を自動で保存します。
+  saveToNotebasePendingConnectedLoginDescription: ログイン後、MeowTabby は可能であれば接続済み Notebase に保存します。このアカウントで利用できない場合は、新しい Notebase を作成して保存します。
   upgrade: アップグレード
   updatePayment: 支払いを更新
   openCustomActions: Custom AI Actions を開く
@@ -1166,7 +1166,7 @@ subtitles:
     downloadTranslatedComplete: 翻訳字幕をダウンロードしました
     downloadSource: 元字幕をダウンロード
   state:
-    loading: Read Frog 字幕読み込み中
+    loading: MeowTabby 字幕読み込み中
     translating: 翻訳中…
     error: エラーが発生しました
   errors:

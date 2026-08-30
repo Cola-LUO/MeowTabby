@@ -1,6 +1,6 @@
-name: Read Frog
-extName: Read Frog - Dịch và học
-extDescription: Read Frog là tiện ích mở rộng trình duyệt mã nguồn mở được thiết kế để giúp bạn học ngôn ngữ sâu từ bất kỳ trang web nào.
+name: MeowTabby
+extName: MeowTabby - Dịch và học
+extDescription: MeowTabby là tiện ích mở rộng trình duyệt mã nguồn mở được thiết kế để giúp bạn học ngôn ngữ sâu từ bất kỳ trang web nào.
 uninstallSurveyUrl: https://tally.so/r/nPK6Ob
 account:
   login: Đăng nhập
@@ -75,7 +75,7 @@ contextMenu:
   readAloudSelection: Đọc to "%s"
   showOriginal: Hiển thị bản gốc
 sidePanel:
-  firefoxUserActionHint: Trong Firefox, hãy mở Read Frog từ thanh bên của trình duyệt.
+  firefoxUserActionHint: Trong Firefox, hãy mở MeowTabby từ thanh bên của trình duyệt.
   firefoxUserActionHelpText: Xem cách mở thanh bên Firefox
   firefoxUserActionHelpUrl: https://support.mozilla.org/vi/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -110,7 +110,7 @@ popup:
   discord:
     tooltip: Tham gia Discord để kết nối với các nhà phát triển và truy cập sớm các tính năng mới
   blog:
-    notification: Có gì mới trong Read Frog
+    notification: Có gì mới trong MeowTabby
   aiSmartContext: Ngữ cảnh thông minh AI
   aiSmartContextDescription: Sử dụng ngữ cảnh trang web để cải thiện chất lượng dịch. Yêu cầu nhà cung cấp dịch LLM.
   more:
@@ -161,8 +161,8 @@ options:
 
   apiProviders:
     title: API tùy chỉnh
-    pageDescription: Kết nối các dịch vụ AI mà Read Frog sử dụng.
-    description: Thêm các nhà cung cấp mà Read Frog có thể gọi. Hơn 20 nhà cung cấp được tích hợp sẵn; bạn cũng có thể thêm API tùy chỉnh tương thích Chat Completions và API Open Responses.
+    pageDescription: Kết nối các dịch vụ AI mà MeowTabby sử dụng.
+    description: Thêm các nhà cung cấp mà MeowTabby có thể gọi. Hơn 20 nhà cung cấp được tích hợp sẵn; bạn cũng có thể thêm API tùy chỉnh tương thích Chat Completions và API Open Responses.
     configTitle: Cấu hình nhà cung cấp
     addProvider: Thêm nhà cung cấp
     builtInProvider: Nhà cung cấp tích hợp
@@ -252,8 +252,8 @@ options:
         customChatComplete: Tùy chỉnh Chat Complete
         customResponses: Tùy chỉnh Responses
       attribution:
-        builtInAi: Mô hình tiêu chuẩn do Read Frog lưu trữ. Người dùng không có Ultra chỉ dùng được trong hành động AI tùy chỉnh; người dùng Ultra dùng được ở nhiều tính năng hơn.
-        builtInAiAdvance: Mô hình nâng cao do Read Frog lưu trữ, dành riêng cho thành viên Ultra. Dùng được ở mọi tính năng AI tích hợp — dịch trang, hành động AI tùy chỉnh và hơn nữa — với hạn mức tuần dùng chung. Tiêu hao hạn mức nhanh hơn mô hình tiêu chuẩn.
+        builtInAi: Mô hình tiêu chuẩn do MeowTabby lưu trữ. Người dùng không có Ultra chỉ dùng được trong hành động AI tùy chỉnh; người dùng Ultra dùng được ở nhiều tính năng hơn.
+        builtInAiAdvance: Mô hình nâng cao do MeowTabby lưu trữ, dành riêng cho thành viên Ultra. Dùng được ở mọi tính năng AI tích hợp — dịch trang, hành động AI tùy chỉnh và hơn nữa — với hạn mức tuần dùng chung. Tiêu hao hạn mức nhanh hơn mô hình tiêu chuẩn.
       description:
         openai: Cung cấp các mô hình như GPT-4o
         azure: Mô hình OpenAI lưu trữ trên Azure qua các bản triển khai của bạn
@@ -339,12 +339,12 @@ options:
     duplicate: Mẫu này đã có trong danh sách
   preference:
     title: Tùy chọn
-    pageDescription: Đặt giao diện của Read Frog, nơi tiện ích hoạt động và cách cấu hình được đồng bộ, sao lưu.
+    pageDescription: Đặt giao diện của MeowTabby, nơi tiện ích hoạt động và cách cấu hình được đồng bộ, sao lưu.
     appearanceAndLanguage:
       title: Giao diện & ngôn ngữ
       theme:
         title: Chủ đề
-        description: Chọn chủ đề cho Read Frog.
+        description: Chọn chủ đề cho MeowTabby.
         system: Hệ thống
         light: Sáng
         dark: Tối
@@ -482,8 +482,8 @@ options:
         description: Bật các tính năng thử nghiệm có thể chưa ổn định
       analytics:
         title: Giúp cải thiện trải nghiệm người dùng
-        tooltip: Khi bật, Read Frog sẽ gửi các tín hiệu sử dụng ẩn danh để phát hiện lỗi, xác minh tính ổn định của tính năng, tối ưu hiệu năng và độ tinh chỉnh UX, đồng thời giúp chúng tôi ưu tiên những gì cần xây tiếp theo.
-        description: Cải thiện Read Frog bằng cách giúp chúng tôi tìm lỗi, tinh chỉnh giao diện và hơn thế nữa
+        tooltip: Khi bật, MeowTabby sẽ gửi các tín hiệu sử dụng ẩn danh để phát hiện lỗi, xác minh tính ổn định của tính năng, tối ưu hiệu năng và độ tinh chỉnh UX, đồng thời giúp chúng tôi ưu tiên những gì cần xây tiếp theo.
+        description: Cải thiện MeowTabby bằng cách giúp chúng tôi tìm lỗi, tinh chỉnh giao diện và hơn thế nữa
   shortcuts:
     title: Phím tắt
     pageDescription: Đặt các phím kích hoạt bản dịch khi bạn đọc.
@@ -536,7 +536,7 @@ options:
     demoImageAlt: Demo nút nổi
     enable:
       title: Bật nút nổi
-      description: Hiển thị nút nổi trên các trang web để truy cập nhanh các tính năng Read Frog
+      description: Hiển thị nút nổi trên các trang web để truy cập nhanh các tính năng MeowTabby
     display:
       title: Hiển thị
       side:
@@ -725,7 +725,7 @@ options:
         duplicateFieldKey: Tên trường phải là duy nhất
   contextMenu:
     title: Menu ngữ cảnh
-    pageDescription: Kiểm soát các mục Read Frog trong menu chuột phải của trình duyệt.
+    pageDescription: Kiểm soát các mục MeowTabby trong menu chuột phải của trình duyệt.
     demoImageAlt: Demo menu ngữ cảnh
     enable:
       title: Bật dịch menu ngữ cảnh
@@ -941,9 +941,9 @@ options:
       noVoicesFound: Không tìm thấy giọng nói
       language:
         title: Giọng nói theo ngôn ngữ
-        description: Chọn một ngôn ngữ, rồi chọn giọng đọc ngôn ngữ đó. Đặt lại sẽ trả về giọng mà Read Frog chọn cho ngôn ngữ này.
+        description: Chọn một ngôn ngữ, rồi chọn giọng đọc ngôn ngữ đó. Đặt lại sẽ trả về giọng mà MeowTabby chọn cho ngôn ngữ này.
         reset: Đặt lại
-        previewSample: Xin chào từ Read Frog! Đây là cách tôi sẽ phát âm khi đọc to.
+        previewSample: Xin chào từ MeowTabby! Đây là cách tôi sẽ phát âm khi đọc to.
       fallback:
         title: Giọng dự phòng
         description: Ngôn ngữ nào bạn chưa gán giọng riêng sẽ được đọc bằng giọng này.
@@ -1054,7 +1054,7 @@ options:
   rateUs:
     title: Đánh giá chúng tôi
   configMigration:
-    versionTooNew: Phiên bản cấu hình đã nhập mới hơn, vui lòng nâng cấp Read Frog lên phiên bản mới nhất
+    versionTooNew: Phiên bản cấu hình đã nhập mới hơn, vui lòng nâng cấp MeowTabby lên phiên bản mới nhất
     validationError: Xác thực cấu hình thất bại
 side:
   sourceLang: Ngôn ngữ nguồn
@@ -1122,13 +1122,13 @@ action:
   saveToNotebaseConnectExisting: Kết nối Notebase hiện có
   saveToNotebaseGoConfigure: Cấu hình
   saveToNotebaseLoginConnectedTitle: Đăng nhập để lưu?
-  saveToNotebaseLoginConnectedDescription: Custom Action này đang kết nối với tài khoản bên dưới. Sau khi đăng nhập, Read Frog sẽ lưu vào Notebase hiện có nếu có thể, hoặc tạo Notebase mới cho tài khoản đã đăng nhập.
+  saveToNotebaseLoginConnectedDescription: Custom Action này đang kết nối với tài khoản bên dưới. Sau khi đăng nhập, MeowTabby sẽ lưu vào Notebase hiện có nếu có thể, hoặc tạo Notebase mới cho tài khoản đã đăng nhập.
   saveToNotebaseConnectionUnavailableTitle: Kết nối Notebase không khả dụng
   saveToNotebaseMissingNotebaseDescription: Notebase cũ không còn tồn tại hoặc tài khoản này không mở được. Hãy tạo Notebase mới và lưu kết quả này, hoặc kết nối Notebase hiện có trong Custom AI Actions.
   saveToNotebaseAccountUnavailableDescription: Tài khoản đã đăng nhập không khớp với tài khoản đã kết nối bên dưới. Tạo và lưu sẽ thay thế kết nối trước đó cùng các ánh xạ trường. Bạn cũng có thể kết nối Notebase hiện có trong Custom AI Actions.
   saveToNotebasePendingLogin: Đăng nhập để hoàn tất lưu
-  saveToNotebasePendingLoginDescription: Sau khi đăng nhập, Read Frog sẽ tự động tạo Notebase và lưu kết quả này.
-  saveToNotebasePendingConnectedLoginDescription: Sau khi đăng nhập, Read Frog sẽ lưu vào Notebase đã kết nối nếu có thể. Nếu tài khoản này không dùng được, Read Frog sẽ tạo Notebase mới và lưu kết quả này.
+  saveToNotebasePendingLoginDescription: Sau khi đăng nhập, MeowTabby sẽ tự động tạo Notebase và lưu kết quả này.
+  saveToNotebasePendingConnectedLoginDescription: Sau khi đăng nhập, MeowTabby sẽ lưu vào Notebase đã kết nối nếu có thể. Nếu tài khoản này không dùng được, MeowTabby sẽ tạo Notebase mới và lưu kết quả này.
   upgrade: Nâng cấp
   updatePayment: Cập nhật thanh toán
   openCustomActions: Mở Custom AI Actions
@@ -1166,7 +1166,7 @@ subtitles:
     downloadTranslatedComplete: Đã tải phụ đề đã dịch
     downloadSource: Tải phụ đề gốc
   state:
-    loading: Read Frog đang tải phụ đề
+    loading: MeowTabby đang tải phụ đề
     translating: Đang dịch…
     error: Đã xảy ra lỗi
   errors:
