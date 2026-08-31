@@ -1,14 +1,13 @@
 // @vitest-environment jsdom
 import type { ReactNode } from "react"
 import type { NoteSuggestionFireInput } from "../use-note-suggestion"
-import type { LLMProviderConfig } from "@/types/config/provider"
 import type { SelectionToolbarCustomAction } from "@/types/config/selection-toolbar"
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 
 const streamBackgroundNoteSuggestionMock = vi.fn<(...args: any[]) => any>()
 const validateNoteSuggestionMock = vi.fn<(...args: any[]) => any>()
@@ -38,10 +37,7 @@ function wrapper(store: ReturnType<typeof createStore>) {
   }
 }
 
-const LLM_PROVIDER_CONFIG = DEFAULT_CONFIG.providersConfig.find(
-  (providerConfig): providerConfig is LLMProviderConfig =>
-    isLLMProviderConfig(providerConfig) && providerConfig.provider === "openai",
-)!
+const LLM_PROVIDER_CONFIG = DEFAULT_PROVIDER_CONFIG.openai
 
 const LOCAL_PROVIDER_REF = {
   kind: "local",

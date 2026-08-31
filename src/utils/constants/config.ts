@@ -160,10 +160,11 @@ export const DEFAULT_CONFIG: Config = {
     noteSuggestion: {
       enabled: true,
       actionId: BUILT_IN_DICTIONARY_ACTION_ID,
-      // Fresh installs always carry the OpenAI default provider; suggestions
-      // start working the moment the user adds their key, with no hosted plan
-      // requirement attached.
-      providerId: DEFAULT_PROVIDER_CONFIG.openai.id,
+      // OpenAI is no longer a default provider, so note suggestions fall back to
+      // the built-in free AI — the product's zero-config LLM. It needs a
+      // signed-in hosted account but no API key, keeping suggestions working
+      // out of the box.
+      providerId: BUILT_IN_AI_PROVIDER_ID,
     },
   },
   sideContent: {
