@@ -1,26 +1,15 @@
 // @vitest-environment jsdom
 import type { ReactNode } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import * as React from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { WhatsNewFooter } from "../whats-new-footer"
 
-const getBlogLocaleFromUILanguageMock = vi.fn<(...args: any[]) => any>(() => "zh")
-const getLastViewedBlogDateMock = vi.fn<(...args: any[]) => any>()
-const getLatestBlogDateMock = vi.fn<(...args: any[]) => any>()
-const saveLastViewedBlogDateMock = vi.fn<(...args: any[]) => any>()
-
 vi.mock("#imports", () => ({
-  i18n: {
-    t: (key: string) => key,
-  },
+  i18n: { t: (key: string) => key },
 }))
 
-vi.mock("jotai", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("jotai")>()),
-  useAtomValue: () => "zh-CN",
-}))
+vi.mock("@/assets/icons/read-frog.png?url", () => ({ default: "meow-logo.png" }))
 
 vi.mock("@iconify/react", () => ({
   Icon: ({ className, icon }: { className?: string; icon: string }) => (
@@ -111,76 +100,12 @@ vi.mock("@/components/ui/base-ui/popover", async () => {
   return {
     Popover,
     PopoverContent,
-    PopoverDescription: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    PopoverHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    PopoverTitle: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     PopoverTrigger,
   }
 })
 
-vi.mock("@/utils/blog", async () => {
-  return {
-    buildBilibiliEmbedUrl: vi.fn<(...args: any[]) => any>(() => null),
-    getBlogLocaleFromUILanguage: (...args: unknown[]) => getBlogLocaleFromUILanguageMock(...args),
-    getLastViewedBlogDate: (...args: unknown[]) => getLastViewedBlogDateMock(...args),
-    getLatestBlogDate: (...args: unknown[]) => getLatestBlogDateMock(...args),
-    hasNewBlogPost: (latestViewedDate: Date | null, latestDate: Date | null) => {
-      if (!latestDate) {
-        return false
-      }
-
-      if (!latestViewedDate) {
-        return true
-      }
-
-      return latestDate > latestViewedDate
-    },
-    saveLastViewedBlogDate: (...args: unknown[]) => saveLastViewedBlogDateMock(...args),
-  }
-})
-
-function createDeferred<T>() {
-  let resolve!: (value: T) => void
-  const promise = new Promise<T>((res) => {
-    resolve = res
-  })
-
-  return {
-    promise,
-    resolve,
-  }
-}
-
-function createQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        gcTime: 0,
-        retry: false,
-      },
-    },
-  })
-}
-
 function renderWhatsNewFooter() {
-  const queryClient = createQueryClient()
-
-  return {
-    queryClient,
-    ...render(
-      <QueryClientProvider client={queryClient}>
-        <WhatsNewFooter />
-      </QueryClientProvider>,
-    ),
-  }
-}
-
-const latestBlogPost = {
-  date: new Date("2026-03-20T12:00:00.000Z"),
-  description: "Latest updates",
-  imageUrl: "https://www.readfrog.app/blog/landing-page-refresh/cover-en.png",
-  title: "Spring release",
-  url: "/blog/spring-release",
+  return render(<WhatsNewFooter />)
 }
 
 afterEach(() => {
@@ -188,117 +113,20 @@ afterEach(() => {
 })
 
 describe("whatsNewFooter", () => {
-  it("auto-opens and marks the post as viewed when unread status arrives after the post", async () => {
-    const latestBlogPostDeferred = createDeferred<typeof latestBlogPost | null>()
-    const lastViewedDateDeferred = createDeferred<Date | null>()
-
-    getLatestBlogDateMock.mockReturnValueOnce(latestBlogPostDeferred.promise)
-    getLastViewedBlogDateMock
-      .mockReturnValueOnce(lastViewedDateDeferred.promise)
-      .mockResolvedValueOnce(latestBlogPost.date)
-    saveLastViewedBlogDateMock.mockResolvedValue(undefined)
-
+  it("renders the sidebar button with the what's-new title", () => {
     renderWhatsNewFooter()
-
-    await waitFor(() => {
-      expect(getBlogLocaleFromUILanguageMock).toHaveBeenCalledWith("zh-CN")
-      expect(getLatestBlogDateMock).toHaveBeenCalledWith(
-        "https://www.readfrog.app/api/blog/latest",
-        "zh",
-        expect.stringMatching(/^\d+\.\d+\.\d+$/),
-      )
-    })
-
-    await act(async () => {
-      latestBlogPostDeferred.resolve(latestBlogPost)
-    })
-
-    await screen.findByRole("button", { name: "options.whatsNew.title" })
-    expect(screen.queryByTestId("whats-new-popover-content")).not.toBeInTheDocument()
-    expect(saveLastViewedBlogDateMock).not.toHaveBeenCalled()
-
-    await act(async () => {
-      lastViewedDateDeferred.resolve(null)
-    })
-
-    await screen.findByTestId("whats-new-popover-content")
-    await waitFor(() => {
-      expect(saveLastViewedBlogDateMock).toHaveBeenCalledTimes(1)
-      expect(saveLastViewedBlogDateMock).toHaveBeenCalledWith(latestBlogPost.date)
-    })
+    expect(screen.getByRole("button", { name: "options.whatsNew.title" })).toBeInTheDocument()
   })
 
-  it("does not auto-open or mark the post as viewed when it is already read", async () => {
-    getLatestBlogDateMock.mockResolvedValue(latestBlogPost)
-    getLastViewedBlogDateMock.mockResolvedValue(new Date("2026-03-21T12:00:00.000Z"))
-    saveLastViewedBlogDateMock.mockResolvedValue(undefined)
-
+  it("shows the brand block and fee notice when opened", () => {
     renderWhatsNewFooter()
 
-    await screen.findByRole("button", { name: "options.whatsNew.title" })
-    await act(async () => {
-      await Promise.resolve()
-    })
-
-    expect(screen.queryByTestId("whats-new-popover-content")).not.toBeInTheDocument()
-    expect(saveLastViewedBlogDateMock).not.toHaveBeenCalled()
-  })
-
-  it("renders the latest blog image in the popover", async () => {
-    getLatestBlogDateMock.mockResolvedValue(latestBlogPost)
-    getLastViewedBlogDateMock.mockResolvedValue(latestBlogPost.date)
-    saveLastViewedBlogDateMock.mockResolvedValue(undefined)
-
-    renderWhatsNewFooter()
-
-    const trigger = await screen.findByRole("button", { name: "options.whatsNew.title" })
+    const trigger = screen.getByRole("button", { name: "options.whatsNew.title" })
     fireEvent.click(trigger)
 
-    const image = await screen.findByRole("img", { name: latestBlogPost.title })
-    expect(image).toHaveAttribute("src", latestBlogPost.imageUrl)
-  })
-
-  it("uses the override URL for the latest blog title and image links", async () => {
-    const urlOverride = "https://www.readfrog.app"
-    getLatestBlogDateMock.mockResolvedValue({ ...latestBlogPost, urlOverride })
-    getLastViewedBlogDateMock.mockResolvedValue(latestBlogPost.date)
-    saveLastViewedBlogDateMock.mockResolvedValue(undefined)
-
-    renderWhatsNewFooter()
-
-    const trigger = await screen.findByRole("button", { name: "options.whatsNew.title" })
-    fireEvent.click(trigger)
-
-    const links = await screen.findAllByRole("link", { name: latestBlogPost.title })
-    expect(links).toHaveLength(2)
-    const expectedHref = new URL(urlOverride).toString()
-    expect(links.map((link) => link.getAttribute("href"))).toEqual([expectedHref, expectedHref])
-  })
-
-  it("marks the post as viewed after a manual open once the unread query finishes", async () => {
-    const lastViewedDateDeferred = createDeferred<Date | null>()
-
-    getLatestBlogDateMock.mockResolvedValue(latestBlogPost)
-    getLastViewedBlogDateMock
-      .mockReturnValueOnce(lastViewedDateDeferred.promise)
-      .mockResolvedValueOnce(latestBlogPost.date)
-    saveLastViewedBlogDateMock.mockResolvedValue(undefined)
-
-    renderWhatsNewFooter()
-
-    const trigger = await screen.findByRole("button", { name: "options.whatsNew.title" })
-    fireEvent.click(trigger)
-
-    expect(await screen.findByTestId("whats-new-popover-content")).toBeInTheDocument()
-    expect(saveLastViewedBlogDateMock).not.toHaveBeenCalled()
-
-    await act(async () => {
-      lastViewedDateDeferred.resolve(null)
-    })
-
-    await waitFor(() => {
-      expect(saveLastViewedBlogDateMock).toHaveBeenCalledTimes(1)
-      expect(saveLastViewedBlogDateMock).toHaveBeenCalledWith(latestBlogPost.date)
-    })
+    expect(screen.getByTestId("whats-new-popover-content")).toBeInTheDocument()
+    expect(screen.getByText("MeowTabby")).toBeInTheDocument()
+    expect(screen.getByText("options.whatsNew.description")).toBeInTheDocument()
+    expect(screen.getByAltText("MeowTabby")).toHaveAttribute("src", "meow-logo.png")
   })
 })

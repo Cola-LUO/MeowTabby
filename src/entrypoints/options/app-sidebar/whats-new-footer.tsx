@@ -1,111 +1,15 @@
 import { Icon } from "@iconify/react"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useAtomValue } from "jotai"
-import { useCallback, useEffect, useEffectEvent, useState } from "react"
-import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/base-ui/popover"
+import { useState } from "react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/base-ui/popover"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/base-ui/sidebar"
-import { env } from "@/env"
-import { configFieldsAtomMap } from "@/utils/atoms/config"
-import {
-  buildBilibiliEmbedUrl,
-  getBlogLocaleFromUILanguage,
-  getLastViewedBlogDate,
-  getLatestBlogDate,
-  hasNewBlogPost,
-  saveLastViewedBlogDate,
-} from "@/utils/blog"
 import { i18n } from "@/utils/i18n"
-import { version } from "../../../../package.json"
+import meowLogo from "@/assets/icons/read-frog.png?url"
 
 export function WhatsNewFooter() {
-  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
-  const uiLanguage = useAtomValue(configFieldsAtomMap.uiLanguage)
-  const blogLocale = getBlogLocaleFromUILanguage(uiLanguage)
-
-  const { data: lastViewedDate, isFetched: isLastViewedDateFetched } = useQuery({
-    queryKey: ["last-viewed-blog-date"],
-    queryFn: getLastViewedBlogDate,
-  })
-
-  const { data: latestBlogPost, isFetched: isLatestBlogPostFetched } = useQuery({
-    queryKey: ["latest-blog-post", blogLocale],
-    queryFn: () => getLatestBlogDate(`${env.WXT_WEBSITE_URL}/api/blog/latest`, blogLocale, version),
-  })
-
-  const markLatestBlogPostViewed = useEffectEvent(async () => {
-    if (!latestBlogPost) {
-      return
-    }
-
-    if (!isLastViewedDateFetched) {
-      return
-    }
-
-    if (lastViewedDate && lastViewedDate.getTime() >= latestBlogPost.date.getTime()) {
-      return
-    }
-
-    await saveLastViewedBlogDate(latestBlogPost.date)
-    await queryClient.invalidateQueries({ queryKey: ["last-viewed-blog-date"] })
-  })
-
-  const handleOpenChange = useCallback((nextOpen: boolean) => {
-    setOpen(nextOpen)
-  }, [])
-
-  const openPopover = useEffectEvent(() => {
-    // eslint-disable-next-line react/set-state-in-effect
-    setOpen(true)
-  })
-
-  const latestBlogPostDate = latestBlogPost?.date ?? null
-  const latestBlogPostKey = latestBlogPost
-    ? `${latestBlogPost.url}:${latestBlogPost.date.toISOString()}`
-    : null
-  const lastViewedDateTimestamp = lastViewedDate?.getTime() ?? null
-  const shouldAutoOpenPopover =
-    isLastViewedDateFetched &&
-    isLatestBlogPostFetched &&
-    hasNewBlogPost(lastViewedDate ?? null, latestBlogPostDate)
-
-  useEffect(() => {
-    if (!shouldAutoOpenPopover) {
-      return
-    }
-
-    openPopover()
-  }, [shouldAutoOpenPopover])
-
-  // Persist the visible post so it doesn't reopen on the next visit.
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-
-    void markLatestBlogPostViewed()
-  }, [isLastViewedDateFetched, lastViewedDateTimestamp, latestBlogPostKey, open])
-
-  if (!latestBlogPost) {
-    return null
-  }
-
-  const blogUrl = new URL(
-    latestBlogPost.urlOverride ?? latestBlogPost.url,
-    env.WXT_WEBSITE_URL,
-  ).toString()
-  const embedUrl = latestBlogPost.videoUrl ? buildBilibiliEmbedUrl(latestBlogPost.videoUrl) : null
-  const imageUrl = embedUrl ? null : latestBlogPost.imageUrl
 
   return (
-    <Popover key={latestBlogPostKey} open={open} onOpenChange={handleOpenChange}>
+    <Popover open={open} onOpenChange={setOpen}>
       <SidebarMenu>
         <SidebarMenuItem>
           <PopoverTrigger
@@ -116,7 +20,7 @@ export function WhatsNewFooter() {
               />
             }
           >
-            <Icon icon="tabler:rss" />
+            <Icon icon="tabler:coin" />
             <span>{i18n.t("options.whatsNew.title")}</span>
           </PopoverTrigger>
         </SidebarMenuItem>
@@ -124,64 +28,17 @@ export function WhatsNewFooter() {
 
       <PopoverContent
         align="end"
-        initialFocus={(openType) => openType === "keyboard"}
         side="top"
         sideOffset={8}
         className="w-[min(24rem,calc(100vw-2rem))] gap-4 p-3"
       >
-        {embedUrl && (
-          <div className="overflow-hidden rounded-md border bg-black">
-            <iframe
-              title={latestBlogPost.title}
-              src={embedUrl}
-              className="aspect-video w-full"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              loading="eager"
-              referrerPolicy="strict-origin-when-cross-origin"
-              sandbox="allow-popups allow-presentation allow-scripts"
-            />
-          </div>
-        )}
-        {imageUrl && (
-          <a
-            href={blogUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block overflow-hidden rounded-md border bg-muted"
-          >
-            <img
-              src={imageUrl}
-              alt={latestBlogPost.title}
-              className="aspect-[1200/630] w-full object-cover"
-              loading="eager"
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-          </a>
-        )}
-
-        <PopoverHeader className="gap-2">
-          <PopoverTitle>
-            <a
-              href={blogUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group hover:underline"
-            >
-              <span className="min-w-0">
-                {latestBlogPost.title}
-                <Icon
-                  aria-hidden="true"
-                  icon="tabler:external-link"
-                  className="ml-1 inline size-[1em] align-[-0.125em] text-muted-foreground transition-colors group-hover:text-foreground"
-                />
-              </span>
-            </a>
-          </PopoverTitle>
-          {latestBlogPost.description && (
-            <PopoverDescription>{latestBlogPost.description}</PopoverDescription>
-          )}
-        </PopoverHeader>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-[#009999] px-4 py-5">
+          <img src={meowLogo} alt="MeowTabby" className="size-12 object-contain" />
+          <span className="text-base font-semibold text-white">MeowTabby</span>
+        </div>
+        <p className="px-1 text-sm leading-relaxed text-muted-foreground">
+          {i18n.t("options.whatsNew.description")}
+        </p>
       </PopoverContent>
     </Popover>
   )

@@ -1050,7 +1050,8 @@ options:
           cancel: キャンセル
           description: すべてのキャッシュされたAI区切り結果が削除されます。次回AI区切りを有効にして動画を再生すると、字幕が再処理されます。
   whatsNew:
-    title: 新機能
+    title: 内蔵AI料金
+    description: The built-in AI uses deepseek-v4-flash by default. To balance backend server rental and development costs, an additional platform service fee is charged at 20% of the official pricing (with peak/off-peak pricing) plus 1 cent per million tokens.
   rateUs:
     title: レビューを書く
   configMigration:

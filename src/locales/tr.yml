@@ -1050,7 +1050,8 @@ options:
           cancel: İptal
           description: Tüm önbelleğe alınmış AI bölümlendirme sonuçları silinecektir. AI bölümlendirme etkinleştirilmiş bir video oynatıldığında altyazılar yeniden işlenecektir.
   whatsNew:
-    title: Yenilikler
+    title: Yerleşik AI Ücretleri
+    description: The built-in AI uses deepseek-v4-flash by default. To balance backend server rental and development costs, an additional platform service fee is charged at 20% of the official pricing (with peak/off-peak pricing) plus 1 cent per million tokens.
   rateUs:
     title: Bizi Değerlendirin
   configMigration:

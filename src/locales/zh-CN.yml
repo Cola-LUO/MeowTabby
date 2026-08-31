@@ -1166,7 +1166,8 @@ options:
           cancel: 取消
           description: 这将删除所有已缓存的 AI 断句结果。下次播放启用 AI 断句的视频时，将重新处理字幕。
   whatsNew:
-    title: 最近更新
+    title: 内置AI费用
+    description: 内置AI默认使用 deepseek-v4-flash，为平衡后端服务器租用及开发成本，按官方定价（有峰谷计价）的20%+每百万token另加1分钱的方式收取额外平台服务费。
   rateUs:
     title: 好评支持
   configMigration:

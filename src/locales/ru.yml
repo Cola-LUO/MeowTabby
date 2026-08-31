@@ -1050,7 +1050,8 @@ options:
           cancel: Отмена
           description: Все кэшированные результаты AI сегментации будут удалены. При следующем воспроизведении видео с включенной AI сегментацией субтитры будут обработаны заново.
   whatsNew:
-    title: Что нового
+    title: Плата за встроенный ИИ
+    description: The built-in AI uses deepseek-v4-flash by default. To balance backend server rental and development costs, an additional platform service fee is charged at 20% of the official pricing (with peak/off-peak pricing) plus 1 cent per million tokens.
   rateUs:
     title: Оцените нас
   configMigration:
