@@ -1,7 +1,6 @@
 import "@/utils/zod-config"
 import type { Config, UiLanguage } from "@/types/config/config"
 import { browser, defineBackground } from "#imports"
-import { env } from "@/env"
 import { storageAdapter } from "@/utils/atoms/storage-adapter"
 import { selectFreshTranslateProviders } from "@/utils/config/default-translate-provider"
 import { CONFIG_STORAGE_KEY } from "@/utils/constants/config"
@@ -45,11 +44,9 @@ export default defineBackground({
     browser.runtime.onInstalled.addListener(async (details) => {
       await ensureInitializedConfig()
 
-      // Open tutorial page when extension is installed
+      // Open the local settings page (options.html) when extension is installed
       if (details.reason === "install") {
-        await browser.tabs.create({
-          url: `${env.WXT_WEBSITE_URL}/guide/step-1`,
-        })
+        await openOptionsPage()
       }
 
       // Deliberately last: probing Google Translate can hang for seconds on networks that
