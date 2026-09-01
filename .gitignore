@@ -47,3 +47,8 @@ scripts/output/
 
 reference/
 .gstack/
+
+# ===== 隐私 / 密钥 / 隧道环境（切勿提交到公开仓库） =====
+# Cloudflare 快速隧道公网地址（含 trycloudflare 临时域名），仅本地/内测用
+.env.production
+# 其余 .env / .env.* 已在上方统一忽略；.env.example 与 .env.local.example 为公开模板保留跟踪
