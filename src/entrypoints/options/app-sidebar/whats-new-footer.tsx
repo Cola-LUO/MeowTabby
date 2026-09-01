@@ -36,7 +36,7 @@ export function WhatsNewFooter() {
           <img src={meowLogo} alt="MeowTabby" className="size-12 object-contain" />
           <span className="text-base font-semibold text-white">MeowTabby</span>
         </div>
-        <p className="px-1 text-sm leading-relaxed text-muted-foreground">
+        <p className="px-1 text-justify text-sm leading-relaxed text-muted-foreground">
           {i18n.t("options.whatsNew.description")}
         </p>
       </PopoverContent>

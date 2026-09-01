@@ -1166,8 +1166,8 @@ options:
           cancel: Cancel
           description: This will delete all cached AI segmentation results. The next time you play a video with AI segmentation enabled, it will re-process the subtitles.
   whatsNew:
-    title: Built-in AI Fees
-    description: The built-in AI uses deepseek-v4-flash by default. To balance backend server rental and development costs, an additional platform service fee is charged at 20% of the official pricing (with peak/off-peak pricing) plus 1 cent per million tokens.
+    title: Built-in AI Billing Info
+    description: The built-in AI service uses deepseek-v4-flash by default. To balance backend server rental and development costs, an additional platform service fee is charged at 20% of the official pricing (with peak/off-peak pricing) plus 1 cent per million tokens. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:
     title: Rate Us
   configMigration:
