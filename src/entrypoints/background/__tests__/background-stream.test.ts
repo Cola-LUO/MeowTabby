@@ -240,7 +240,7 @@ describe("background-stream", () => {
 
     expect(getModelByIdMock).not.toHaveBeenCalled()
     expect(createBillingTextPartStreamMock).toHaveBeenCalledTimes(1)
-    const billingCall = createBillingTextPartStreamMock.mock.calls[0][0]
+    const billingCall = createBillingTextPartStreamMock.mock.calls[0]![0]
     expect(billingCall).toMatchObject({
       requestId: "123e4567-e89b-42d3-a456-426614174000",
       feature: "customAction",
@@ -1074,7 +1074,7 @@ describe("background-stream", () => {
     expect(getModelByIdMock).not.toHaveBeenCalled()
     expect(streamTextMock).not.toHaveBeenCalled()
     expect(createBillingTextPartStreamMock).toHaveBeenCalledTimes(1)
-    const billingCall = createBillingTextPartStreamMock.mock.calls[0][0]
+    const billingCall = createBillingTextPartStreamMock.mock.calls[0]![0]
     expect(billingCall).toMatchObject({
       feature: "noteSuggestion",
       requestId: "123e4567-e89b-42d3-a456-426614174010",

@@ -692,7 +692,15 @@ async function createBillingStructuredObjectPartStream(
   serializablePayload:
     | BackgroundStreamStructuredObjectSerializablePayload
     | BackgroundStreamNoteSuggestionSerializablePayload,
-  options: { feature: BillingFeature; objectSchema: z.ZodType; inputSchema: z.ZodType },
+  options: {
+    feature: BillingFeature
+    objectSchema: z.ZodType
+    inputSchema: z.ZodType<{
+      instructions?: string
+      prompt?: string
+      requestId?: string
+    }>
+  },
   signal?: AbortSignal,
 ): Promise<AsyncIterable<unknown>> {
   const { instructions, prompt, temperature, modelTier, requestId, maxOutputTokens } =
