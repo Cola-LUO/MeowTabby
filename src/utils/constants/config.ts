@@ -9,7 +9,11 @@ import {
   DEFAULT_SUBTITLE_TRANSLATE_PROMPTS_CONFIG,
   DEFAULT_TRANSLATE_PROMPTS_CONFIG,
 } from "./prompt"
-import { buildDefaultProviderConfigList, MICROSOFT_TRANSLATE_PROVIDER_ID } from "./providers"
+import {
+  buildDefaultProviderConfigList,
+  DEFAULT_PROVIDER_CONFIG_LIST,
+  MICROSOFT_TRANSLATE_PROVIDER_ID,
+} from "./providers"
 import { DEFAULT_SELECTION_OVERLAY_OPACITY } from "./selection"
 import { DEFAULT_SIDE_CONTENT_WIDTH } from "./side"
 import {
