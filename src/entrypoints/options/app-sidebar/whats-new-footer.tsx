@@ -1,9 +1,9 @@
 import { Icon } from "@iconify/react"
 import { useState } from "react"
+import meowLogo from "@/assets/icons/read-frog.png?url"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/base-ui/popover"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/base-ui/sidebar"
 import { i18n } from "@/utils/i18n"
-import meowLogo from "@/assets/icons/read-frog.png?url"
 
 export function WhatsNewFooter() {
   const [open, setOpen] = useState(false)

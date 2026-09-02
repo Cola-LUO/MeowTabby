@@ -31,36 +31,44 @@
 ## Task 1: 能力注册 + hub 变体（库层）
 
 **改 `src/utils/providers/provider-registry.ts`：**
+
 - `ProviderCapability` 联合类型加 `"translationHub"`。
 - `SYSTEM_PROVIDER_DEFS` 两个 def 的 `capabilities` 各加 `"translationHub"`。
 - `LOCAL_PROVIDER_CAPABILITY_PREDICATES` 加 `translationHub: isTranslateProviderConfig`（record 完整性由 `satisfies` 强制）。
 
 **改 `src/utils/host/translate/translate-variants.ts`：**
+
 - 新增 `translateTextForHub(text: string, sourceCode: LangCodeISO6393 | "auto", targetCode: LangCodeISO6393, providerRef: UnwrappedProviderRef)`：类比 `translateTextForInput` 的薄封装（语言解析/目标语言跳过逻辑照抄其适用部分），内部调 `translateTextCore`，固定 `hostedFeature: "selectionTranslation"`；不带网页上下文（hub 是扩展页面，无网页上下文）、`textFormat: "plain"`。
 - 不改动任何现有 variant 的行为。
 
 **测试（新文件放对应 `__tests__/`）：**
+
 - registry：`getSystemProviderIdsForCapability("translationHub")` 返回两个内置 AI id；`getSelectableProvidersForCapability`/`resolveProviderRefForCapability("translationHub", …)` 对系统 id 返回正确 `modelTier`；既有能力的行为不回归。
 - variants：`translateTextForHub` 以系统 ref 调用 `translateTextCore` 且 `hostedFeature === "selectionTranslation"`（mock `sendMessage("enqueueTranslateRequest")`，参考既有 variants/translate-text 测试的 mock 方式）；目标语言跳过等继承逻辑按 `translateTextForInput` 的既有测试样式覆盖。
 
 ## Task 2: 翻译中心 UI 接线（atoms / 下拉 / 卡片 / 提示词选择器）
 
 **改 `src/entrypoints/translation-hub/atoms.ts`：**
+
 - `selectedProviderIdsAtom` 默认值按约束 3（本地 enabled + 两个系统 id，去重）。override 机制不动。
 
 **改 `src/entrypoints/translation-hub/components/translation-service-dropdown.tsx`：**
+
 - 新增「内置 AI」分组（两项：普通/高级），名称/logo 按约束 5。
 - 可用性按约束 4（`useHostedAiStatus`），不可用时项置灰 + 引导登录文案。
 - 勾选读写走现有 `selectedProviderIdsAtom` 逻辑。
 
 **改 `src/entrypoints/translation-hub/components/translation-card.tsx：**
+
 - `isBuiltInAiProviderId(providerId)` 时：名称 `getBuiltInAiProviderName`、logo `BUILT_IN_AI_PROVIDER_LOGO`、翻译改调 `translateTextForHub(req.inputText, req.sourceLanguage, req.targetCode, systemRef)`（`language.level` 若 variant 需要则透传）；系统 ref 用 `resolveProviderRefForCapability("translationHub", providersConfig, providerId)` 解析。非系统 id 走原 `executeTranslate` 路径，零行为变化。
 - 失败展示沿用现有 mutation 错误路径（`HostedAiProviderUnavailableError` 等已有 i18n 文案）。
 
 **改 `src/entrypoints/translation-hub/components/prompt-selector.tsx`：**
+
 - `hasLLMProvider` 判定加：选中 id 含任一 `isBuiltInAiProviderId` 也视为有 LLM（内置 AI 是托管 LLM，提示词选择器应显示）。
 
 **测试：**
+
 - atoms：默认选中含两个系统 id 且与本地 enabled 合并去重；override 仍生效。
 - dropdown：内置 AI 分组渲染（名称/两项）、未登录 mock 下置灰 + 引导文案；本地分组不回归。
 - card：系统 id 分流到 `translateTextForHub`（mock variant）；本地 id 仍走 `executeTranslate`；系统 id 查本地配置为 undefined 不再抛 "Provider not found"。

@@ -1,8 +1,8 @@
 import type { ProvidersConfig } from "@/types/config/provider"
 import { createStore } from "jotai"
 import { describe, expect, it, vi } from "vitest"
-import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
 import { selectedProviderIdsAtom } from "../atoms"
 
 // The hub atoms only read `providersConfig` out of the config atom map, so the
@@ -39,10 +39,7 @@ describe("selectedProviderIdsAtom", () => {
 
     // The advance tier is hidden from the hub's default card list — billing
     // serves one model, so a second built-in card would be a duplicate.
-    expect(store.get(selectedProviderIdsAtom)).toEqual([
-      LOCAL_ENABLED.id,
-      BUILT_IN_AI_PROVIDER_ID,
-    ])
+    expect(store.get(selectedProviderIdsAtom)).toEqual([LOCAL_ENABLED.id, BUILT_IN_AI_PROVIDER_ID])
   })
 
   it("dedupes when a local row somehow carries a built-in AI id", () => {

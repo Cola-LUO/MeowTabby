@@ -86,9 +86,7 @@ vi.mock("@/components/ui/base-ui/select", async () => {
     ),
     SelectValue: ({ children }: { children?: ReactNode }) => <>{children}</>,
     SelectContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    SelectGroup: ({ children }: { children: ReactNode }) => (
-      <div role="group">{children}</div>
-    ),
+    SelectGroup: ({ children }: { children: ReactNode }) => <div role="group">{children}</div>,
     SelectLabel: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     SelectItem: ({
       children,
@@ -174,7 +172,9 @@ describe("TranslationServiceDropdown", () => {
     ).not.toBeInTheDocument()
     // The built-in group closes the list: the user's own providers stay first.
     const localItem = screen.getByRole("option", { name: "icon:OpenAI" })
-    expect(localItem.compareDocumentPosition(normal) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      localItem.compareDocumentPosition(normal) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it("keeps the local LLM and normal translator groups rendering", () => {
@@ -200,9 +200,7 @@ describe("TranslationServiceDropdown", () => {
     expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
 
     // Local providers are unaffected by the hosted status.
-    expect(screen.getByRole("option", { name: "icon:OpenAI" })).not.toHaveAttribute(
-      "data-disabled",
-    )
+    expect(screen.getByRole("option", { name: "icon:OpenAI" })).not.toHaveAttribute("data-disabled")
   })
 
   it("keeps built-in items selectable when signed in", () => {
@@ -241,7 +239,9 @@ describe("TranslationServiceDropdown", () => {
       screen.getByRole("option", { name: "icon:options.apiProviders.providers.name.builtInAi" }),
     ).not.toHaveAttribute("data-disabled")
     expect(screen.queryByText("hostedAi.availability.ultraRequired")).not.toBeInTheDocument()
-    expect(screen.queryByText("hostedAi.availability.authenticationRequired")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("hostedAi.availability.authenticationRequired"),
+    ).not.toBeInTheDocument()
   })
 
   it("prefers the sign-in wall when sign-in and Ultra walls coexist", () => {

@@ -3,7 +3,10 @@ import type { TranslateProviderConfig } from "@/types/config/provider"
 import { atom } from "jotai"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { filterEnabledProvidersConfig, getTranslateProvidersConfig } from "@/utils/config/helpers"
-import { getSystemProviderIdsForCapability, isHiddenBuiltInAiProviderId } from "@/utils/providers/provider-registry"
+import {
+  getSystemProviderIdsForCapability,
+  isHiddenBuiltInAiProviderId,
+} from "@/utils/providers/provider-registry"
 
 // === LangCode Atoms (derive from config, local override) ===
 const sourceLangCodeOverrideAtom = atom<LangCodeISO6393 | "auto" | null>(null)

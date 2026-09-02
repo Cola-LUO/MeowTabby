@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-
 import { ModelSelectionPage } from ".."
 
 // The three sections reach into config storage and provider hooks; the page test only cares that
