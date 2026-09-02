@@ -32,13 +32,15 @@ import { generateText, Output, parsePartialJson, streamText } from "ai"
 import { z } from "zod"
 import { BACKGROUND_STREAM_PORTS } from "@/types/background-stream"
 import { isLLMProviderConfig } from "@/types/config/provider"
-import { createStructuredObjectSchema } from "@/utils/ai/structured-object-schema"
+import {
+  buildJsonOutputDirective,
+  createStructuredObjectSchema,
+} from "@/utils/ai/structured-object-schema"
 import { createBillingTextPartStream } from "@/utils/billing/generate"
 import { extractAISDKErrorMessage } from "@/utils/error/extract-message"
 import { i18n } from "@/utils/i18n"
 import { logger } from "@/utils/logger"
 import { noteSuggestionEnvelopeSchema } from "@/utils/note-suggestion/types"
-import { backgroundOrpcClient } from "@/utils/orpc/background-client"
 import { buildLocalGenerateTextParams } from "@/utils/providers/generate-params"
 import { getLanguageModelForConfig, getModelById } from "@/utils/providers/model"
 import { isBuiltInAiProviderId } from "@/utils/providers/provider-registry"
@@ -51,11 +53,6 @@ const aiOutputLengthLimitErrorMessage =
   "The AI output reached the length limit. Please reduce the requested output length and try again."
 
 type AiStreamPart = Record<string, unknown> & { type: string }
-
-type HostedStreamFn = (
-  input: Record<string, unknown>,
-  options?: { signal?: AbortSignal },
-) => Promise<AsyncIterable<unknown>>
 
 function createStreamAbortError(message: string) {
   return new DOMException(message, "AbortError")
@@ -424,16 +421,6 @@ function normalizeHostedAiError(error: unknown): unknown {
   return error
 }
 
-async function* normalizeHostedPartStreamErrors(stream: AsyncIterable<unknown>): AsyncGenerator {
-  try {
-    for await (const part of stream) {
-      yield part
-    }
-  } catch (error) {
-    throw normalizeHostedAiError(error)
-  }
-}
-
 function getStreamFinishReason(part: Record<string, unknown>): string | undefined {
   return typeof part.finishReason === "string" ? part.finishReason : undefined
 }
@@ -701,6 +688,57 @@ async function createHostedTextPartStream(
   }
 }
 
+async function createBillingStructuredObjectPartStream(
+  serializablePayload:
+    | BackgroundStreamStructuredObjectSerializablePayload
+    | BackgroundStreamNoteSuggestionSerializablePayload,
+  options: { feature: BillingFeature; objectSchema: z.ZodType; inputSchema: z.ZodType },
+  signal?: AbortSignal,
+): Promise<AsyncIterable<unknown>> {
+  const { instructions, prompt, temperature, modelTier, requestId, maxOutputTokens } =
+    serializablePayload
+  const { feature, objectSchema, inputSchema } = options
+
+  // Same contract pre-validation as the retired oRPC path: converges the
+  // hosted-only constraints (field-name length, field count) locally instead
+  // of as a doomed paid request. Zod strips keys the note-suggestion schema
+  // does not declare (outputSchema), so one candidate object serves both.
+  const input = inputSchema.safeParse({
+    instructions,
+    prompt,
+    temperature,
+    modelTier,
+    requestId,
+    ...("outputSchema" in serializablePayload
+      ? { outputSchema: serializablePayload.outputSchema }
+      : {}),
+  })
+  if (!input.success) {
+    throw new BackgroundStreamError("invalid_request", "Invalid hosted AI request")
+  }
+  if (!input.data.requestId) {
+    throw new BackgroundStreamError("invalid_request", "Hosted AI request requires requestId")
+  }
+
+  // Billing /v1/generate is a plain-text protocol: the JSON contract travels
+  // as a directive appended to the system prompt (the AI SDK's Output.object
+  // does the equivalent injection for the local path). Billing errors bubble
+  // as-is — their retry meta is already attached by classifyBillingHttpError.
+  const directive = buildJsonOutputDirective(objectSchema)
+  const systemPrompt = [input.data.instructions, directive].filter(Boolean).join("\n\n")
+
+  return createBillingTextPartStream(
+    {
+      systemPrompt,
+      prompt: input.data.prompt ?? "",
+      requestId: input.data.requestId,
+      feature,
+      ...(maxOutputTokens !== undefined ? { maxOutputTokens } : {}),
+    },
+    signal,
+  )
+}
+
 /**
  * One text generation against either provider kind, collected into a string.
  *
@@ -830,38 +868,6 @@ async function createLocalStructuredObjectPartStream<TOutput extends Record<stri
   return result.stream
 }
 
-async function createHostedStructuredObjectPartStream(
-  serializablePayload: BackgroundStreamStructuredObjectSerializablePayload,
-  signal?: AbortSignal,
-): Promise<AsyncIterable<unknown>> {
-  const { outputSchema, prompt, instructions, temperature, modelTier, requestId } =
-    serializablePayload
-
-  // Contract-schema parse converges the hosted-only constraints (field-name
-  // length, field count) the transport check deliberately leaves loose for
-  // BYOK, and fails locally instead of as a server 400.
-  const input = HostedAiStreamStructuredObjectInputSchema.safeParse({
-    instructions,
-    prompt,
-    outputSchema,
-    temperature,
-    modelTier,
-    requestId,
-  })
-  if (!input.success) {
-    throw new BackgroundStreamError("invalid_request", "Invalid hosted AI request")
-  }
-
-  try {
-    const stream = await (
-      backgroundOrpcClient.hostedAi.customAction.streamStructuredObject as unknown as HostedStreamFn
-    )(input.data, { signal })
-    return normalizeHostedPartStreamErrors(stream)
-  } catch (error) {
-    throw normalizeHostedAiError(error)
-  }
-}
-
 export async function runStructuredObjectStreamInBackground(
   serializablePayload: BackgroundStreamStructuredObjectSerializablePayload,
   options: StreamRuntimeOptions<BackgroundStructuredObjectStreamSnapshot> = {},
@@ -874,7 +880,15 @@ export async function runStructuredObjectStreamInBackground(
 
   const objectSchema = createStructuredObjectSchema(serializablePayload.outputSchema)
   const partStream = isBuiltInAiProviderId(serializablePayload.providerId)
-    ? await createHostedStructuredObjectPartStream(serializablePayload, signal)
+    ? await createBillingStructuredObjectPartStream(
+        serializablePayload,
+        {
+          feature: "customAction",
+          objectSchema,
+          inputSchema: HostedAiStreamStructuredObjectInputSchema,
+        },
+        signal,
+      )
     : await createLocalStructuredObjectPartStream(serializablePayload, objectSchema, options)
 
   return consumeStructuredObjectPartStream(partStream, {
@@ -882,34 +896,6 @@ export async function runStructuredObjectStreamInBackground(
     onChunk,
     signal,
   })
-}
-
-async function createHostedNoteSuggestionPartStream(
-  serializablePayload: BackgroundStreamNoteSuggestionSerializablePayload,
-  signal?: AbortSignal,
-): Promise<AsyncIterable<unknown>> {
-  const { prompt, instructions, temperature, modelTier, requestId } = serializablePayload
-
-  const input = HostedAiNoteSuggestionStreamInputSchema.safeParse({
-    instructions,
-    prompt,
-    temperature,
-    modelTier,
-    requestId,
-  })
-  if (!input.success) {
-    throw new BackgroundStreamError("invalid_request", "Invalid hosted AI request")
-  }
-
-  try {
-    const stream = await (
-      backgroundOrpcClient.hostedAi.noteSuggestion
-        .streamStructuredObject as unknown as HostedStreamFn
-    )(input.data, { signal })
-    return normalizeHostedPartStreamErrors(stream)
-  } catch (error) {
-    throw normalizeHostedAiError(error)
-  }
 }
 
 export async function runNoteSuggestionStreamInBackground(
@@ -937,7 +923,15 @@ export async function runNoteSuggestionStreamInBackground(
     // and `action.targetActionId` fields belong to a richer server-driven flow
     // this client does not implement yet, so they are dropped in the envelope
     // adaptation below.
-    const partStream = await createHostedNoteSuggestionPartStream(serializablePayload, signal)
+    const partStream = await createBillingStructuredObjectPartStream(
+      serializablePayload,
+      {
+        feature: "noteSuggestion",
+        objectSchema: HostedAiNoteSuggestionObjectSchema,
+        inputSchema: HostedAiNoteSuggestionStreamInputSchema,
+      },
+      signal,
+    )
     const hostedSnapshot = await consumeStructuredObjectPartStream(partStream, {
       objectSchema: HostedAiNoteSuggestionObjectSchema,
       signal,
