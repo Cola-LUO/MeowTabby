@@ -9,6 +9,8 @@ export type BillingFeature =
   | "videoSubtitlesSegmentation"
   | "languageDetection"
   | "summarization"
+  | "customAction"
+  | "noteSuggestion"
 
 export interface BillingSession {
   sessionId: string
