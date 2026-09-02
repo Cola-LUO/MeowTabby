@@ -149,48 +149,11 @@ vi.mock("@/utils/constants/feature-providers", () => ({
   getFeatureLabelI18nKey: (key: string) => `feature.${key}`,
 }))
 
-// The built-in panel gates Ultra assignment rows on the live plan; tests set
-// hostedAiState.value per case (default: settled error, i.e. status unknown).
-const { hostedAiState } = vi.hoisted(() => {
-  const state: { value: { status: unknown; isPending: boolean; isError: boolean } } = {
-    value: { status: undefined, isPending: false, isError: true },
-  }
-  return { hostedAiState: state }
-})
-
-vi.mock("@/components/llm-providers/use-hosted-ai-status", () => ({
-  useHostedAiStatus: () => hostedAiState.value,
-}))
-
-function makeUltraAccessStatus(accessAllowed: boolean) {
-  // A denial carries its reason: the server answers the advance tier of a
-  // non-Ultra account with `ultra_required`, never with a bare accessAllowed
-  // flag. The panel locks on the reason, so a fixture without one models a
-  // state the wire cannot produce.
-  //
-  // `requiresUltra` is left off deliberately. The real wire sets it on every
-  // advance tier, but it renders the Ultra badge inside the row's <label>,
-  // which then becomes part of the switch's accessible name and breaks the
-  // `getByRole("switch", { name })` queries below. These cases are about
-  // locking, not badging — the badge has its own test above.
-  const advance = accessAllowed
-    ? { accessAllowed: true, available: true, unavailableReason: null }
-    : { accessAllowed: false, available: false, unavailableReason: "ultra_required" as const }
-  return {
-    credits: [],
-    features: {
-      pageTranslation: { advance },
-      selectionTranslation: { advance },
-      noteSuggestion: { advance },
-      customAction: { advance },
-      videoSubtitles: { advance },
-      inputTranslation: { advance },
-      languageDetection: { advance },
-    },
-  }
-}
-
-/** Must mirror the built-in hosted assignment rows, except dynamic custom actions. */
+/**
+ * Labels the built-in editors used to render as per-provider assignment rows.
+ * Assignments moved to the model-selection page; these stay as regression
+ * sentinels for the "not rendered" assertions below.
+ */
 const BUILT_IN_ASSIGNMENT_LABELS = [
   "feature.pageTranslation",
   "feature.videoSubtitles",
@@ -254,7 +217,6 @@ describe("ProvidersConfig", () => {
     writeConfigMock.mockReset()
     testState.selectedProviderId = providerConfig.id
     config.languageDetection = { mode: "basic", providerId: undefined }
-    hostedAiState.value = { status: undefined, isPending: false, isError: true }
   })
 
   it("anchors an in-use disable error to the corresponding provider switch", () => {
@@ -283,10 +245,10 @@ describe("ProvidersConfig", () => {
     expect(screen.queryByText("options.apiProviders.sponsorCta")).not.toBeInTheDocument()
     expect(screen.queryByText("options.apiProviders.form.duplicate")).not.toBeInTheDocument()
     expect(screen.queryByText("options.apiProviders.form.delete")).not.toBeInTheDocument()
-    // Both tiers list every hosted-capable feature row; the normal tier marks
-    // the Ultra-gated ones with the badge instead of hiding them.
+    // Feature assignments live on the model-selection page now; the built-in
+    // panel renders none of them.
     for (const label of BUILT_IN_ASSIGNMENT_LABELS) {
-      expect(screen.getByText(label)).toBeInTheDocument()
+      expect(screen.queryByText(label)).not.toBeInTheDocument()
     }
   })
 
@@ -299,7 +261,7 @@ describe("ProvidersConfig", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders the Ultra editor with its own attribution and all three feature assignments", () => {
+  it("renders the Ultra editor with its own attribution and no feature assignments", () => {
     testState.selectedProviderId = BUILT_IN_AI_ADVANCE_PROVIDER_ID
 
     renderProvidersConfig()
@@ -308,72 +270,18 @@ describe("ProvidersConfig", () => {
       screen.getByText("options.apiProviders.providers.attribution.builtInAiAdvance"),
     ).toBeInTheDocument()
     for (const label of BUILT_IN_ASSIGNMENT_LABELS) {
-      expect(screen.getByText(label)).toBeInTheDocument()
+      expect(screen.queryByText(label)).not.toBeInTheDocument()
     }
     expect(screen.queryByText("options.apiProviders.sponsorCta")).not.toBeInTheDocument()
   })
 
-  it("keeps Ultra assignment rows interactive while the plan status is unknown", () => {
-    testState.selectedProviderId = BUILT_IN_AI_ADVANCE_PROVIDER_ID
-    // Default hostedAiState: settled error → status undefined → no verdict.
-
+  it("renders no feature assignments for an LLM API provider editor", () => {
+    // providerConfig is an OpenAI (LLM) provider and is selected by default.
     renderProvidersConfig()
 
     for (const label of BUILT_IN_ASSIGNMENT_LABELS) {
-      expect(screen.getByRole("switch", { name: label })).not.toHaveAttribute(
-        "aria-disabled",
-        "true",
-      )
+      expect(screen.queryByText(label)).not.toBeInTheDocument()
     }
-  })
-
-  it("locks Ultra assignment rows when the server denies ultra access", () => {
-    testState.selectedProviderId = BUILT_IN_AI_ADVANCE_PROVIDER_ID
-    hostedAiState.value = {
-      status: makeUltraAccessStatus(false),
-      isPending: false,
-      isError: false,
-    }
-
-    renderProvidersConfig()
-
-    // base-ui renders a span[role=switch]; disabled surfaces as aria-disabled.
-    for (const label of BUILT_IN_ASSIGNMENT_LABELS) {
-      expect(screen.getByRole("switch", { name: label })).toHaveAttribute("aria-disabled", "true")
-    }
-  })
-
-  it("unlocks Ultra assignment rows for an ultra-entitled account", () => {
-    testState.selectedProviderId = BUILT_IN_AI_ADVANCE_PROVIDER_ID
-    hostedAiState.value = {
-      status: makeUltraAccessStatus(true),
-      isPending: false,
-      isError: false,
-    }
-
-    renderProvidersConfig()
-
-    for (const label of BUILT_IN_ASSIGNMENT_LABELS) {
-      expect(screen.getByRole("switch", { name: label })).not.toBeDisabled()
-    }
-  })
-
-  it("assigns language detection from a Built-in AI editor", () => {
-    testState.selectedProviderId = BUILT_IN_AI_PROVIDER_ID
-
-    renderProvidersConfig()
-    fireEvent.click(
-      screen.getByRole("switch", {
-        name: "options.apiProviders.languageDetection.title",
-      }),
-    )
-
-    expect(writeConfigMock).toHaveBeenCalledWith({
-      languageDetection: {
-        mode: "llm",
-        providerId: BUILT_IN_AI_PROVIDER_ID,
-      },
-    })
   })
 
   it("counts default assignments on the free Built-in AI card badge", () => {

@@ -1,11 +1,9 @@
 import type { APIProviderConfig } from "@/types/config/provider"
-import type { HostedAiFeature } from "@/utils/hosted-ai/types"
 import { Icon } from "@iconify/react"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router"
 import { SponsorBadge } from "@/components/badges/sponsor-badge"
-import { useHostedAiStatus } from "@/components/llm-providers/use-hosted-ai-status"
 import ProviderIcon from "@/components/provider-icon"
 import { useTheme } from "@/components/providers/theme-provider"
 import { SortableList } from "@/components/sortable-list"
@@ -26,7 +24,6 @@ import {
 import { BUILT_IN_AI_PROVIDER_IDS, type BuiltInAiProviderId } from "@/utils/constants/provider-ids"
 import { API_PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { getSelectionToolbarActions } from "@/utils/custom-actions"
-import { getHostedAiTierStatus } from "@/utils/hosted-ai/status"
 import { i18n } from "@/utils/i18n"
 import {
   getRequestedProviderId,
@@ -34,7 +31,6 @@ import {
   PROVIDER_CONFIG_SECTION_ID,
   shouldHighlightApiKey,
 } from "@/utils/navigation"
-import { isDurablyUnusableTier } from "@/utils/providers/provider-availability"
 import {
   BUILT_IN_AI_PROVIDER_LOGO,
   BUILT_IN_AI_ADVANCE_PROVIDER_ID,
@@ -390,35 +386,8 @@ function BuiltInProviderCard({ providerId }: { providerId: BuiltInAiProviderId }
   )
 }
 
-/**
- * Every hosted-capable FEATURE_KEYS entry, in FEATURE_KEYS order. Language
- * detection is a separate ProviderCapability rather than a FeatureKey, so the
- * built-in editor renders it with LanguageDetectionAssignment below.
- */
-const BUILT_IN_FEATURE_KEYS = [
-  "pageTranslation",
-  "videoSubtitles",
-  "selectionTranslation",
-  "inputTranslation",
-  "noteSuggestion",
-] as const
-
 function BuiltInProviderPanel({ providerId }: { providerId: BuiltInAiProviderId }) {
   const isAdvance = providerId === BUILT_IN_AI_ADVANCE_PROVIDER_ID
-  const modelTier = isAdvance ? ("advance" as const) : ("normal" as const)
-  const { status } = useHostedAiStatus()
-
-  // Both cards list every hosted-capable feature. Same policy as the provider
-  // dropdowns, and now literally the same predicate: rows lock only on durable
-  // account facts (sign-in), never on transient service state (exhausted
-  // quota, open circuit, unconfigured model) — those surface at run time. Fail
-  // open while status is unknown so one failed fetch never locks the UI.
-  const getAssignmentStatus = (feature: HostedAiFeature) => {
-    const tierStatus = getHostedAiTierStatus(status, feature, modelTier)
-    return {
-      disabled: isDurablyUnusableTier(tierStatus),
-    }
-  }
 
   return (
     <BuiltInProviderEditor.Provider providerId={providerId}>
@@ -434,19 +403,6 @@ function BuiltInProviderPanel({ providerId }: { providerId: BuiltInAiProviderId 
               )}
             </ProviderEditor.Attribution>
           </div>
-          <ProviderEditor.Assignments defaultOpen>
-            {BUILT_IN_FEATURE_KEYS.map((featureKey) => (
-              <ProviderEditor.FeatureAssignment
-                key={featureKey}
-                featureKey={featureKey}
-                {...getAssignmentStatus(featureKey)}
-              />
-            ))}
-            <ProviderEditor.LanguageDetectionAssignment
-              {...getAssignmentStatus("languageDetection")}
-            />
-            <ProviderEditor.CustomActionAssignments {...getAssignmentStatus("customAction")} />
-          </ProviderEditor.Assignments>
         </EntityEditor.Body>
       </EntityEditor.Root>
     </BuiltInProviderEditor.Provider>

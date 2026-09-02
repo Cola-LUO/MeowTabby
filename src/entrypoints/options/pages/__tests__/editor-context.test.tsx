@@ -1,21 +1,16 @@
 // @vitest-environment jsdom
 
-import type { APIProviderConfig } from "@/types/config/provider"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { describe, expect, it } from "vitest"
-import { ThemeProvider } from "@/components/providers/theme-provider"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
 import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
-import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { getBuiltInDictionaryAction } from "@/utils/custom-actions"
 import {
   BuiltInProviderEditor,
-  CustomProviderEditor,
   ProviderEditor,
-  useProviderForm,
   useProviderEditor,
 } from "../api-providers/providers-config/provider-editor"
 import {
@@ -52,23 +47,6 @@ function createConfigStore() {
   const store = createStore()
   store.set(configAtom, structuredClone(DEFAULT_CONFIG))
   return store
-}
-
-function CustomProviderAssignments({ providerConfig }: { providerConfig: APIProviderConfig }) {
-  const form = useProviderForm(providerConfig, async () => {})
-
-  return (
-    <CustomProviderEditor.Provider
-      providerConfig={providerConfig}
-      form={form}
-      duplicate={async () => {}}
-      delete={async () => {}}
-    >
-      <ProviderEditor.Assignments defaultOpen>
-        <ProviderEditor.CustomActionAssignments />
-      </ProviderEditor.Assignments>
-    </CustomProviderEditor.Provider>
-  )
 }
 
 describe("editor compound component contexts", () => {
@@ -152,49 +130,6 @@ describe("editor compound component contexts", () => {
       const selectionToolbar = store.get(configAtom).selectionToolbar
       expect(selectionToolbar.customActions).toEqual([])
       expect(selectionToolbar.noteSuggestion.actionId).toBe(BUILT_IN_DICTIONARY_ACTION_ID)
-    })
-  })
-
-  it("assigns an action and enables a disabled custom provider through context actions", async () => {
-    const store = createConfigStore()
-    const config = structuredClone(store.get(configAtom))
-    // The default config no longer ships an API provider, so add one to exercise
-    // enabling a disabled provider through a built-in action assignment.
-    const providerConfig: APIProviderConfig = {
-      ...DEFAULT_PROVIDER_CONFIG.openai,
-      id: "openai-test-provider",
-    }
-    config.providersConfig = [...config.providersConfig, providerConfig]
-    config.providersConfig = config.providersConfig.map((provider) =>
-      provider.id === providerConfig.id ? { ...provider, enabled: false } : provider,
-    )
-    store.set(configAtom, config)
-    const dictionary = getBuiltInDictionaryAction(config.selectionToolbar)
-
-    render(
-      <Provider store={store}>
-        <ThemeProvider forcedTheme="light">
-          <CustomProviderAssignments providerConfig={{ ...providerConfig, enabled: false }} />
-        </ThemeProvider>
-      </Provider>,
-    )
-
-    const assignmentRow = screen.getByText(dictionary.name).parentElement
-    const assignmentSwitch = assignmentRow?.querySelector('[role="switch"]')
-    if (!(assignmentSwitch instanceof HTMLElement)) {
-      throw new Error("Expected the Dictionary assignment switch")
-    }
-    fireEvent.click(assignmentSwitch)
-
-    await waitFor(() => {
-      const updatedConfig = store.get(configAtom)
-      expect(
-        updatedConfig.providersConfig.find((provider) => provider.id === providerConfig.id)
-          ?.enabled,
-      ).toBe(true)
-      expect(getBuiltInDictionaryAction(updatedConfig.selectionToolbar).providerId).toBe(
-        providerConfig.id,
-      )
     })
   })
 })
