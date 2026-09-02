@@ -1318,7 +1318,7 @@ hostedAi:
   ultraBadge:
     tooltip: 需开通 Ultra 套餐 · 点击徽章获取套餐
   availability:
-    authenticationRequired: 登录后可使用
+    authenticationRequired: 请设置自定义API或登录充值后使用
     ultraRequired: 需要 Ultra 套餐
     quotaExhausted: 额度已用完
     serviceUnavailable: 暂时不可用
