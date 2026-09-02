@@ -10,7 +10,7 @@ account:
 billing:
   errors:
     network: 网络错误，请稍后重试
-    balanceInsufficient: 余额不足，请充值
+    balanceInsufficient: 需使用自定义API，或登录充值使用
     sessionExpired: 登录已过期，请重新登录
     generic: 请求失败，请稍后重试
     passwordMismatch: 两次输入的新密码不一致，请重新输入

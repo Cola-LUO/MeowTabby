@@ -84,7 +84,9 @@ export async function createBillingTextPartStream(
     }
     const detail = await readErrorDetail(response)
     if (response.status === 402) {
-      throw classifyBillingHttpError(402, detail ?? i18n.t("billing.errors.balanceInsufficient"))
+      // Fixed guidance copy wins over the backend detail: the message must
+      // point users at the two real exits (custom API / sign-in + top-up).
+      throw classifyBillingHttpError(402, i18n.t("billing.errors.balanceInsufficient"))
     }
     throw classifyBillingHttpError(response.status, detail ?? response.statusText)
   }

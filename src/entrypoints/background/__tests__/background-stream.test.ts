@@ -10,8 +10,6 @@ const outputObjectMock = vi.fn<(...args: any[]) => any>((params: Record<string, 
 const getModelByIdMock = vi.fn<(...args: any[]) => any>()
 const loggerErrorMock = vi.fn<(...args: any[]) => any>()
 const createBillingTextPartStreamMock = vi.fn<(...args: any[]) => any>()
-const hostedStreamStructuredObjectMock = vi.fn<(...args: any[]) => any>()
-const hostedNoteSuggestionStreamMock = vi.fn<(...args: any[]) => any>()
 const parsePartialJsonMock = vi.fn<(...args: any[]) => any>(async (text: string | undefined) => {
   if (!text) {
     return { state: "undefined-input", value: undefined }
@@ -45,19 +43,6 @@ vi.mock("ai", () => ({
 
 vi.mock("@/utils/providers/model", () => ({
   getModelById: getModelByIdMock,
-}))
-
-vi.mock("@/utils/orpc/background-client", () => ({
-  backgroundOrpcClient: {
-    hostedAi: {
-      customAction: {
-        streamStructuredObject: hostedStreamStructuredObjectMock,
-      },
-      noteSuggestion: {
-        streamStructuredObject: hostedNoteSuggestionStreamMock,
-      },
-    },
-  },
 }))
 
 vi.mock("@/utils/billing/generate", () => ({
@@ -221,15 +206,13 @@ describe("background-stream", () => {
   })
 
   it("streams hosted structured object output from background", async () => {
-    hostedStreamStructuredObjectMock.mockResolvedValue(
+    createBillingTextPartStreamMock.mockResolvedValue(
       (async function* () {
-        yield { type: "start" }
-        yield { type: "text-delta", id: "text-1", text: '{"score":97' }
-        yield { type: "start-step", request: {}, warnings: [] }
-        yield { type: "reasoning-start", id: "reasoning-1" }
-        yield { type: "reasoning-delta", id: "reasoning-1", text: "checking context" }
-        yield { type: "reasoning-end", id: "reasoning-1" }
-        yield { type: "text-delta", id: "text-1", text: ',"summary":"Strong argument structure"}' }
+        yield { type: "text-delta", text: '{"score":97' }
+        yield { type: "reasoning-start" }
+        yield { type: "reasoning-delta", text: "checking context" }
+        yield { type: "reasoning-end" }
+        yield { type: "text-delta", text: ',"summary":"Strong argument structure"}' }
         yield { type: "finish", finishReason: "stop" }
       })(),
     )
@@ -256,20 +239,17 @@ describe("background-stream", () => {
     )
 
     expect(getModelByIdMock).not.toHaveBeenCalled()
-    expect(hostedStreamStructuredObjectMock).toHaveBeenCalledWith(
-      {
-        instructions: "Return structured data",
-        prompt: "Analyze selection",
-        outputSchema: [
-          { name: "score", type: "number" },
-          { name: "summary", type: "string" },
-        ],
-        temperature: undefined,
-        modelTier: "advance",
-        requestId: "123e4567-e89b-42d3-a456-426614174000",
-      },
-      { signal: undefined },
-    )
+    expect(createBillingTextPartStreamMock).toHaveBeenCalledTimes(1)
+    const billingCall = createBillingTextPartStreamMock.mock.calls[0]![0]
+    expect(billingCall).toMatchObject({
+      requestId: "123e4567-e89b-42d3-a456-426614174000",
+      feature: "customAction",
+      prompt: "Analyze selection",
+    })
+    // Directive injection: original instructions + JSON contract as text.
+    expect(billingCall.systemPrompt).toContain("Return structured data")
+    expect(billingCall.systemPrompt).toContain('"score"')
+    expect(billingCall.systemPrompt).toContain("JSON")
     expect(result).toEqual({
       output: {
         score: 97,
@@ -283,56 +263,15 @@ describe("background-stream", () => {
     expect(chunkSnapshots.at(-1)).toEqual(result)
   })
 
-  it("surfaces guest hosted rate limit errors with the sign-in message", async () => {
-    hostedStreamStructuredObjectMock.mockResolvedValue(
-      (async function* () {
-        yield { type: "start" }
-        throw Object.assign(new Error("Too Many Requests"), {
-          code: "TOO_MANY_REQUESTS",
-          status: 429,
-          data: { quotaScope: "guest", retryAfterMs: 42_000 },
-        })
-      })(),
-    )
-
-    const { runStructuredObjectStreamInBackground } = await import("../background-stream")
-
-    let caught: unknown
-    try {
-      await runStructuredObjectStreamInBackground({
-        providerId: "read-frog-free-ai",
-        instructions: "Return structured data",
-        prompt: "Analyze selection",
-        outputSchema: [{ name: "score", type: "number" }],
-      })
-    } catch (error) {
-      caught = error
-    }
-
-    expect(caught).toBeInstanceOf(Error)
-    expect((caught as Error).message).toContain("hostedAi.errors.guestRateLimited")
-    expect(
-      defaultRequestRetryPolicy.decide(caught, {
-        retryCount: 0,
-        maxRetries: 2,
-        baseRetryDelayMs: 1_000,
-        now: Date.now(),
-        rateLimitRetryCount: 0,
-        consecutiveRateLimits: 0,
+  it("keeps a billing 429 retryable on the rate-limit path", async () => {
+    createBillingTextPartStreamMock.mockRejectedValue(
+      Object.assign(new Error("请求过于频繁"), {
+        statusCode: 429,
+        kind: "rate-limit",
+        isRetryable: true,
+        // Deterministic pause: Retry-After wins over the jittered backoff.
+        retryAfterMs: 42_000,
       }),
-    ).toEqual({ action: "pause-and-retry", pauseMs: 42_000 })
-  })
-
-  it("does not normalize billing-period quota exhaustion into short-term traffic limiting", async () => {
-    hostedStreamStructuredObjectMock.mockResolvedValue(
-      (async function* () {
-        yield { type: "start" }
-        throw Object.assign(new Error("Quota exhausted"), {
-          code: "HOSTED_AI_QUOTA_EXHAUSTED",
-          status: 429,
-          data: { quotaScope: "guest", retryAfterMs: 42_000 },
-        })
-      })(),
     )
 
     const { runStructuredObjectStreamInBackground } = await import("../background-stream")
@@ -351,9 +290,45 @@ describe("background-stream", () => {
       caught = error
     }
 
-    expect(caught).toBeInstanceOf(Error)
-    expect((caught as Error).message).toContain("hostedAi.availability.quotaExhausted")
-    expect((caught as Error & { retryAfterMs?: number }).retryAfterMs).toBeUndefined()
+    expect(
+      defaultRequestRetryPolicy.decide(caught, {
+        retryCount: 0,
+        maxRetries: 2,
+        baseRetryDelayMs: 1_000,
+        now: Date.now(),
+        rateLimitRetryCount: 0,
+        consecutiveRateLimits: 0,
+      }),
+    ).toEqual({ action: "pause-and-retry", pauseMs: 42_000 })
+  })
+
+  it("drains the backlog on a billing 402 with the guidance copy intact", async () => {
+    createBillingTextPartStreamMock.mockRejectedValue(
+      Object.assign(new Error("需使用自定义API，或登录充值使用"), {
+        statusCode: 402,
+        kind: "access-denied",
+        isRetryable: false,
+      }),
+    )
+
+    const { runStructuredObjectStreamInBackground } = await import("../background-stream")
+
+    let caught: unknown
+    try {
+      await runStructuredObjectStreamInBackground({
+        providerId: "read-frog-free-ai",
+        modelTier: "normal",
+        requestId: "123e4567-e89b-42d3-a456-426614174002",
+        instructions: "Return structured data",
+        prompt: "Analyze selection",
+        outputSchema: [{ name: "score", type: "number" }],
+      })
+    } catch (error) {
+      caught = error
+    }
+
+    // The fixed guidance copy survives untouched — no oRPC re-normalization.
+    expect((caught as Error).message).toBe("需使用自定义API，或登录充值使用")
     expect(
       defaultRequestRetryPolicy.decide(caught, {
         retryCount: 0,
@@ -365,59 +340,6 @@ describe("background-stream", () => {
       }),
     ).toEqual({ action: "fail", failQueue: true })
   })
-
-  it.each([
-    {
-      code: "HOSTED_AI_TIER_RESTRICTED",
-      status: 403,
-      messageKey: "hostedAi.availability.ultraRequired",
-    },
-    {
-      code: "UNAUTHORIZED",
-      status: 401,
-      messageKey: "hostedAi.availability.authenticationRequired",
-    },
-  ])(
-    "drains the backlog on $code without leaking the transport status",
-    async ({ code, status, messageKey }) => {
-      hostedStreamStructuredObjectMock.mockResolvedValue(
-        (async function* () {
-          yield { type: "start" }
-          throw Object.assign(new Error("denied"), { code, status, data: {} })
-        })(),
-      )
-
-      const { runStructuredObjectStreamInBackground } = await import("../background-stream")
-
-      let caught: unknown
-      try {
-        await runStructuredObjectStreamInBackground({
-          providerId: "read-frog-free-ai",
-          modelTier: "normal",
-          requestId: "123e4567-e89b-42d3-a456-426614174002",
-          instructions: "Return structured data",
-          prompt: "Analyze selection",
-          outputSchema: [{ name: "score", type: "number" }],
-        })
-      } catch (error) {
-        caught = error
-      }
-
-      expect(caught).toBeInstanceOf(Error)
-      expect((caught as Error).message).toContain(messageKey)
-      expect((caught as Error & { retryAfterMs?: number }).retryAfterMs).toBeUndefined()
-      expect(
-        defaultRequestRetryPolicy.decide(caught, {
-          retryCount: 0,
-          maxRetries: 2,
-          baseRetryDelayMs: 1_000,
-          now: Date.now(),
-          rateLimitRetryCount: 0,
-          consecutiveRateLimits: 0,
-        }),
-      ).toEqual({ action: "fail", failQueue: true })
-    },
-  )
 
   // Denials arrive two ways and they are thrown by different code. Failing to
   // open the stream lands in `createHostedTextPartStream`'s own `catch`; a
@@ -1113,7 +1035,6 @@ describe("background-stream", () => {
       thinking: { status: "complete", text: "" },
     })
     expect(createBillingTextPartStreamMock).not.toHaveBeenCalled()
-    expect(hostedStreamStructuredObjectMock).not.toHaveBeenCalled()
   })
 
   it("streams hosted note suggestions and adapts the contract object into the envelope", async () => {
@@ -1133,11 +1054,10 @@ describe("background-stream", () => {
       ],
     }
     const hostedObjectJson = JSON.stringify(hostedObject)
-    hostedNoteSuggestionStreamMock.mockResolvedValue(
+    createBillingTextPartStreamMock.mockResolvedValue(
       (async function* () {
-        yield { type: "start" }
-        yield { type: "text-delta", id: "text-1", text: hostedObjectJson.slice(0, 40) }
-        yield { type: "text-delta", id: "text-1", text: hostedObjectJson.slice(40) }
+        yield { type: "text-delta", text: hostedObjectJson.slice(0, 40) }
+        yield { type: "text-delta", text: hostedObjectJson.slice(40) }
         yield { type: "finish", finishReason: "stop" }
       })(),
     )
@@ -1153,17 +1073,15 @@ describe("background-stream", () => {
 
     expect(getModelByIdMock).not.toHaveBeenCalled()
     expect(streamTextMock).not.toHaveBeenCalled()
-    expect(hostedStreamStructuredObjectMock).not.toHaveBeenCalled()
-    expect(hostedNoteSuggestionStreamMock).toHaveBeenCalledWith(
-      {
-        instructions: "Suggest words",
-        prompt: "Selection context",
-        temperature: undefined,
-        modelTier: "advance",
-        requestId: "123e4567-e89b-42d3-a456-426614174010",
-      },
-      { signal: undefined },
-    )
+    expect(createBillingTextPartStreamMock).toHaveBeenCalledTimes(1)
+    const billingCall = createBillingTextPartStreamMock.mock.calls[0]![0]
+    expect(billingCall).toMatchObject({
+      feature: "noteSuggestion",
+      requestId: "123e4567-e89b-42d3-a456-426614174010",
+      prompt: "Selection context",
+    })
+    expect(billingCall.systemPrompt).toContain("Suggest words")
+    expect(billingCall.systemPrompt).toContain('"summaryFieldName"')
     // The contract's action.createNewDictionaryAction / action.targetActionId
     // are dropped in the envelope adaptation; only summaryFieldName survives.
     expect(result).toEqual({
@@ -1185,9 +1103,9 @@ describe("background-stream", () => {
       },
       notes: [{ fields: [{ name: "Word", value: "ephemeral" }] }],
     }
-    hostedNoteSuggestionStreamMock.mockResolvedValue(
+    createBillingTextPartStreamMock.mockResolvedValue(
       (async function* () {
-        yield { type: "text-delta", id: "text-1", text: JSON.stringify(hostedObject) }
+        yield { type: "text-delta", text: JSON.stringify(hostedObject) }
         yield { type: "finish", finishReason: "stop" }
       })(),
     )
@@ -1195,14 +1113,15 @@ describe("background-stream", () => {
     const { runNoteSuggestionStreamInBackground } = await import("../background-stream")
     await runNoteSuggestionStreamInBackground({
       providerId: "read-frog-free-ai",
+      modelTier: undefined,
+      requestId: "123e4567-e89b-42d3-a456-426614174012",
       instructions: "Suggest words",
       prompt: "Selection context",
     })
 
-    expect(hostedNoteSuggestionStreamMock).toHaveBeenCalledWith(
-      expect.objectContaining({ modelTier: "normal" }),
-      { signal: undefined },
-    )
+    // modelTier is dropped by the billing route; the contract schema default
+    // still validates the payload before the paid call.
+    expect(createBillingTextPartStreamMock).toHaveBeenCalledTimes(1)
   })
 
   it("rejects invalid hosted note suggestion input before calling the procedure", async () => {
@@ -1238,48 +1157,9 @@ describe("background-stream", () => {
     expect((contractCaught as Error & { code?: string }).code).toBe("invalid_request")
     expect((contractCaught as Error).message).toBe("Invalid hosted AI request")
 
-    expect(hostedNoteSuggestionStreamMock).not.toHaveBeenCalled()
+    expect(createBillingTextPartStreamMock).not.toHaveBeenCalled()
     expect(streamTextMock).not.toHaveBeenCalled()
     expect(getModelByIdMock).not.toHaveBeenCalled()
-  })
-
-  it("normalizes hosted note suggestion quota exhaustion into an access-denied failure", async () => {
-    hostedNoteSuggestionStreamMock.mockRejectedValue(
-      Object.assign(new Error("Quota exhausted"), {
-        code: "HOSTED_AI_QUOTA_EXHAUSTED",
-        status: 429,
-        data: { quotaScope: "user", retryAfterMs: 42_000 },
-      }),
-    )
-
-    const { runNoteSuggestionStreamInBackground } = await import("../background-stream")
-
-    let caught: unknown
-    try {
-      await runNoteSuggestionStreamInBackground({
-        providerId: "read-frog-free-ai",
-        modelTier: "normal",
-        requestId: "123e4567-e89b-42d3-a456-426614174011",
-        instructions: "Suggest words",
-        prompt: "Selection context",
-      })
-    } catch (error) {
-      caught = error
-    }
-
-    expect(caught).toBeInstanceOf(Error)
-    expect((caught as Error).message).toContain("hostedAi.availability.quotaExhausted")
-    expect((caught as Error & { retryAfterMs?: number }).retryAfterMs).toBeUndefined()
-    expect(
-      defaultRequestRetryPolicy.decide(caught, {
-        retryCount: 0,
-        maxRetries: 2,
-        baseRetryDelayMs: 1_000,
-        now: Date.now(),
-        rateLimitRetryCount: 0,
-        consecutiveRateLimits: 0,
-      }),
-    ).toEqual({ action: "fail", failQueue: true })
   })
 
   it("propagates provider resolution failures for note suggestions", async () => {

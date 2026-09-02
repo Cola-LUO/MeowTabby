@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import { isAPIProviderConfig } from "@/types/config/provider"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
 import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
 import { getBuiltInDictionaryAction } from "@/utils/custom-actions"
@@ -158,12 +159,13 @@ describe("editor compound component contexts", () => {
   it("assigns an action and enables a disabled custom provider through context actions", async () => {
     const store = createConfigStore()
     const config = structuredClone(store.get(configAtom))
-    const providerConfig = config.providersConfig.find(
-      (provider) => provider.id === "openai-default",
-    )
-    if (!providerConfig || !isAPIProviderConfig(providerConfig)) {
-      throw new Error("Expected the default OpenAI provider")
+    // The default config no longer ships an API provider, so add one to exercise
+    // enabling a disabled provider through a built-in action assignment.
+    const providerConfig: APIProviderConfig = {
+      ...DEFAULT_PROVIDER_CONFIG.openai,
+      id: "openai-test-provider",
     }
+    config.providersConfig = [...config.providersConfig, providerConfig]
     config.providersConfig = config.providersConfig.map((provider) =>
       provider.id === providerConfig.id ? { ...provider, enabled: false } : provider,
     )

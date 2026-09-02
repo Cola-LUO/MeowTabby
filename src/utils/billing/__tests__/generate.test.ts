@@ -122,7 +122,12 @@ describe("createBillingTextPartStream", () => {
     })
     await expect(createBillingTextPartStream(INPUT)).rejects.toSatisfy((error: unknown) => {
       const meta = getRequestErrorMeta(error)
-      return meta.statusCode === 402 && meta.kind === "access-denied"
+      if (meta.statusCode !== 402 || meta.kind !== "access-denied") {
+        return false
+      }
+      // Fixed guidance copy wins over the backend detail ("余额不足"); the
+      // mocked i18n facade resolves keys to themselves.
+      return (error as Error).message === "billing.errors.balanceInsufficient"
     })
   })
 

@@ -10,7 +10,7 @@ account:
 billing:
   errors:
     network: Network error, please try again later.
-    balanceInsufficient: Balance insufficient. Please recharge.
+    balanceInsufficient: 사용자 지정 API를 이용하거나 로그인 후 충전하여 이용해 주세요.
     sessionExpired: Your session has expired. Please log in again.
     generic: Request failed, please try again later.
     passwordMismatch: The two passwords do not match.

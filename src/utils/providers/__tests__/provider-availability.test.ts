@@ -120,7 +120,7 @@ describe("canProviderRefGenerateText", () => {
     expect(
       canProviderRefGenerateText({
         kind: "local",
-        config: providerById("openai-default") as never,
+        config: { id: "openai-default", provider: "openai" } as never,
       }),
     ).toBe(true)
     expect(
