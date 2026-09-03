@@ -13,6 +13,7 @@ import { TooltipProvider } from "@/components/ui/base-ui/tooltip"
 import { isLLMProviderConfig } from "@/types/config/provider"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { getBuiltInDictionaryAction } from "@/utils/custom-actions"
 import { buildContextSnapshot, createRangeSnapshot, normalizeSelectedText } from "../../utils"
 import { setSelectionStateAtom } from "../atoms"
@@ -362,6 +363,21 @@ vi.mock("@/utils/message", () => ({
   sendMessage: vi.fn<(...args: any[]) => any>(),
 }))
 
+// The config atom rehydrates from storage on mount and every write reconciles
+// against storage, so the storage fixture — not `store.set` — is what keeps
+// extra LLM providers alive across those cycles. Plain functions survive
+// `vi.resetAllMocks()`.
+let storageConfig: Config = DEFAULT_CONFIG
+
+vi.mock("@/utils/atoms/storage-adapter", () => ({
+  storageAdapter: {
+    get: async (_key: string, fallback: unknown) => storageConfig ?? fallback,
+    set: async () => {},
+    setMeta: async () => {},
+    watch: () => () => {},
+  },
+}))
+
 function cloneConfig(config: Config): Config {
   return JSON.parse(JSON.stringify(config)) as Config
 }
@@ -598,6 +614,15 @@ describe("selection toolbar requests", () => {
     })
     getOrCreateWebPageContextMock.mockResolvedValue(null)
     getOrGenerateWebPageSummaryMock.mockResolvedValue(undefined)
+    // Two local LLM rows so provider-switch fixtures always have an alternate.
+    storageConfig = {
+      ...DEFAULT_CONFIG,
+      providersConfig: [
+        ...DEFAULT_CONFIG.providersConfig,
+        DEFAULT_PROVIDER_CONFIG.openai,
+        DEFAULT_PROVIDER_CONFIG.jalapenocloud,
+      ],
+    }
   })
 
   afterEach(() => {
@@ -860,6 +885,10 @@ describe("selection toolbar requests", () => {
     renderWithProviders(<TranslateButton />, store)
 
     const updatedConfig = cloneConfig(store.get(configAtom))
+    updatedConfig.providersConfig = [
+      ...updatedConfig.providersConfig,
+      DEFAULT_PROVIDER_CONFIG.openai,
+    ]
     setSelectionToolbarTranslateProvider(updatedConfig, "openai-default")
     act(() => {
       store.set(configAtom, updatedConfig)
@@ -902,6 +931,10 @@ describe("selection toolbar requests", () => {
 
     const store = createStore()
     const updatedConfig = cloneConfig(DEFAULT_CONFIG)
+    updatedConfig.providersConfig = [
+      ...updatedConfig.providersConfig,
+      DEFAULT_PROVIDER_CONFIG.openai,
+    ]
     setSelectionToolbarTranslateProvider(updatedConfig, "openai-default")
     store.set(configAtom, updatedConfig)
     setSelectionState(store, { text: "Selected text" })
@@ -1874,7 +1907,13 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    const configWithLlm = cloneConfig(DEFAULT_CONFIG)
+    configWithLlm.providersConfig = [
+      ...configWithLlm.providersConfig,
+      DEFAULT_PROVIDER_CONFIG.openai,
+      DEFAULT_PROVIDER_CONFIG.jalapenocloud,
+    ]
+    store.set(configAtom, configWithLlm)
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1897,10 +1936,17 @@ describe("selection toolbar requests", () => {
     expect(streamBackgroundStructuredObjectMock).toHaveBeenCalledTimes(1)
 
     const updatedConfig = cloneConfig(store.get(configAtom))
+    console.log(
+      "DEBUG providers:",
+      JSON.stringify(updatedConfig.providersConfig.map((p) => `${p.id}:${p.provider}`)),
+    )
     const currentProviderId = updatedConfig.selectionToolbar.builtInActions.dictionary.providerId
+    console.log("DEBUG current:", currentProviderId)
     const nextProviderId = findAlternateLLMProviderId(updatedConfig, currentProviderId)
     if (!nextProviderId) {
-      throw new Error("No alternate LLM provider available for custom action test")
+      throw new Error(
+        `No alternate LLM provider available for custom action test. current=${currentProviderId} providers=${JSON.stringify(updatedConfig.providersConfig.map((p) => `${p.id}:${p.provider}:${String(isLLMProviderConfig(p))}`))}`,
+      )
     }
     updatedConfig.selectionToolbar.builtInActions.dictionary = {
       ...updatedConfig.selectionToolbar.builtInActions.dictionary,
@@ -2041,7 +2087,13 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    const configWithLlm = cloneConfig(DEFAULT_CONFIG)
+    configWithLlm.providersConfig = [
+      ...configWithLlm.providersConfig,
+      DEFAULT_PROVIDER_CONFIG.openai,
+      DEFAULT_PROVIDER_CONFIG.jalapenocloud,
+    ]
+    store.set(configAtom, configWithLlm)
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 

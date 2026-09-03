@@ -3,6 +3,7 @@ import type { HostedAiStatus, HostedAiTierStatus } from "@/utils/hosted-ai/types
 import { describe, expect, it } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { buildFeatureProviderPatch } from "@/utils/constants/feature-providers"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { isSystemProviderSelectorItem } from "@/utils/providers/provider-display"
 import {
   BUILT_IN_AI_PROVIDER_LOGO,
@@ -17,8 +18,13 @@ import {
 } from "../helpers"
 
 function getProviderById(id: string): ProviderConfig {
-  const provider = DEFAULT_CONFIG.providersConfig.find((item) => item.id === id)
-  if (!provider) throw new Error(`Provider "${id}" not found in DEFAULT_CONFIG.providersConfig`)
+  // The default list only carries microsoft/google translate since the
+  // openai/jalapenocloud/atlascloud rows were dropped; LLM fixtures fall back
+  // to the preset templates, which keep the same `-default` ids.
+  const provider =
+    DEFAULT_CONFIG.providersConfig.find((item) => item.id === id) ??
+    Object.values(DEFAULT_PROVIDER_CONFIG).find((item) => item.id === id)
+  if (!provider) throw new Error(`Provider "${id}" not found in DEFAULT_PROVIDER_CONFIG`)
   return provider
 }
 
@@ -516,7 +522,7 @@ describe("feature providers", () => {
       const result = resolveLanguageDetectionConfigForModeChange(
         DEFAULT_CONFIG.languageDetection,
         "llm",
-        DEFAULT_CONFIG.providersConfig,
+        [getProviderById("google-translate-default"), getProviderById("openai-default")],
       )
 
       expect(result).toEqual({
@@ -532,7 +538,7 @@ describe("feature providers", () => {
           providerId: "jalapenocloud-default",
         },
         "llm",
-        DEFAULT_CONFIG.providersConfig,
+        [getProviderById("jalapenocloud-default")],
       )
 
       expect(result).toEqual({

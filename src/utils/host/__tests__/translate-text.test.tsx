@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { NO_TRANSLATION_SENTINEL } from "@/utils/constants/prompt"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { detectLanguage } from "@/utils/content/language"
 import { Sha256Hex } from "@/utils/hash"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
@@ -19,6 +20,14 @@ import {
 import { getTranslatePrompt } from "@/utils/prompts/translate"
 import { HostedAiProviderUnavailableError } from "@/utils/providers/provider-ref"
 import { isTranslationCancelledError } from "@/utils/request/cancellation"
+
+// LLM-path fixtures need an actual LLM row in providersConfig; the default
+// list only carries microsoft/google translate since the openai row was
+// dropped from fresh installs.
+const CONFIG_WITH_OPENAI = {
+  ...DEFAULT_CONFIG,
+  providersConfig: [...DEFAULT_CONFIG.providersConfig, DEFAULT_PROVIDER_CONFIG.openai],
+}
 
 // Mock dependencies
 vi.mock("@/utils/config/storage", () => ({
@@ -327,7 +336,7 @@ describe("translate-text", () => {
   describe("translateTextForPageTitle", () => {
     it("should use the latest original title instead of document.title when building webpage context", async () => {
       const llmConfig = {
-        ...DEFAULT_CONFIG,
+        ...CONFIG_WITH_OPENAI,
         pageTranslation: {
           ...DEFAULT_CONFIG.pageTranslation,
           providerId: "openai-default",
@@ -361,7 +370,7 @@ describe("translate-text", () => {
 
     it("should include webpage content for AI-aware title translation", async () => {
       const llmConfig = {
-        ...DEFAULT_CONFIG,
+        ...CONFIG_WITH_OPENAI,
         pageTranslation: {
           ...DEFAULT_CONFIG.pageTranslation,
           providerId: "openai-default",
@@ -395,7 +404,7 @@ describe("translate-text", () => {
 
     it("should forward document.title to regular page translations", async () => {
       const llmConfig = {
-        ...DEFAULT_CONFIG,
+        ...CONFIG_WITH_OPENAI,
         pageTranslation: {
           ...DEFAULT_CONFIG.pageTranslation,
           providerId: "openai-default",
@@ -447,7 +456,7 @@ describe("translate-text", () => {
 
     it("includes webpage summary for AI-aware llm input translations", async () => {
       const llmConfig = {
-        ...DEFAULT_CONFIG,
+        ...CONFIG_WITH_OPENAI,
         pageTranslation: {
           ...DEFAULT_CONFIG.pageTranslation,
           enableAIContentAware: true,
@@ -486,7 +495,7 @@ describe("translate-text", () => {
 
     it("degrades to no summary when the optional summary hits a hosted denial", async () => {
       mockGetConfigFromStorage.mockResolvedValue({
-        ...DEFAULT_CONFIG,
+        ...CONFIG_WITH_OPENAI,
         pageTranslation: {
           ...DEFAULT_CONFIG.pageTranslation,
           enableAIContentAware: true,
@@ -524,7 +533,7 @@ describe("translate-text", () => {
     // wrong route once made page translation gate on the input-translation
     // quota (and bypass the session's provider-ref snapshot).
     const llmAiAwareConfig = {
-      ...DEFAULT_CONFIG,
+      ...CONFIG_WITH_OPENAI,
       pageTranslation: {
         ...DEFAULT_CONFIG.pageTranslation,
         providerId: "openai-default",

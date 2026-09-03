@@ -2,6 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { PageTranslationManager } from "../page-translation"
 
 const {
@@ -144,6 +145,9 @@ describe("pageTranslationManager title handling", () => {
   it("primes webpage context on start for AI-aware llm translation", async () => {
     mockGetLocalConfig.mockResolvedValue({
       ...DEFAULT_CONFIG,
+      // The openai row was dropped from the default list; the LLM-path fixture
+      // still points at it, so carry it in providersConfig explicitly.
+      providersConfig: [...DEFAULT_CONFIG.providersConfig, DEFAULT_PROVIDER_CONFIG.openai],
       pageTranslation: {
         ...DEFAULT_CONFIG.pageTranslation,
         providerId: "openai-default",

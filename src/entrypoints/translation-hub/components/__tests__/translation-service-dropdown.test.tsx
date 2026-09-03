@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { TranslationServiceDropdown } from "@/entrypoints/translation-hub/components/translation-service-dropdown"
 import { buildHostedAiStatusFromBilling } from "@/utils/billing/hosted-status-adapter"
 import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/constants/provider-ids"
-import { DEFAULT_PROVIDER_CONFIG_LIST } from "@/utils/constants/providers"
+import { DEFAULT_PROVIDER_CONFIG, DEFAULT_PROVIDER_CONFIG_LIST } from "@/utils/constants/providers"
 
 const {
   hostedAiStatusMock,
@@ -153,7 +153,12 @@ function mockHostedStatus(signedIn: boolean) {
 describe("TranslationServiceDropdown", () => {
   beforeEach(() => {
     setSelectedIdsMock.mockClear()
-    providersConfigFixture.current = structuredClone(DEFAULT_PROVIDER_CONFIG_LIST)
+    // The default list only carries microsoft/google translate; the dropdown
+    // group tests expect a local LLM row (OpenAI) to render as well.
+    providersConfigFixture.current = structuredClone([
+      ...DEFAULT_PROVIDER_CONFIG_LIST,
+      DEFAULT_PROVIDER_CONFIG.openai,
+    ])
     selectedIdsFixture.current = []
     mockHostedStatus(true)
   })

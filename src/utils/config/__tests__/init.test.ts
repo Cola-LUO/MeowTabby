@@ -2,7 +2,10 @@ import type { Config } from "@/types/config/config"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { isAPIProviderConfig } from "@/types/config/provider"
 import { CONFIG_SCHEMA_VERSION, DEFAULT_CONFIG } from "@/utils/constants/config"
-import { MICROSOFT_TRANSLATE_PROVIDER_ID } from "@/utils/constants/providers"
+import {
+  DEFAULT_PROVIDER_CONFIG_LIST,
+  MICROSOFT_TRANSLATE_PROVIDER_ID,
+} from "@/utils/constants/providers"
 
 const getItemMock = vi.fn<(...args: any[]) => any>()
 const getMetaMock = vi.fn<(...args: any[]) => any>()
@@ -106,11 +109,10 @@ describe("initializeConfig", () => {
     expect(setItemMock).toHaveBeenCalledTimes(1)
     expect(setItemMock).toHaveBeenCalledWith("local:config", expect.any(Object))
     const freshConfig = setItemMock.mock.calls[0]?.[1] as Config
-    for (const providerId of ["openai-default", "jalapenocloud-default", "atlascloud-default"]) {
-      expect(freshConfig.providersConfig.find((provider) => provider.id === providerId)).toEqual(
-        expect.objectContaining({ description: expect.any(String) }),
-      )
-    }
+    // The fresh config carries the default provider list verbatim (each row's
+    // description — present on LLM rows, absent on pure translators — comes
+    // from the preset templates).
+    expect(freshConfig.providersConfig).toEqual(DEFAULT_PROVIDER_CONFIG_LIST)
     expect(setMetaMock).toHaveBeenCalledTimes(1)
     expect(setMetaMock).toHaveBeenCalledWith(
       "local:config",
