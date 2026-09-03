@@ -107,24 +107,11 @@ popup:
         action: Haz clic para cambiar a bilingüe
   hub:
     tooltip: Traduce texto con varios modelos al mismo tiempo
-  discord:
-    tooltip: Únete a Discord para conectar con desarrolladores y obtener acceso anticipado a nuevas funciones
-  blog:
-    notification: Novedades de MeowTabby
   aiSmartContext: Contexto inteligente de IA
   aiSmartContextDescription: Usa el contexto de la página web para mejorar la calidad de la traducción. Requiere un proveedor de traducción LLM.
   more:
     title: Más
-    help: Ayuda
-    tutorial: Tutorial
     emailUs: Escríbenos
-    featureRequest: Sugerir una función
-    bugReport: Informar de un fallo
-    community: Comunidad
-    joinDiscord: Unirse a Discord
-    joinWechat: Unirse al grupo de WeChat
-    starGithub: Marcar con estrella en GitHub
-    rateUs: Calificarnos
 errorRecovery:
   title: Algo salió mal
   description: El modo de recuperación está activo. Puedes exportar tu configuración actual como copia de seguridad y luego restablecer la configuración e intentarlo de nuevo.

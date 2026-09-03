@@ -107,24 +107,11 @@ popup:
         action: 點選切換為雙語對照
   hub:
     tooltip: 一次使用多個翻譯模型翻譯文字
-  discord:
-    tooltip: 加入 Discord 與開發者討論，搶先體驗新功能
-  blog:
-    notification: 翻译喵更新動態
   aiSmartContext: AI 智慧上下文
   aiSmartContextDescription: 結合網頁前後文提升翻譯品質。需要設定 LLM 翻譯服務提供者。
   more:
     title: 更多
-    help: 說明
-    tutorial: 使用教學
     emailUs: 電子郵件聯絡
-    featureRequest: 功能建議
-    bugReport: 回報問題
-    community: 社群
-    joinDiscord: 加入 Discord
-    joinWechat: 加入微信群
-    starGithub: 在 GitHub 加星
-    rateUs: 給予好評
 errorRecovery:
   title: 應用程式發生異常
   description: 已進入復原模式。可先匯出目前設定作為備份，重設設定後再重試。
