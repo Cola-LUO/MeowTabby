@@ -20,7 +20,7 @@ export function WhatsNewFooter() {
               />
             }
           >
-            <Icon icon="tabler:coin" />
+            <Icon icon="fluent:clipboard-chat-empty-24-regular" />
             <span>{i18n.t("options.whatsNew.title")}</span>
           </PopoverTrigger>
         </SidebarMenuItem>
