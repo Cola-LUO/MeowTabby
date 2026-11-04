@@ -1,13 +1,12 @@
 import { z } from "zod"
 
 export const PRODUCTION_EXTENSION_ENV_DEFAULTS = {
-  WXT_API_URL: "https://api.readfrog.app",
+  WXT_API_URL: "https://mtapi.netxmeow.top",
   // 上架合规：内容脚本只允许注入自家域名，不得注入上游 readfrog.app（2026-09-25）
   WXT_OFFICIAL_SITE_ORIGINS: "https://netxmeow.top,https://www.netxmeow.top",
   // 用父域即可命中 mtapi.netxmeow.top 的会话 cookie
   WXT_AUTH_COOKIE_DOMAINS: "netxmeow.top",
-  // .invalid 是 IANA 保留 TLD：明示占位，发版前必须以真实 HTTPS 域名覆盖
-  WXT_BILLING_API_URL: "https://billing.meowtabby.invalid",
+  WXT_BILLING_API_URL: "https://mtapi.netxmeow.top",
 } as const
 
 export const LOCAL_EXTENSION_ENV_DEFAULTS = {

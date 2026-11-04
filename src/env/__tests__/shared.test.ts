@@ -51,13 +51,13 @@ describe("extension env resolution", () => {
     expect(
       resolveExtensionEnv({
         WXT_USE_LOCAL_PACKAGES: "true",
-        WXT_API_URL: "https://preview-api.readfrog.app",
+        WXT_API_URL: "https://api.example.com",
         WXT_AUTH_COOKIE_DOMAINS: "preview.readfrog.app",
       }),
     ).toMatchObject({
       ...LOCAL_EXTENSION_ENV_DEFAULTS,
       WXT_USE_LOCAL_PACKAGES: "true",
-      WXT_API_URL: "https://preview-api.readfrog.app",
+      WXT_API_URL: "https://api.example.com",
       WXT_AUTH_COOKIE_DOMAINS: "preview.readfrog.app",
     })
   })
@@ -99,7 +99,7 @@ describe("extension env parsing", () => {
   it("rejects urls with trailing slashes", () => {
     expect(() =>
       parseResolvedExtensionEnv({
-        WXT_API_URL: "https://api.readfrog.app/",
+        WXT_API_URL: "https://mtapi.netxmeow.top/",
       }),
     ).toThrowError("must not end with a trailing slash")
   })
@@ -226,9 +226,10 @@ describe("extension env parsing", () => {
 })
 
 describe("WXT_BILLING_API_URL", () => {
-  it("defaults to the .invalid placeholder in production mode", () => {
+  it("uses the MeowTabby host for both production APIs", () => {
     const resolved = resolveExtensionEnv({})
-    expect(resolved.WXT_BILLING_API_URL).toBe("https://billing.meowtabby.invalid")
+    expect(resolved.WXT_API_URL).toBe("https://mtapi.netxmeow.top")
+    expect(resolved.WXT_BILLING_API_URL).toBe("https://mtapi.netxmeow.top")
   })
 
   it("defaults to localhost:8000 when local packages are enabled", () => {

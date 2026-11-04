@@ -17,9 +17,7 @@ import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
 import { createFeatureUsageContext } from "@/utils/analytics"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { APP_NAME } from "@/utils/constants/app"
-import { buildFeaturebaseFeedbackMetadata, buildFeaturebasePortalUrl } from "@/utils/featurebase"
 import { i18n } from "@/utils/i18n"
-import { resolveUiLocale } from "@/utils/i18n/locale-map"
 import { sendMessage } from "@/utils/message"
 import { cn } from "@/utils/styles/utils"
 import { matchDomainPattern } from "@/utils/url"
@@ -126,7 +124,6 @@ function getNormalizedFloatingContainerTop(mainButtonTop: number, mainOffsetY: n
 
 export default function FloatingButton() {
   const [floatingButton, setFloatingButton] = useAtom(configFieldsAtomMap.floatingButton)
-  const uiLanguage = useAtomValue(configFieldsAtomMap.uiLanguage)
   const translationState = useAtomValue(enablePageTranslationAtom)
   const [isDraggingButton, setIsDraggingButton] = useAtom(isDraggingButtonAtom)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -141,7 +138,6 @@ export default function FloatingButton() {
   const floatingButtonSide = getFloatingButtonSide(floatingButton.side)
   const isFloatingButtonExpanded = isHitAreaExpanded || isDropdownOpen
   const isMainButtonAttached = isFloatingButtonLocked || isFloatingButtonExpanded
-  const locale = resolveUiLocale(uiLanguage)
 
   useEffect(() => {
     if (!isDraggingButton) return undefined
@@ -218,17 +214,7 @@ export default function FloatingButton() {
   }
 
   const handleFeedbackClick = () => {
-    const url = buildFeaturebasePortalUrl({
-      destination: "feedback",
-      locale,
-      metadata: buildFeaturebaseFeedbackMetadata({
-        browserName: import.meta.env.BROWSER,
-        extensionVersion: browser.runtime.getManifest().version,
-        pageUrl: window.location.href,
-      }),
-    })
-
-    void sendMessage("openPage", { url, active: true })
+    void sendMessage("openPage", { url: "https://netxmeow.top/meowtabby/support/", active: true })
   }
 
   const startActiveDrag = () => {
