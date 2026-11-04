@@ -1,0 +1,70 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.pnpm-store/
+.output
+# 本地打包的 YOLO 模型（72MB，不走 git）
+public/*.onnx
+stats.html
+stats-*.html
+stats-*.json
+.wxt
+web-ext.config.ts
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.p12
+*.pfx
+*.key
+*credentials*.json
+*secrets*.json
+
+coverage/
+.turbo/
+.nx/
+.claude/worktrees/
+
+tsconfig.local.json
+
+docs/
+
+/repos
+
+scripts/output/
+
+reference/
+.gstack/
+
+# ===== 隐私 / 密钥 / 环境配置（切勿提交到公开仓库） =====
+# .env.production 内含生产后端地址等私有配置，不入库
+.env.production
+# 其余 .env / .env.* 已在上方统一忽略；.env.example 与 .env.local.example 为公开模板保留跟踪
+
+# 共用本地 PDF 模型与内部验证生成物
+/model-store/
+/tools/pdf-verify/.output/
+/tools/pdf-verify/.wxt/
+/tools/pdf-verify/dev/output/
+/开发周报.md

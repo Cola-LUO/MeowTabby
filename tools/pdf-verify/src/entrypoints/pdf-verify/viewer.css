@@ -1,0 +1,331 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #1a1a1a;
+  color: #e5e5e5;
+}
+#app {
+  min-height: 100vh;
+}
+#app.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #dc2626;
+  color: white;
+  padding: 8px 16px;
+  z-index: 9999;
+  display: none;
+  white-space: pre-wrap;
+}
+
+.file-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+}
+.file-picker p {
+  font-size: 16px;
+  color: #a3a3a3;
+}
+.file-btn {
+  padding: 12px 32px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.file-btn:hover {
+  background: #2563eb;
+}
+.slice-option {
+  font-size: 14px;
+  color: #d4d4d4;
+  cursor: pointer;
+}
+.slice-option input {
+  margin-right: 4px;
+}
+.slice-status {
+  margin-top: -12px;
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.toolbar {
+  padding: 12px 16px;
+  background: #262626;
+  border-bottom: 1px solid #404040;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  font-size: 7.8px;
+}
+.toolbar button {
+  padding: 8px 16px;
+  background: #525252;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: inherit;
+}
+.toolbar button:hover {
+  background: #737373;
+}
+.toolbar-label {
+  margin-left: 12px;
+  font-size: inherit;
+  color: #a3a3a3;
+}
+.toolbar-label input[type="checkbox"] {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.toolbar-select {
+  margin-left: 4px;
+  padding: 4px 6px;
+  background: #404040;
+  color: #e5e5e5;
+  border: 1px solid #525252;
+  border-radius: 4px;
+  font-size: inherit;
+}
+.toolbar-status {
+  margin-left: 12px;
+  font-size: inherit;
+  color: #a3a3a3;
+}
+.toolbar-compare {
+  margin-left: 12px;
+  padding: 5px 8px;
+  min-width: 0;
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  border: 1px solid #525252;
+  border-radius: 4px;
+  font-size: inherit;
+  color: #e5e5e5;
+}
+.compare-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fde047;
+  font: inherit;
+  cursor: pointer;
+}
+.compare-link:hover {
+  text-decoration: underline;
+}
+
+.file-picker .hint2 {
+  font-size: 13px;
+  color: #737373;
+}
+
+.panes {
+  display: flex;
+  height: calc(100vh - 49px);
+}
+.pane--left {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 16px;
+}
+.pane--middle {
+  width: 420px;
+  flex: none;
+  overflow-y: auto;
+  padding: 16px;
+  background: #202020;
+  border-left: 1px solid #404040;
+}
+.pane--right {
+  width: 380px;
+  flex: none;
+  overflow-y: auto;
+  padding: 16px;
+  background: #262626;
+  border-left: 1px solid #404040;
+}
+
+.page-wrap {
+  margin-bottom: 24px;
+}
+.page-header {
+  font-size: 14px;
+  color: #a3a3a3;
+  margin-bottom: 8px;
+}
+.canvas-wrap {
+  position: relative;
+  display: inline-block;
+}
+.canvas-wrap canvas {
+  display: block;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+.region-box {
+  position: absolute;
+  border: 1px solid;
+  border-radius: 2px;
+}
+/* 同段组高亮：只留半透明块，不要边框（边框压住 PDF 文字，影响阅读） */
+.para-box {
+  position: absolute;
+  border: none;
+  border-radius: 3px;
+}
+.paragraph-outline {
+  position: absolute;
+  border: 1px dashed rgba(6, 182, 212, 0.8);
+  background: rgba(6, 182, 212, 0.1);
+  border-radius: 2px;
+}
+.compare-target {
+  position: absolute;
+  z-index: 11;
+  border: 3px solid #fde047;
+  border-radius: 3px;
+  background: #fde04733;
+}
+.para-label {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  font-size: 11px;
+  font-weight: bold;
+}
+.order-badge {
+  position: absolute;
+  z-index: 10;
+  padding: 0 4px;
+  font-weight: bold;
+  color: #111;
+  background: #fde047;
+  border: 1px solid #854d0e;
+  border-radius: 3px;
+  line-height: 1.4;
+  opacity: 0.6;
+  transform: translateX(-100%);
+}
+
+.panel-header {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.request-card {
+  margin-bottom: 12px;
+  border: 1px solid #525252;
+  border-radius: 6px;
+  background: #303030;
+}
+.request-card--selected {
+  border-color: #fde047;
+}
+.request-title {
+  padding: 8px 12px;
+  border-bottom: 1px solid #525252;
+  font-size: 12px;
+  color: #a3a3a3;
+}
+.request-variant {
+  padding: 8px 12px 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #a3a3a3;
+}
+.request-text + .request-variant {
+  border-top: 1px solid #525252;
+}
+.request-text {
+  margin: 0;
+  padding: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    13px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+.request-changed {
+  color: #f87171;
+}
+.request-difference {
+  padding: 8px 12px;
+  border-top: 1px solid #525252;
+  color: #a3a3a3;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.group-card {
+  background: #303030;
+  border: 1px solid #737373;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.group-item {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #a3a3a3;
+  border-top: 1px solid #2a2a2a;
+  word-break: break-all;
+}
+
+/* 每次判定：结论、两段摘录、总分及分项。 */
+.pair-title {
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.verdict-ok {
+  color: #4ade80;
+  font-weight: bold;
+}
+.verdict-no {
+  color: #f87171;
+  font-weight: bold;
+}
+.pair-excerpt {
+  padding: 2px 12px;
+  text-indent: 2em;
+  font-size: 12px;
+  color: #d4d4d4;
+  overflow-wrap: anywhere;
+}
+.pair-score {
+  padding: 5px 12px 8px;
+  font-size: 11px;
+  color: #a3a3a3;
+  overflow-wrap: anywhere;
+}
