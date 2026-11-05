@@ -1,0 +1,5 @@
+Đọc bài nghiên cứu trong Edge với PDF gốc ở bên trái và bản dịch ở bên phải. Khi gặp một thuật ngữ khó hiểu, bạn có thể nhìn sang câu gốc ngay bên cạnh. MeowTabby nhận diện bố cục trang ngay trong trình duyệt và cố gắng nối các phần của đoạn văn kéo dài sang cột hoặc trang tiếp theo trước khi dịch. Bạn có thể đối chiếu công thức với lời giải thích, rồi xuất kết quả thành PDF để đọc lại sau.
+
+Trên trang web, bạn có thể chọn xem song ngữ hoặc chỉ xem bản dịch. Chọn một từ để dịch, xem giải thích hoặc nghe đọc. Với trình phát video được hỗ trợ, bạn có thể xem phụ đề song ngữ và xuất tệp phụ đề. Trong trung tâm dịch, hãy gửi cùng một đoạn văn đến nhiều dịch vụ để so sánh cách diễn đạt.
+
+Bạn có thể dùng dịch vụ AI tích hợp trong phạm vi số dư tài khoản, hoặc nhập khóa API riêng để sử dụng dịch vụ của nhà cung cấp theo điều khoản của họ.

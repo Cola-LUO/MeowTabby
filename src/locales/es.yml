@@ -354,53 +354,6 @@ options:
         urlPattern: Patrón de URL
     config:
       title: Configuración
-      googleDrive:
-        title: Sincronización cloud con Google Drive
-        description: Descarga la configuración cuando la remota es más reciente, sube la configuración cuando la local es más reciente
-        sync: Sincronizar con Google Drive
-        syncing: Sincronizando...
-        syncSuccess:
-          uploaded: Configuración local subida a la nube
-          downloaded: Configuración remota aplicada
-          sameChanges: Mismos cambios en ambos lados, sincronizado
-          noChange: Ya está sincronizado
-          unresolved: Conflictos resueltos y sincronizados
-        syncError: Error de sincronización, inténtalo de nuevo
-        metadataCorrupted: Metadatos de sincronización dañados, configuración remota aplicada
-        lastSyncTime: Última sincronización a las
-        logout: Cerrar sesión
-        logoutSuccess: Sesión de cuenta de Google cerrada
-        unresolved:
-          title: Resolución de sincronización de configuración
-          description: Las configuraciones local y remota difieren. Elige qué versión conservar para cada campo.
-          resolved: Resuelto
-          unresolved: Sin resolver
-          localValue: Valor local
-          remoteValue: Valor remoto
-          useLocal: Usar local
-          useRemote: Usar remoto
-          useAllLocal: Usar todo local
-          useAllRemote: Usar todo remoto
-          reset: Restablecer selección
-          progress: $1/$2 cambios resueltos
-          confirm: Confirmar sincronización
-          cancel: Cancelar
-          hasUnresolvedInChildren: ⚠ Contiene cambios sin resolver
-          item: elemento
-          items: elementos
-          unresolvedPrompt: "[Unresolved - Please select]"
-          localLatest: Local más reciente
-          remoteLatest: Remoto más reciente
-          bothChanged: Ambos cambiaron
-          localChanged: Local cambió
-          remoteChanged: Remoto cambió
-          configValid: La configuración es válida
-          configInvalid: La configuración no es válida
-          resolveToContinue: Resuelve los conflictos para continuar
-          validationAlert:
-            title: La configuración combinada tiene errores de validación.
-            description: "Ajusta las diferencias siguientes para corregir:"
-          moreErrors: ...y $1 errores más
       manualSync:
         title: Sincronización manual de configuración
         description: Importa y exporta manualmente tus ajustes de configuración

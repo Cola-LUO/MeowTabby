@@ -1,0 +1,39 @@
+Single purpose
+Translate web pages, selected text, PDF documents and supported video subtitles, with original and translated text available for comparison.
+
+storage
+Store translation settings, provider preferences and local application data in the user's browser.
+
+tabs
+Identify the active tab for translation actions and open extension pages such as settings, PDF translation and the translation center.
+
+alarms
+Schedule local configuration backups and periodic cleanup of translation caches and local data.
+
+cookies
+Observe authentication-cookie changes on configured service domains to invalidate cached authentication state and keep hosted-service status consistent with sign-in changes.
+
+contextMenus
+Provide translation actions for selected text through the browser context menu.
+
+scripting
+Inject the translation interface and required scripts into pages or frames when the user invokes translation.
+
+webNavigation
+Track navigation and frames to maintain translation state, update the extension icon and inject translation support into the appropriate page frames.
+
+offscreen
+Use a local offscreen document for text-to-speech audio playback.
+
+sidePanel
+Currently opens the extension's coming-soon side panel. Translation functionality is provided through the popup, in-page interface and dedicated extension pages. This placeholder is not promoted as a working translation feature.
+
+Host permissions (*://*/*)
+Read user-selected text and page content, insert translated text into the original page, handle supported video subtitles and contact the translation endpoint chosen by the user. Translation can be used on arbitrary websites.
+
+Remote code
+JavaScript and WebAssembly executables are packaged with the extension. The remotely downloaded PDF layout model is an ONNX data file. It is cached for layout inference.
+
+Data usage working notes
+待按后台实际选项填写：邮箱、账号认证信息、托管 AI 用量和扣费记录，以及用户主动翻译的网页、选中文本、PDF 或字幕内容。使用自备 API Key 时，请求发送到用户选择的服务商。使用内置 AI 时，请求经过自有后端并转发给模型服务商。当前无 Google Drive 同步，PostHog 未配置、统计关闭。
+根据公开隐私政策和实际后台字段完成后再保存声明，不能把此工作说明当成问卷已完成。

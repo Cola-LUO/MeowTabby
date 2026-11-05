@@ -176,17 +176,19 @@ export function splitByCapacity(
   if (translated.trim() === "") return { pieces: parts.map(() => ""), scale: 1 }
 
   const scales = opts.scales ?? SCALE_STEPS
-  const last = parts.length - 1
   for (const scale of scales) {
     const caps = parts.map((b) => maxChars(translated, b, scale))
-    const counts = allocateChars(translated.length, caps, MIN_CHARS)
-    // 后盒吃剩余 → 用它的硬容量校验（口径②：装不下就降档，绝不撑高）
-    if (counts[last]! <= caps[last]!) {
-      const softened = softenCutPoints(translated, counts, MIN_CHARS)
-      // 软化把字转给末盒 → 校正后可能超出它的硬容量；越界就放弃软化（宁可切在句中，也不许撑高）
-      const final = softened[last]! <= caps[last]! ? softened : counts
-      return { pieces: sliceByCounts(translated, final), scale }
+    if (caps.reduce((sum, cap) => sum + cap, 0) < translated.length) continue
+    const counts = caps.map(() => 0)
+    for (let i = 0; i < translated.length; i++) {
+      let best = -1
+      for (let k = 0; k < caps.length; k++) {
+        if (counts[k]! >= caps[k]!) continue
+        if (best < 0 || counts[k]! / caps[k]! < counts[best]! / caps[best]!) best = k
+      }
+      counts[best]!++
     }
+    return { pieces: sliceByCounts(translated, counts), scale }
   }
   // 全档失败：总容量 < 总内容 → 比例兜底（每盒轻微溢出，各自盒内滚动兜底）
   return { pieces: ratioSplit(translated, parts), scale: scales[scales.length - 1]! }

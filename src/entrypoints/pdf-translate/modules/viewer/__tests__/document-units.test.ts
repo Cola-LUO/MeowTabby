@@ -110,7 +110,7 @@ describe("D文档单元回填现有原位盒", () => {
     units[0]!.fill("整条标题")
     expect(views[0]!.clusters[0]!.box.textContent).toBe("整条标题")
   })
-  it("保留前盒可用空间与末盒原位高度", () => {
+  it("外部提供扩展空间时仍锁定所有原位高度", () => {
     const a = setup(1, ["first"]),
       b = setup(2, ["second"])
     const units = buildTranslationUnits(
@@ -121,7 +121,7 @@ describe("D文档单元回填现有原位盒", () => {
       ]),
       { availHeight: () => 100 },
     )
-    expect(units[0]!.layoutTargets.map((t) => t.availHeight)).toEqual([100, 20])
+    expect(units[0]!.layoutTargets.map((t) => t.availHeight)).toEqual([20, 20])
     expect(units[0]!.groupBoxes?.map((t) => t.isLast)).toEqual([false, true])
   })
   it("重复回填清空本盒，不累积文字", () => {
@@ -157,12 +157,12 @@ describe("保留合并组原有字符容量分配", () => {
     expect(boxes.map((box) => box.textContent)).toEqual(["甲译一句。乙译二", "句。丙译三句。"])
     expect(boxes[0]!.style.fontSize).toBe(`${9 * 0.81}px`)
   })
-  it("前盒可向下扩展时优先容纳，末盒仍锁定原位容量", () => {
+  it("外部提供扩展空间时所有文字框仍沿用原位容量", () => {
     const { group, boxes } = narrowGroup(40)
     group.fill("甲译一句。乙译二句。丙译三句。")
-    expect(boxes.map((box) => box.textContent)).toEqual(["甲译一句。乙译二句。", "丙译三句。"])
-    expect(boxes[0]!.style.fontSize).toBe("9px")
-    expect(group.layoutTargets.map((t) => t.availHeight)).toEqual([40, 10])
+    expect(boxes.map((box) => box.textContent)).toEqual(["甲译一句。乙译二", "句。丙译三句。"])
+    expect(boxes[0]!.style.fontSize).toBe(`${9 * 0.81}px`)
+    expect(group.layoutTargets.map((t) => t.availHeight)).toEqual([10, 10])
   })
   it("实测后重排替换原文字，保持全部译文", () => {
     const { group, boxes } = narrowGroup(40)

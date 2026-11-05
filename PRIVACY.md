@@ -38,7 +38,6 @@ PDF 翻译的原文件完全在你的浏览器本地解析与渲染，**原 PDF 
 
 ### 1.6 可选功能
 
-- **Google Drive 备份**：仅当你主动使用该功能时，才会通过 Google 官方授权流程访问你的 Drive，用于保存/恢复你的扩展配置，备份文件存在你自己的 Drive 中；
 - **版面识别模型下载**：PDF 翻译首次使用时会从 huggingface.co（或其镜像 hf-mirror.com）下载约 75MB 的开源模型文件，下载源可看到你的 IP；模型缓存在本地，之后不再重复下载。
 
 ## 2. 我们如何使用数据
@@ -133,7 +132,6 @@ The extension contains PostHog analytics code, but the shipped build has **no an
 
 ### 1.6 Optional Features
 
-- **Google Drive backup**: only when you actively use it; authorized via Google's official OAuth flow; backups are saved to your own Drive.
 - **Layout model download**: on first use of PDF translation, a ~75MB open-source model is downloaded from huggingface.co (or mirror hf-mirror.com), then cached locally.
 
 ## 2. How We Use Data

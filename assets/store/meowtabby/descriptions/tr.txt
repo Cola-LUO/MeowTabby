@@ -1,0 +1,5 @@
+Edge'de makale okurken özgün PDF'yi solda, çevirisini sağda görün. Bir terimin anlamından emin olamadığınızda hemen yanındaki cümleye bakabilirsiniz. MeowTabby, sayfa düzenini tarayıcınızda tanır ve sonraki sütuna ya da sayfaya taşan paragrafları çevirmeden önce birleştirmeye çalışır. Formülleri açıklamalarıyla birlikte okuyabilir, sonucu daha sonra başvurmak üzere PDF olarak dışa aktarabilirsiniz.
+
+Web sayfalarında iki dilli görünüm ile yalnızca çeviriyi gösteren görünüm arasında geçiş yapın. Bir sözcüğü seçerek çevirisini veya açıklamasını görün ya da sesli okunuşunu dinleyin. Desteklenen video oynatıcılarda iki dilli altyazıları görüntüleyip dışa aktarabilirsiniz. Çeviri merkezinde aynı metni birden fazla hizmete gönderip çevirileri yan yana karşılaştırabilirsiniz.
+
+Yerleşik yapay zekâ hizmetini hesabınızdaki kullanılabilir krediyle kullanabilir veya kendi API anahtarınızı girerek seçtiğiniz sağlayıcının koşullarına göre işlem yapabilirsiniz.

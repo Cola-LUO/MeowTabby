@@ -1,0 +1,22 @@
+MeowTabby certification testing notes
+
+Purpose
+MeowTabby translates web pages, selected text, PDF documents and subtitles. Users can compare original and translated text.
+
+Testing
+1. Open the extension popup and settings. Choose a translation provider and target language.
+2. For a provider requiring an API key, enter your own valid key. Built-in hosted AI requires signing into a MeowTabby account with sufficient credit.
+3. Open an ordinary English article and use the floating translation button. Compare the original and translated paragraphs.
+4. Select an English sentence to open selection translation.
+5. Open the PDF translation page from the extension, choose a text-based PDF, and translate a short page range. Compare original and translated pages, including formulas and multi-column paragraphs.
+6. The layout model is downloaded on first use from Hugging Face or the configured mirror, then cached. This download requires network access and is about 75 MB.
+7. Visit https://netxmeow.top/meowtabby/support/ to test feedback. The support form may require login and Cloudflare verification.
+8. Hosted AI requests are processed by our backend and forwarded to the model provider. Hosted AI credit is separate from installing the extension.
+9. The browser side panel currently shows a coming-soon page; it is not advertised as a translation feature.
+10. Google Drive synchronization is removed. Local configuration import/export and local backups remain available.
+
+Privacy policy
+https://netxmeow.top/meowtabby/privacy/
+
+Reviewer account
+待补：正式提交前应提供专用测试账号及足够的测试额度。请勿将个人账号密码填入此文件。

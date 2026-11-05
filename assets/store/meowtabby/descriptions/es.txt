@@ -1,0 +1,5 @@
+Lee artículos en Edge con el PDF original a la izquierda y la traducción a la derecha. Si dudas de un término, puedes consultar la frase original sin perder el hilo. MeowTabby reconoce la estructura de la página en el navegador e intenta unir los párrafos que continúan en otra columna o página antes de traducirlos. Así puedes consultar una fórmula junto con su explicación y exportar el resultado en PDF para más adelante.
+
+En la web, alterna entre la vista bilingüe y la traducción. Selecciona una palabra para traducirla, ver una explicación o escucharla. En reproductores compatibles puedes leer subtítulos bilingües y exportarlos. El centro de traducción te permite comparar cómo traducen varios servicios el mismo pasaje.
+
+Puedes usar el servicio de IA integrado con el crédito disponible en tu cuenta o introducir tu propia clave API y utilizar el proveedor que elijas según sus condiciones.

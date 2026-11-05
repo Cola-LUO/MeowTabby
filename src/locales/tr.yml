@@ -353,53 +353,6 @@ options:
         urlPattern: URL Deseni
     config:
       title: Yapılandırma
-      googleDrive:
-        title: Google Drive bulut senkronizasyonu
-        description: Uzak daha yeniyse indirir, yerel daha yeniyse yükler
-        sync: Google Drive'a Senkronize Et
-        syncing: Senkronize ediliyor...
-        syncSuccess:
-          uploaded: Yerel ayarlar buluta yüklendi
-          downloaded: Uzak ayarlar uygulandı
-          sameChanges: Yerel ve uzak değişiklikler aynı, senkronize edildi
-          noChange: Zaten güncel
-          unresolved: Çakışmalar çözüldü ve senkronize edildi
-        syncError: Senkronizasyon başarısız, lütfen tekrar deneyin
-        metadataCorrupted: Senkronizasyon meta verileri bozuk, uzak yapılandırma uygulandı
-        lastSyncTime: Son senkronizasyon
-        logout: Çıkış yap
-        logoutSuccess: Google hesabından çıkış yapıldı
-        unresolved:
-          title: Yapılandırma senkronizasyon çözümü
-          description: Yerel ve uzak yapılandırmalar farklı. Lütfen her alan için hangi sürümün tutulacağını seçin.
-          resolved: Çözüldü
-          unresolved: Çözülmedi
-          localValue: Yerel değer
-          remoteValue: Uzak değer
-          useLocal: Yereli kullan
-          useRemote: Uzakı kullan
-          useAllLocal: Tüm yereli kullan
-          useAllRemote: Tüm uzakı kullan
-          reset: Seçimi sıfırla
-          progress: $1/$2 değişiklik çözüldü
-          confirm: Senkronizasyonu onayla
-          cancel: İptal
-          hasUnresolvedInChildren: ⚠ Çözülmemiş değişiklikler içeriyor
-          item: öğe
-          items: öğe
-          unresolvedPrompt: "[Çözülmedi - lütfen seçin]"
-          localLatest: En son yerel
-          remoteLatest: En son uzak
-          bothChanged: Her ikisi de değişti
-          localChanged: Yerel değişti
-          remoteChanged: Uzak değişti
-          configValid: Yapılandırma geçerli
-          configInvalid: Yapılandırma geçersiz
-          resolveToContinue: Devam etmek için çakışmaları çözün
-          validationAlert:
-            title: Birleştirilmiş yapılandırmada doğrulama hataları var
-            description: "Düzeltmek için aşağıdaki farklılıkları ayarlayın:"
-          moreErrors: ...ve $1 hata daha
       manualSync:
         title: Manuel yapılandırma senkronizasyonu
         description: Yapılandırma ayarlarınızı manuel olarak içe ve dışa aktarın

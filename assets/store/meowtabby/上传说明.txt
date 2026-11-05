@@ -1,0 +1,27 @@
+MeowTabby · Edge 商店素材
+
+1. 详细说明（Description）
+打开 descriptions 文件夹，按商店页面语言选择同名 TXT，复制全文。zh_CN 是简体中文，zh_TW 是繁体中文，en 是英语。其余文件分别对应西班牙语（es）、日语（ja）、韩语（ko）、俄语（ru）、土耳其语（tr）和越南语（vi）。名称和短描述由扩展 ZIP 提供。
+
+2. 图片
+Extension logo：上传 logo.png（300 × 300），可复制到所有语言。
+Small promotional tile：上传 promo-small.png（440 × 280，简体中文）。
+Large promotional tile：上传 promo-large.png（1400 × 560，简体中文）。
+Screenshots：按 01.png 至 05.png 的顺序上传（均为 1280 × 800），分别展示公式对照、双栏论文、跨页段落、跨栏段落和网页双语对照。这两张推广图和五张截图用于简体中文页面，其余语言可以只传 Logo。
+
+3. 可选搜索词（简体中文，每项单独填写）
+PDF翻译
+论文翻译
+双语对照
+网页翻译
+划词翻译
+字幕翻译
+翻译喵
+
+4. 页面地址
+官网：https://netxmeow.top/meowtabby/
+支持：https://netxmeow.top/meowtabby/support/
+隐私政策：https://netxmeow.top/meowtabby/privacy/
+
+5. 演示动图（官网等支持 GIF 的页面可用）
+demo.gif 为 1280 × 800 的循环动图。Edge 商店官方文档未说明截图栏支持播放 GIF，截图栏使用上述五张 PNG。商店视频栏选填，如需展示演示，可将原视频上传 YouTube 后填写分享链接。

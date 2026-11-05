@@ -44,6 +44,12 @@ export default defineBackground({
     logger.info("Hello background!", { id: browser.runtime.id })
 
     browser.runtime.onInstalled.addListener(async (details) => {
+      // 清理已下线的 Google Drive 同步凭证和配置副本。
+      await browser.storage.local.remove([
+        "__googleDriveToken",
+        "lastSyncedConfig",
+        "lastSyncedConfig$",
+      ])
       await ensureInitializedConfig()
 
       // Open the local settings page (options.html) when extension is installed

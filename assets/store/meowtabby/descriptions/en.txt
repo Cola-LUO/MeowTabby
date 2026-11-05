@@ -1,0 +1,5 @@
+Read a paper in Edge with the original PDF on the left and the translation on the right. When a term seems ambiguous, glance at the sentence beside it. MeowTabby detects the page layout in your browser and tries to join paragraphs that continue into the next column or onto the next page before translating them. Formulas stay in context, and you can export the result as a PDF to read again later.
+
+On web pages, switch between a bilingual view and the translation alone. Select a word for a translation, an explanation or spoken audio. On supported video players, read bilingual subtitles and export them. In the translation center, send the same passage to several services and compare their wording side by side.
+
+Use the built-in AI service with the credit available on your account, or enter your own API key and use your provider under its terms.

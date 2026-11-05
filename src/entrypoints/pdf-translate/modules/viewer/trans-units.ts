@@ -55,19 +55,11 @@ function clusterOf(view: BlockView, paraIdx: number): BlockCluster | null {
   return view.clusters.find((c) => c.idx.includes(paraIdx)) ?? null
 }
 
-function targetOf(
-  cluster: BlockCluster,
-  ctx: ClusterFitContext | undefined,
-  pageIndex: number,
-  blockId: string,
-  paraIdx: number,
-  allowGrow = true,
-): ClusterLayoutTarget {
-  const avail = allowGrow ? (ctx?.availHeight?.(pageIndex, blockId, paraIdx) ?? null) : null
+function targetOf(cluster: BlockCluster): ClusterLayoutTarget {
   return {
     box: cluster.box,
     minHeight: cluster.geo.h,
-    availHeight: Math.max(avail ?? cluster.geo.h, cluster.geo.h),
+    availHeight: cluster.geo.h,
     width: cluster.geo.w,
     baseFontSize: cluster.fontSize,
     lineHeight: cluster.lineHeight,
@@ -77,22 +69,17 @@ function targetOf(
 export function buildTranslationUnits(
   planned: DocumentUnit[],
   pageViews: Map<number, BlockView[]>,
-  fit?: ClusterFitContext,
+  _fit?: ClusterFitContext,
 ): Unit[] {
   const units: Unit[] = []
   const pushGroupUnit = (plan: DocumentUnit, texts: string[], targets: FillTarget[]) => {
     const clusters = targets.map((tg) => clusterOf(tg.view, tg.paraIdx)!)
     const partBoxes: PartBox[] = targets.map((tg, k) => {
       const cl = clusters[k]!
-      // 后盒（阅读序最后一个 part）高度锁死原位高：绝不向下长（用户硬约束）。
-      // 前盒才享有"向下吃到障碍"的空间；可用高未知（跨页对页无障碍表等）→ 退回原位高（安全侧）
-      const isLast = k === targets.length - 1
-      const avail = isLast
-        ? null
-        : (fit?.availHeight?.(tg.pageIndex, tg.view.blockId, tg.paraIdx) ?? null)
+      // 所有文字框保持原位高度，译文通过统一调整字号和切分来容纳。
       return {
         width: cl.geo.w,
-        availHeight: Math.max(avail ?? cl.geo.h, cl.geo.h),
+        availHeight: cl.geo.h,
         fontSize: cl.fontSize,
         lineHeight: cl.lineHeight,
       }
@@ -117,16 +104,7 @@ export function buildTranslationUnits(
       request: requestTextForUnit(plan),
       kind: "group",
       // 后盒不吃下吃空间（它在阅读序末尾，往下吃就是压住后面的下文）
-      layoutTargets: targets.map((tg, k) =>
-        targetOf(
-          clusters[k]!,
-          fit,
-          tg.pageIndex,
-          tg.view.blockId,
-          tg.paraIdx,
-          k !== targets.length - 1,
-        ),
-      ),
+      layoutTargets: targets.map((_, k) => targetOf(clusters[k]!)),
       fill: (t) => {
         lastRaw = t
         const { pieces, scale } = splitByCapacity(t, partBoxes)
@@ -170,9 +148,7 @@ export function buildTranslationUnits(
     units.push({
       request: requestTextForUnit(plan),
       kind: plan.kind,
-      layoutTargets: clusters.map((c) =>
-        targetOf(c, fit, first.pageIndex, view.blockId, c.idx[0]!),
-      ),
+      layoutTargets: clusters.map((c) => targetOf(c)),
       fill: (translated) => {
         if (plan.kind === "title") {
           const box = clusters[0]!.box
