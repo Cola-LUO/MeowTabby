@@ -79,3 +79,11 @@ reference/
 /.trae/documents/
 /.claude/projects/
 /.claude/plans/
+
+# 一次性产物与本地留档（2026-11-05 清理出索引）
+# 主题配色对比页：决策用的一次性设计稿，无任何引用
+/theme-compare.html
+# web_pdf_trans 遗留合并文档，原实验目录已并入并删除
+/PROJECT_DOCS.md
+# 版面验证的一次性输入/结果快照，可用重跑替代
+/tools/pdf-verify/archive/
