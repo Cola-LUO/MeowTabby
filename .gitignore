@@ -77,8 +77,12 @@ reference/
 # Agent 会话记录和工作草稿
 /.superpowers/
 /.trae/documents/
-/.claude/projects/
-/.claude/plans/
+# Agent 配置与 skill 文档：本地开发辅助，不入公开仓库
+/.claude/
+# 内部设计与实施计划：过程留档，不入公开仓库
+/specs/
+# 本地目录导读文档
+/目录结构说明.md
 
 # 一次性产物与本地留档（2026-11-05 清理出索引）
 # 主题配色对比页：决策用的一次性设计稿，无任何引用
