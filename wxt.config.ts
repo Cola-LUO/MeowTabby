@@ -90,15 +90,20 @@ export default defineConfig({
     }),
   }),
   zip: {
-    includeSources: ["**/*", ".env.production"],
-    excludeSources: [
-      "docs/**/*",
-      "assets/**/*",
-      "repos/**/*",
-      "tools/pdf-verify/**/*",
-      "model-store/**/*",
-      ".superpowers/**/*",
+    includeSources: [
+      "src/**/*",
+      "public/**/*",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "wxt.config.ts",
+      "tsconfig.json",
+      "postcss.config.cjs",
+      "README.md",
+      "LICENSE",
+      "PRIVACY.md",
     ],
+    excludeSources: ["**/.env*", "**/*.onnx"],
   },
   hooks: {
     "build:publicAssets": (_wxt, files) => {

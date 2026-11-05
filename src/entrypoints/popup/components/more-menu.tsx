@@ -8,9 +8,8 @@ import {
 import { i18n } from "@/utils/i18n"
 
 const SUPPORT_EMAIL = "luofchn@outlook.com"
-const REPO_URL = "https://github.com/Cola-LUO/meowtabby"
 
-function openExternal(url: string) {
+function openLink(url: string) {
   window.open(url, "_blank", "noopener,noreferrer")
 }
 
@@ -29,12 +28,12 @@ export function MoreMenu() {
         <span className="text-[13px] font-medium">{i18n.t("popup.more.title")}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="w-fit">
-        <DropdownMenuItem onClick={() => openExternal(REPO_URL)} className="cursor-pointer">
+        <DropdownMenuItem onClick={() => openLink("/open-source.html")} className="cursor-pointer">
           <Icon icon="tabler:scale" className="size-4" strokeWidth={1.6} />
           {i18n.t("popup.more.openSource")}
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => openExternal(`mailto:${SUPPORT_EMAIL}`)}
+          onClick={() => openLink(`mailto:${SUPPORT_EMAIL}`)}
           className="cursor-pointer"
         >
           <Icon icon="tabler:mail" className="size-4" strokeWidth={1.6} />
