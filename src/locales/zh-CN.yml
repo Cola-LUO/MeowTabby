@@ -112,6 +112,7 @@ popup:
   aiSmartContextDescription: 结合网页上下文提升翻译效果。需要配置 LLM 翻译服务商。
   more:
     title: 更多
+    projectWebsite: 项目官网
     openSource: 开源声明
     emailUs: 邮件联系
 errorRecovery:

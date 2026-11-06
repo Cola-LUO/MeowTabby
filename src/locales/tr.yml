@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: Çeviri kalitesini artırmak için web sayfası bağlamını kullanır. LLM çeviri sağlayıcısı gerektirir.
   more:
     title: Daha Fazla
+    projectWebsite: Proje web sitesi
     openSource: Açık Kaynak
     emailUs: Bize e-posta gönderin
 errorRecovery:

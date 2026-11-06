@@ -112,6 +112,7 @@ popup:
   aiSmartContextDescription: Uses webpage context to improve translation quality. Requires LLM translation provider.
   more:
     title: More
+    projectWebsite: Project website
     openSource: Open Source
     emailUs: Email us
 errorRecovery:

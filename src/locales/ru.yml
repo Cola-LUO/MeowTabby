@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: Использует контекст веб-страницы для улучшения качества перевода. Требуется LLM-провайдер перевода.
   more:
     title: Ещё
+    projectWebsite: Официальный сайт
     openSource: Открытый код
     emailUs: Написать нам
 errorRecovery:

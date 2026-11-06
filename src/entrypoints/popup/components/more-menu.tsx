@@ -8,6 +8,7 @@ import {
 import { i18n } from "@/utils/i18n"
 
 const SUPPORT_EMAIL = "luofchn@outlook.com"
+const PROJECT_WEBSITE = "https://netxmeow.top/meowtabby/"
 
 function openLink(url: string) {
   window.open(url, "_blank", "noopener,noreferrer")
@@ -28,6 +29,10 @@ export function MoreMenu() {
         <span className="text-[13px] font-medium">{i18n.t("popup.more.title")}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="w-fit">
+        <DropdownMenuItem onClick={() => openLink(PROJECT_WEBSITE)} className="cursor-pointer">
+          <Icon icon="tabler:world-www" className="size-4" strokeWidth={1.6} />
+          {i18n.t("popup.more.projectWebsite")}
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => openLink("/open-source.html")} className="cursor-pointer">
           <Icon icon="tabler:scale" className="size-4" strokeWidth={1.6} />
           {i18n.t("popup.more.openSource")}

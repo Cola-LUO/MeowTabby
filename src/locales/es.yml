@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: Usa el contexto de la página web para mejorar la calidad de la traducción. Requiere un proveedor de traducción LLM.
   more:
     title: Más
+    projectWebsite: Sitio web oficial
     openSource: Código abierto
     emailUs: Escríbenos
 errorRecovery:

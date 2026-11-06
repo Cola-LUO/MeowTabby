@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: 結合網頁前後文提升翻譯品質。需要設定 LLM 翻譯服務提供者。
   more:
     title: 更多
+    projectWebsite: 專案官網
     openSource: 開源聲明
     emailUs: 電子郵件聯絡
 errorRecovery:

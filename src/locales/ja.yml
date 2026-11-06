@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
   more:
     title: その他
+    projectWebsite: 公式サイト
     openSource: オープンソース
     emailUs: メールで問い合わせ
 errorRecovery:

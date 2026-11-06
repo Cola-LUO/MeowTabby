@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: 웹페이지 컨텍스트를 사용하여 번역 품질을 향상시킵니다. LLM 번역 제공자가 필요합니다.
   more:
     title: 더보기
+    projectWebsite: 프로젝트 공식 사이트
     openSource: 오픈소스
     emailUs: 이메일 문의
 errorRecovery:

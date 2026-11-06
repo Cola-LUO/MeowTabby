@@ -110,6 +110,7 @@ popup:
   aiSmartContextDescription: Sử dụng ngữ cảnh trang web để cải thiện chất lượng dịch. Yêu cầu nhà cung cấp dịch LLM.
   more:
     title: Thêm
+    projectWebsite: Trang web dự án
     openSource: Mã nguồn mở
     emailUs: Gửi email cho chúng tôi
 errorRecovery:
