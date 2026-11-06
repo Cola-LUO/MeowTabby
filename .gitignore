@@ -91,3 +91,5 @@ reference/
 /PROJECT_DOCS.md
 # 版面验证的一次性输入/结果快照，可用重跑替代
 /tools/pdf-verify/archive/
+# 版面验证切片产物（本地生成，不入库）
+/tools/pdf-verify/slices/
