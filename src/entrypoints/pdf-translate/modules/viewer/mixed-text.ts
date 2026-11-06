@@ -127,8 +127,7 @@ export function fillMixedText(el: HTMLElement, paragraphs: string[], render?: Re
  *  —— 行数算得越少，行高就拉得越狠（实测被拉到 2.7 倍），真实内容反而更高，
  *  最后"估算说装得下、实际溢出" → 盒子 overflow:hidden 静默把尾巴裁掉。
  *
- *  映射规则：文本节点原样；`<br>` → 换行；块级子元素（display 公式）独占整行；
- *  排版层装饰（`.linear-mask`）不属于译文，跳过。 */
+ *  映射规则：文本节点原样；`<br>` → 换行；块级子元素（display 公式）独占整行。 */
 export function readMixedText(el: HTMLElement): string {
   let out = ""
   const pushBreak = (): void => {
@@ -142,7 +141,6 @@ export function readMixedText(el: HTMLElement): string {
       }
       if (child.nodeType !== 1) continue
       const e = child as HTMLElement
-      if (e.classList.contains("linear-mask")) continue // 排版层装饰，不是译文
       if (e.tagName === "BR") {
         out += "\n"
         continue

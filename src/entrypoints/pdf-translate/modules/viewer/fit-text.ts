@@ -145,7 +145,7 @@ function sliceByCounts(text: string, counts: number[]): string[] {
   return out
 }
 
-/** 总容量不足时的兜底：按各盒容量比例切（每盒轻微溢出、均匀分担，由盒内滚动兜底）。
+/** 总容量不足时的兜底：按各盒容量比例切（每盒轻微溢出、均匀分担，超出框的内容裁切）。
  *  旧实现里它是"句子数 < 盒数"的退化路径，字符级后升级为"总容量不足"的主兜底路径。 */
 function ratioSplit(text: string, parts: PartBox[]): string[] {
   if (text === "") return parts.map(() => "")
@@ -190,6 +190,6 @@ export function splitByCapacity(
     }
     return { pieces: sliceByCounts(translated, counts), scale }
   }
-  // 全档失败：总容量 < 总内容 → 比例兜底（每盒轻微溢出，各自盒内滚动兜底）
+  // 全档失败：总容量 < 总内容 → 比例兜底（每盒轻微溢出，超出各框的内容裁切）
   return { pieces: ratioSplit(translated, parts), scale: scales[scales.length - 1]! }
 }

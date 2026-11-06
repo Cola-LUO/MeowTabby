@@ -91,7 +91,7 @@ interface AcceptanceEntry {
   keepRects: Array<{ x1: number; y1: number; x2: number; y2: number }>
   /** 渲染后实际高超过"原位高 + 1 行"的簇数（白盒向下长出去 = 压住别人的直接证据） */
   clustersOvergrown: number
-  /** 带 .trans-cluster--overflow 的簇数（装不下、走盒内滚动；排版求解落地后才有值） */
+  /** 带 .trans-cluster--overflow 的簇数（估算溢出标记，仅用于统计） */
   overflowClusters: number
   /** 实测高越过"可用高"（= 障碍边界）的簇数：**结构性不变量，必须恒为 0**
    *  —— 求解器已把盒高钳在可用高内，非 0 即说明越界压住别人的路径重新出现 */
@@ -689,7 +689,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   /** 求解输入：几何来自 target（renderBlocks 建盒时的原位几何），文本取盒内已回填的内容。
    *  文本必须用 readMixedText 读（而不是 textContent）：段间的 `<br>` 不产生文本，textContent
    *  会把多段拼成一条，行数被低估 → 阶段 2 按低估的行数把行高拉得更大 → 真实内容溢出，
-   *  而阶段 3 仍按低估值判"装得下" → 不挂滚动、被 overflow:hidden 静默裁掉。 */
+   *  而阶段 3 仍按低估值判"装得下" → 被 overflow:hidden 静默裁掉。 */
   function layoutInputOf(t: ClusterLayoutTarget, startScale?: number): ClusterLayoutInput {
     return {
       text: readMixedText(t.box),
@@ -730,8 +730,8 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
    *  **阶段 B · 行高降到底仍溢出，才缩字号**：此时行高锁在底线，否则阶段 2 会按"填满原位高"
    *  把刚缩下去的内容又填回来（字号小了、行高更大，内容反而不降），等于白缩。
    *
-   *  **盒高不动（不补框）**：盒高恒为求解结果，两阶段都失败才挂盒内滚动兜底，绝不向外长。
-   *  降到下限仍超只告警（不截断、不透明化、不露原文）。
+   *  **盒高不动（不补框）**：盒高恒为求解结果，两阶段都失败时裁切超出框的内容，绝不向外长。
+   *  降到下限仍超则告警，保留白底。
    *  jsdom 下 scrollHeight/clientHeight 恒 0 → 天然跳过，不污染单测。 */
   function refitOverflowingUnits(units: Unit[]): void {
     const LH_STEP_DOWN = 0.1
@@ -783,7 +783,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       }
       if (!fixed) {
         console.warn(
-          "[render] 降字号到下限仍有盒内容溢出（已挂盒内滚动兜底）：" +
+          "[render] 降字号到下限仍有盒内容溢出（超出框的内容已裁切）：" +
             `可用高 ${Math.round(u.layoutTargets[0]?.availHeight ?? 0)}px，${bad.length} 个白盒`,
         )
       }

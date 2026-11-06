@@ -169,8 +169,6 @@ function injectPrintRules(
         width: auto !important;
       }
       #print-root * { visibility: visible !important; }
-      /* 打印时不能滚动，溢出 cluster 内容必须可见 */
-      .trans-cluster--overflow { overflow: visible !important; }
     }
   `
   document.head.appendChild(style)

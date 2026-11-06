@@ -79,7 +79,7 @@ export function solveClusterLayout(input: ClusterLayoutInput): ClusterLayoutResu
           })
         : { lineHeight: lh0, increase: 0 }
 
-  // 阶段 3：盒高与溢出。overflow 时盒高锁在可用高（绝不越界），由 DOM 层挂滚动兜底
+  // 阶段 3：盒高与溢出。overflow 时盒高锁在可用高（绝不越界），超出框的内容由 CSS 裁切
   const measured = contentSize(text, width, fontSize, fit.lineHeight)
   const overflow = measured.height > avail
   return {

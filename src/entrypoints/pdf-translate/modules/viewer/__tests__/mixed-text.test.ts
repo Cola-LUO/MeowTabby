@@ -120,15 +120,6 @@ describe("readMixedText：读回带段界的文本（排版估算口径）", () 
     expect(readMixedText(el)).toBe("上文\n公式\n下文")
   })
 
-  it("跳过排版层装饰 .linear-mask，不把它算进译文", () => {
-    const el = document.createElement("div")
-    fillMixedText(el, ["正文"])
-    const mask = el.ownerDocument.createElement("div")
-    mask.className = "linear-mask"
-    el.appendChild(mask)
-    expect(readMixedText(el)).toBe("正文")
-  })
-
   it("空盒返回空串", () => {
     expect(readMixedText(document.createElement("div"))).toBe("")
   })

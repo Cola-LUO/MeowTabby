@@ -25,16 +25,16 @@ describe("applyClusterLayout：DOM 写入", () => {
     expect(box.style.lineHeight).toBe("1.6")
   })
 
-  it("溢出 → 加类 + 插 .linear-mask；重复调用不重复插", () => {
+  it("溢出 → 保留统计标记，不添加渐变遮罩", () => {
     const box = mkBox()
     const layout = { scale: 1, lineHeight: 1.3, height: 52, overflow: true, contentHeight: 80 }
     applyClusterLayout(box, layout)
     applyClusterLayout(box, layout)
     expect(box.classList.contains("trans-cluster--overflow")).toBe(true)
-    expect(box.querySelectorAll(".linear-mask")).toHaveLength(1)
+    expect(box.children).toHaveLength(0)
   })
 
-  it("不溢出 → 移除类与 mask（实测复核降档后可回到非溢出态）", () => {
+  it("不溢出 → 移除溢出统计标记", () => {
     const box = mkBox()
     applyClusterLayout(box, {
       scale: 1,
@@ -51,7 +51,7 @@ describe("applyClusterLayout：DOM 写入", () => {
       contentHeight: 40,
     })
     expect(box.classList.contains("trans-cluster--overflow")).toBe(false)
-    expect(box.querySelectorAll(".linear-mask")).toHaveLength(0)
+    expect(box.children).toHaveLength(0)
   })
 
   it("缺 dataset.baseFontSize 时回退到 inline font-size", () => {
