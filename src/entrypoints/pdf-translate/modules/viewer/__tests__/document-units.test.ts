@@ -64,12 +64,12 @@ describe("D文档单元回填现有原位盒", () => {
     expect(views[0]!.clusters.map((c) => c.box.textContent)).toEqual(["译一", "译二"])
     expect(views[0]!.clusters.map((c) => c.box.style.top)).toEqual(["72px", "132px"])
   })
-  it("普通段保留分段请求与回填", () => {
+  it("普通段无需分段标记即可回填", () => {
     const { views, parts } = setup(1, ["one", "two"])
     const units = buildTranslationUnits([unit(parts)], new Map([[1, views]]))
-    expect(units[0]!.request).toContain("%%")
-    units[0]!.fill("译一\n\n%%\n\n译二")
-    expect(views[0]!.clusters.map((c) => c.box.textContent)).toEqual(["译一", "译二"])
+    expect(units[0]!.request).toBe("one two")
+    units[0]!.fill("译一。译二")
+    expect(views[0]!.clusters.map((c) => c.box.textContent).join("")).toBe("译一。译二")
   })
   it("三页组只发一条请求，分别写回三个原位盒", () => {
     const pages = [setup(1, ["first"]), setup(2, ["second"]), setup(3, ["third"])]

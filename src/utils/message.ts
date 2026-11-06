@@ -113,7 +113,7 @@ export interface ProtocolMap {
   /** PDF 对照翻译：viewer 页把一条翻译请求（可能含 %% 多段）发来，background
    * 按设置页「PDF翻译」的 provider 走 billing 队列（feature=web-pdf-trans），
    * 返回带 %% 段结构的原始译文，由 viewer 自行拆分回填。 */
-  translatePdfRequest: (data: { text: string; to: string }) => Promise<string>
+  translatePdfRequest: (data: { text: string; to: string; summary?: string }) => Promise<string>
   /** PDF 翻译设置快照：返回 JSON 字符串（目标语 + provider 身份，含本地
    * provider 的整份配置）。viewer 的「刷新翻译」按钮据此判断设置是否变化：
    * 变了才重翻，没变点击无效。 */

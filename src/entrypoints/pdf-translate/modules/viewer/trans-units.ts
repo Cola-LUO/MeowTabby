@@ -1,6 +1,6 @@
 import type { BlockView, BlockCluster } from "./render-view"
 import type { DocumentUnit } from "@/modules/pdf-core/document-flow"
-import { requestTextForUnit, splitSegments } from "../translate/segment-utils"
+import { requestTextForUnit } from "../translate/segment-utils"
 import { splitByCapacity, type PartBox } from "./fit-text"
 import { fillMixedText } from "./mixed-text"
 import { distributeTextsSkip } from "./render-view"
@@ -157,9 +157,7 @@ export function buildTranslationUnits(
           box.style.backgroundColor = "#fff"
           return
         }
-        const split = translated === "" ? [] : splitSegments(translated)
-        const segments = split.length === texts.length ? split : [translated]
-        const distributed = distributeTextsSkip(view, segments, translated, skip)
+        const distributed = distributeTextsSkip(view, [translated], translated, skip)
         for (const cluster of clusters) {
           cluster.box.replaceChildren()
           fillMixedText(cluster.box, distributed[view.clusters.indexOf(cluster)] ?? [])

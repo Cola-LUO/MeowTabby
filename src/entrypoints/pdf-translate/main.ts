@@ -355,13 +355,16 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   let paragraphHover = createParagraphHover()
   let flowFinished = false
   let translationJobs = new Set<Promise<void>>()
+  let pdfSummary = ""
+  let summaryChecked = false
+  let abstractHeading: PageAnalysis["blocks"][number]["paras"][number] | undefined
   function makeTranslator() {
     const version = translationVersion
     const next = createTranslateScheduler({
       maxConcurrentPages: MAX_CONCURRENT_PAGES,
       translate: async (text) => {
         if (version !== translationVersion) throw new Error("翻译设置已更新")
-        return await sendMessage("translatePdfRequest", { text, to })
+        return await sendMessage("translatePdfRequest", { text, to, summary: pdfSummary })
       },
       onError: (error, text) => {
         if (version === translationVersion)
@@ -563,6 +566,19 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       regions: panel.regionsVisible(st.regions),
     })
     st.analysis = page
+    if (st.index === 1 && !summaryChecked) {
+      summaryChecked = true
+      const paragraphs = page.order.seq.flatMap((block) => block.paras)
+      const heading = paragraphs.findIndex((para) =>
+        ["Abstract", "abstract", "ABSTRACT"].includes(para.text.replace(/\s/g, "")),
+      )
+      abstractHeading = heading >= 0 ? paragraphs[heading] : undefined
+      pdfSummary = heading >= 0 ? (paragraphs[heading + 1]?.text ?? "") : ""
+      if (abstractHeading) {
+        const block = page.order.seq.find((candidate) => candidate.paras.includes(abstractHeading!))
+        if (block) block.behavior = "skip"
+      }
+    }
     st.pageWu = page.pageWu
     st.pageHu = page.pageHu
     const update = flow.push(page)
@@ -622,7 +638,12 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     const jobs = translationJobs
     for (const batch of batches) {
       const units = buildTranslationUnits(batch, pageViews, { availHeight: clusterAvailHeight })
-      const job = fillTranslations(units, version, scheduler).then(() => {
+      const direct = new Set(
+        batch.flatMap((plan, index) =>
+          plan.parts.length === 1 && plan.parts[0]?.paragraph === abstractHeading ? [index] : [],
+        ),
+      )
+      const job = fillTranslations(units, version, scheduler, direct).then(() => {
         if (version !== analysisVersion) return
         for (const page of states)
           if (page.analysis) {
@@ -662,9 +683,13 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     units: Unit[],
     version: number,
     scheduler: ReturnType<typeof createTranslateScheduler>,
+    direct: Set<number>,
   ): Promise<void> {
     const requests = units.map((u) => u.request)
-    const { issued, pages } = await scheduler.fill(requests, () => version === analysisVersion)
+    const { issued, pages } = await scheduler.fill(
+      requests.filter((_, i) => !direct.has(i)),
+      () => version === analysisVersion,
+    )
     if (version !== analysisVersion) return
     if (issued > 0)
       console.info(`[translate] 并行送翻 ${issued} 条（在途批数 ${pages}/${MAX_CONCURRENT_PAGES}）`)
@@ -674,7 +699,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     const solved: { box: HTMLElement; input: ClusterLayoutInput; result: ClusterLayoutResult }[] =
       []
     units.forEach((u, i) => {
-      const startScales = u.fill(scheduler.cache.get(requests[i]!) ?? "")
+      const startScales = u.fill(direct.has(i) ? "摘要" : (scheduler.cache.get(requests[i]!) ?? ""))
       u.layoutTargets.forEach((t, k) => {
         // 可用高落成 data 属性：验收要核"盒高是否越过障碍边界"这个结构性不变量
         t.box.dataset.availHeight = String(t.availHeight)

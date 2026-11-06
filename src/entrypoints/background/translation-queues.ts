@@ -826,7 +826,7 @@ export function setUpPdfTranslation(): void {
     baseRetryDelayMs: 1_000,
   })
   onMessage("translatePdfRequest", async ({ data }) => {
-    const { text, to } = data
+    const { text, to, summary } = data
     const config = (await ensureInitializedConfig()) ?? DEFAULT_CONFIG
     const targetCode = (to && PDF_SRC_LANG_TO_TARGET_CODE[to]) || config.language.targetCode
     const langConfig = { ...config.language, targetCode }
@@ -856,7 +856,7 @@ export function setUpPdfTranslation(): void {
     const hostedRequestId = providerRef.kind === "system" ? getRandomUUID() : undefined
     const thunk = (signal?: AbortSignal) =>
       executeQueuedTranslation(text, langConfig, providerRef, pdfPromptResolver, {
-        isBatch: true,
+        context: { summary },
         signal,
         hostedRequestId,
         hostedFeature: "web-pdf-trans",

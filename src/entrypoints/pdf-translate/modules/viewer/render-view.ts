@@ -203,34 +203,17 @@ export function fillBlockText(el: HTMLElement, paragraphs: string[]): void {
   })
 }
 
-/** 剥掉残留的分段标记：模型偶有漏切（或在行内留下 `%%`），标记本身不该出现在译文里。
- *  请求里的段间隔是 `\n\n%%\n\n`（前后各两个换行，见 joinSegments），所以 `%%` 要和它
- *  两侧的空白**一起**压成**一个换行**：
- *  - 换成空格 → 留下 `\n\n \n`（视觉三个换行 + 一个空格）；
- *  - 只删 `%%` → 留下 `\n\n\n\n`（视觉四个换行）。
- *  段与段之间最终由回填时的 `<br>` 分隔，这里只需保证不额外制造空行。 */
-export function stripSeparators(text: string): string {
-  return text
-    .replace(/\s*%%\s*/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
-}
-
-/** 段数对不上时的兜底：把整条译文按各段**原文字符数占比**切回各段（切在句边界）。
- *  旧行为是"整条落进第一个簇"——于是带 `%%` 的原文全挤在一个白底盒里、盒被一路撑长，
- *  其余段全空。现在改为按比例铺开：标记剥掉、各行都有内容，只是段落归属可能与原文不严格对应。 */
+/** 段数对不上时，按原文字符数占比把译文切回各段。 */
 function spreadByRatio(text: string, weights: number[]): string[] {
   const total = weights.reduce((s, w) => s + w, 0)
   if (total <= 0) return weights.map(() => "")
   return splitByRatio(
-    stripSeparators(text),
+    text.trim(),
     weights.map((w) => w / total),
   )
 }
 
-/** 块级译文 → 各簇的文案（返回顺序与 `view.clusters` 一致，便于逐簇回填）。
- *  段数与原文相符 → 按段下标映射（簇内段落保持原顺序）；不符（模型没守 `%%` 约定）→
- *  按各段原文长度占比把整条译文铺回各段（不再整条塞首簇）。纯函数，便于单测。 */
+/** 块级译文 → 各簇的文案。 */
 export function distributeTexts(view: BlockView, segments: string[], raw: string): string[][] {
   if (raw.trim() === "") return view.clusters.map(() => []) // 空译文：各簇皆空（白底仍在，等下次翻译）
   const perPara = segments.length === view.paras.length ? segments : null

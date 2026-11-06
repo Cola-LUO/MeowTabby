@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest"
 import { buildPdfTranslateSystemPrompt, pdfPromptResolver } from "../pdf-translate"
 
 describe("buildPdfTranslateSystemPrompt", () => {
-  it("keeps the %% batch-separator rules intact", () => {
+  it("keeps the translation rule separate from document context", () => {
     const prompt = buildPdfTranslateSystemPrompt("Chinese")
-    expect(prompt).toContain("%%")
+    expect(prompt).not.toContain("%%")
+    expect(prompt).toContain("Translate only the text in the user message")
     expect(prompt).toContain("Translation Rules")
   })
 
@@ -22,9 +23,9 @@ describe("buildPdfTranslateSystemPrompt", () => {
 
 describe("pdfPromptResolver", () => {
   it("passes the input through as the prompt and resolves the system prompt from targetLang", async () => {
-    const result = await pdfPromptResolver("Chinese", "Hello\n\n%%\n\nWorld")
-    expect(result.prompt).toBe("Hello\n\n%%\n\nWorld")
+    const result = await pdfPromptResolver("Chinese", "Hello", { context: { summary: "Context" } })
+    expect(result.prompt).toBe("Hello")
     expect(result.systemPrompt).toContain("into Chinese")
-    expect(result.systemPrompt).toContain("%%")
+    expect(result.systemPrompt).toContain("Abstract (reference only):\nContext")
   })
 })
