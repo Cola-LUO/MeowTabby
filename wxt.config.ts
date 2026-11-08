@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs"
+import { homedir } from "node:os"
 import path from "node:path"
 import process from "node:process"
 import ViteYaml from "@modyfi/vite-plugin-yaml"
@@ -14,6 +15,8 @@ const WXT_API_KEY_PATTERN = /^WXT_.*API_KEY/
 const ALLOWED_BUNDLED_API_KEYS = new Set(["WXT_POSTHOG_API_KEY"])
 const useLocalPackages = isLocalPackagesEnabled(process.env)
 const shouldSkipEnvValidation = process.env.WXT_SKIP_ENV_VALIDATION === "true"
+// dev 浏览器固定用户数据目录：放在仓库外，避免 WXT 生成目录重建时被清掉
+const devBrowserProfile = path.resolve(homedir(), ".meowtabby-edge-dev-profile")
 // Root of the read-frog monorepo whose source is aliased in when developing
 // with local packages. Defaults to the sibling checkout; override with
 // WXT_MONOREPO_PATH to point at a git worktree (relative or absolute).
@@ -141,6 +144,11 @@ export default defineConfig({
       port: 3333,
       strictPort: false,
     },
+  },
+  webExt: {
+    // 两项必须同时设置：未开启保留改动时，web-ext 只会把该目录复制到临时副本
+    chromiumProfile: devBrowserProfile,
+    keepProfileChanges: true,
   },
   vite: (configEnv) => ({
     // 注入到前端代码的编译时常量：model-runner.ts 用它决定是读本地打包模型还是远程下载
