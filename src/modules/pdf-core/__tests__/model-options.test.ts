@@ -90,6 +90,66 @@ it("内置模型更新后读取实际打包字节，不套用旧远程缓存", a
   }
 })
 
+it("默认模型按 modelscope → huggingface → hf-mirror 顺序尝试，首源失败自动续试", async () => {
+  const MODEL_SCOPE_URL =
+    "https://modelscope.cn/models/AI-ModelScope/DocLayout-YOLO-DocStructBench-onnx/resolve/master/doclayout_yolo_docstructbench_imgsz1024.onnx"
+  mocks.fetch
+    .mockReset()
+    // mockReset 会清掉 beforeEach 的默认 resolve，这里重建序列：
+    // modelscope 500 → 继续尝试 huggingface.co 成功
+    .mockResolvedValueOnce(new Response(null, { status: 500 }))
+    .mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3])))
+  vi.stubGlobal("fetch", mocks.fetch)
+  try {
+    await LayoutModelRunner.load(DEFAULT_MODEL_URL)
+    expect(mocks.fetch.mock.calls.map(([u]) => u)).toEqual([MODEL_SCOPE_URL, DEFAULT_MODEL_URL])
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
+
+it("三个下载源两轮重试后仍不可达时明确报错，不再无限等待", async () => {
+  vi.stubGlobal("caches", undefined)
+  mocks.fetch.mockReset().mockResolvedValue(new Response(null, { status: 500 }))
+  vi.stubGlobal("fetch", mocks.fetch)
+  try {
+    await expect(LayoutModelRunner.load(DEFAULT_MODEL_URL)).rejects.toThrow(
+      "all sources unreachable",
+    )
+    // 两轮 × 三源 = 6 次尝试
+    expect(mocks.fetch).toHaveBeenCalledTimes(6)
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
+
+it("第一轮全灭时第二轮放宽超时重试，命中即成功", async () => {
+  vi.stubGlobal("caches", undefined)
+  const MODEL_SCOPE_URL =
+    "https://modelscope.cn/models/AI-ModelScope/DocLayout-YOLO-DocStructBench-onnx/resolve/master/doclayout_yolo_docstructbench_imgsz1024.onnx"
+  const HF_MIRROR_URL =
+    "https://hf-mirror.com/wybxc/DocLayout-YOLO-DocStructBench-onnx/resolve/main/doclayout_yolo_docstructbench_imgsz1024.onnx"
+  mocks.fetch
+    .mockReset()
+    // 第一轮三源全 500 → 第二轮从 modelscope 再试，命中
+    .mockResolvedValueOnce(new Response(null, { status: 500 }))
+    .mockResolvedValueOnce(new Response(null, { status: 500 }))
+    .mockResolvedValueOnce(new Response(null, { status: 500 }))
+    .mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3])))
+  vi.stubGlobal("fetch", mocks.fetch)
+  try {
+    await LayoutModelRunner.load(DEFAULT_MODEL_URL)
+    expect(mocks.fetch.mock.calls.map(([u]) => u)).toEqual([
+      MODEL_SCOPE_URL,
+      DEFAULT_MODEL_URL,
+      HF_MIRROR_URL,
+      MODEL_SCOPE_URL,
+    ])
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
+
 it("内置模型缺失时明确失败，不偷偷改用远程模型", async () => {
   vi.stubGlobal("caches", undefined)
   mocks.fetch.mockReset().mockResolvedValue(new Response(null, { status: 404 }))

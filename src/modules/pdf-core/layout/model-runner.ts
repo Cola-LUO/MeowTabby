@@ -254,7 +254,7 @@ async function fetchModelCached(
 ): Promise<ArrayBuffer> {
   // 内置/指定模型必须读取其实际字节；不能命中默认远程模型的旧缓存，
   // 加载失败也不能换用另一个模型，否则验证切片的模型指纹会失真。
-  if (url !== DEFAULT_MODEL_URL && url !== MIRROR_FALLBACK) {
+  if (!REMOTE_DEFAULT_URLS.includes(url)) {
     const response = await fetch(url)
     if (!response.ok) throw new Error(`model download failed: ${response.status}`)
     return readWithProgress(response, onProgress)
@@ -281,19 +281,37 @@ async function fetchModelCached(
   return readWithProgress(resp, onProgress)
 }
 
-/** hf.co 直连在部分网络不可达：主 URL 失败/超时后走 hf-mirror */
+/** ModelScope 源（无签名标准地址，302 到国内 CDN，永久有效；实测直连最快）。
+ * 签名直链的 auth_key 有时效，写死进代码会过期失效，故不用直链 */
+const MODEL_SCOPE_FALLBACK =
+  "https://modelscope.cn/models/AI-ModelScope/DocLayout-YOLO-DocStructBench-onnx/resolve/master/doclayout_yolo_docstructbench_imgsz1024.onnx"
+/** hf-mirror 源（HF 国内镜像，兜底必达） */
 const MIRROR_FALLBACK =
   "https://hf-mirror.com/wybxc/DocLayout-YOLO-DocStructBench-onnx/resolve/main/doclayout_yolo_docstructbench_imgsz1024.onnx"
+/** 默认远程模型（主 + 全部镜像）：共享同一固定缓存键，命中即不再下载 */
+const REMOTE_DEFAULT_URLS = [DEFAULT_MODEL_URL, MIRROR_FALLBACK, MODEL_SCOPE_FALLBACK]
+/** 外部显式指定镜像自身时不再绕完整链（不含 DEFAULT_MODEL_URL——默认源必须走完整链） */
+const FALLBACK_MIRRORS = [MIRROR_FALLBACK, MODEL_SCOPE_FALLBACK]
+/** 模型下载超时（ms）：第一轮每源 8s 快速探路；若全灭，第二轮每源放宽到 15s */
+const MODEL_FETCH_TIMEOUTS_MS = [8_000, 15_000]
+/** 实际尝试顺序：modelscope（国内直连最快）→ huggingface.co（原主源）→ hf-mirror（兜底） */
+const FALLBACK_CHAIN = [MODEL_SCOPE_FALLBACK, DEFAULT_MODEL_URL, MIRROR_FALLBACK]
 
 async function fetchWithMirrorFallback(url: string): Promise<Response> {
-  if (url === MIRROR_FALLBACK) return fetch(url)
-  try {
-    const resp = await withTimeout(fetch(url), 15_000)
-    if (resp.ok) return resp
-  } catch {
-    /* 落到镜像 */
+  if (url !== DEFAULT_MODEL_URL && FALLBACK_MIRRORS.includes(url)) return fetch(url)
+  // 两轮重试：第一轮每源 8s 快速探路；若全灭再给一轮每源 15s 的宽限（抗网络抖动/CDN 慢）；
+  // 两轮都不通则明确报错，不再无限等待。
+  for (const timeoutMs of MODEL_FETCH_TIMEOUTS_MS) {
+    for (const candidate of FALLBACK_CHAIN) {
+      try {
+        const resp = await withTimeout(fetch(candidate), timeoutMs)
+        if (resp.ok) return resp
+      } catch {
+        /* 试下一源 */
+      }
+    }
   }
-  return fetch(MIRROR_FALLBACK)
+  throw new Error("model download failed: all sources unreachable")
 }
 
 function withTimeout(p: Promise<Response>, ms: number): Promise<Response> {
