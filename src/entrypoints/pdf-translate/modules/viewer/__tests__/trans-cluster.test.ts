@@ -125,7 +125,7 @@ describe("renderBlocks：白底盒落在各簇原位", () => {
   })
 })
 
-describe("title 块：整块一并送翻（不插 %%）、不分段、只有一个盒", () => {
+describe("title 块：整块一并送翻、不分段、只有一个盒", () => {
   it("即使段落间有大空隙，title 块也只出一个盒（不留空盒盖住整条译文）", () => {
     const views = renderBlocks(
       host(),
@@ -137,7 +137,7 @@ describe("title 块：整块一并送翻（不插 %%）、不分段、只有一�
     expect(views[0]!.clusters[0]!.idx).toEqual([0, 1])
   })
 
-  it("普通块不被标记（仍按 %% 分段送翻）", () => {
+  it("普通块保持默认的分段回填（与 title 的整体性相反）", () => {
     const views = renderBlocks(host(), [translateBlock([para(50, 700, 400, 10)])], () => {})
     expect(views[0]!.noSegment).toBe(false)
   })
@@ -162,16 +162,16 @@ describe("distributeTexts：块级译文按段下标分发到各簇盒", () => {
     expect(distributeTexts(view(), segs, segs.join("\n\n%%\n\n"))).toEqual(segs.map((s) => [s]))
   })
 
-  it("段数不符（模型没守 %% 约定）→ 按各段原文占比铺开，不丢字、不残留 %% 标记", () => {
+  it("段数不符 → 按各段原文占比铺开，不丢字、不空盒", () => {
     const out = distributeTexts(view(), ["整段译文"], "整段译文")
     expect(out.flat().join("")).toBe("整段译文") // 不丢字
     // 铺开而非全挤首簇：至少两个簇拿到内容（旧行为是首簇独吞、盒被撑长）
     expect(out.filter((paras) => paras.some((t) => t !== "")).length).toBeGreaterThan(1)
   })
 
-  it("段数不符且译文残留 %% 标记 → 标记被剥掉，不落进任何盒", () => {
+  it("段数不符且译文含 %% 字样 → 当作普通文本原样保留，不剥不丢", () => {
     const out = distributeTexts(view(), ["x"], "第一段\n\n%%\n\n第二段")
-    expect(out.flat().join("")).not.toContain("%%")
+    expect(out.flat().join("")).toBe("第一段\n\n%%\n\n第二段")
   })
 
   it("空译文 → 各簇皆空（白底仍在，等下次翻译）", () => {
