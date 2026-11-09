@@ -146,6 +146,7 @@ options:
     toggle: Toggle sidebar
     settings: Settings
     features: Features
+    featureSettings: Feature settings
   tools:
     translationHub: Translation Hub
     pdfTranslate: PDF translation

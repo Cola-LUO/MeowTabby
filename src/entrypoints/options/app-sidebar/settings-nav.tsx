@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/base-ui/sidebar"
 import { i18n } from "@/utils/i18n"
+import { FeatureSettingsNav } from "./feature-settings-nav"
 
 export function SettingsNav() {
   const { pathname } = useLocation()
@@ -18,6 +19,16 @@ export function SettingsNav() {
       <SidebarGroupLabel>{i18n.t("options.sidebar.settings")}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              render={<Link to="/account" />}
+              isActive={pathname === "/account"}
+              tooltip={i18n.t("options.account.title")}
+            >
+              <Icon icon="tabler:user" />
+              <span>{i18n.t("options.account.title")}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               render={<Link to="/api-providers" />}
@@ -51,27 +62,7 @@ export function SettingsNav() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              render={<Link to="/shortcuts" />}
-              isActive={pathname === "/shortcuts"}
-              tooltip={i18n.t("options.shortcuts.title")}
-            >
-              <Icon icon="tabler:command" />
-              <span>{i18n.t("options.shortcuts.title")}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              render={<Link to="/account" />}
-              isActive={pathname === "/account"}
-              tooltip={i18n.t("options.account.title")}
-            >
-              <Icon icon="tabler:user" />
-              <span>{i18n.t("options.account.title")}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <FeatureSettingsNav />
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

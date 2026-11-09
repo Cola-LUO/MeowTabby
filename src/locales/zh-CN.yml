@@ -89,7 +89,7 @@ popup:
   translate: 翻译
   showOriginal: 显示原文
   enabledFloatingButton: 启用悬浮按钮
-  enabledSelectionToolbar: 启用选择工具栏
+  enabledSelectionToolbar: 启用划词工具栏
   alwaysTranslate: 总是翻译这个网站
   addToWhitelist: 在此网站启用扩展
   addToBlacklist: 在此网站禁用扩展
@@ -146,6 +146,7 @@ options:
     toggle: 切换侧边栏
     settings: 设置
     features: 功能
+    featureSettings: 功能设置
   tools:
     translationHub: 翻译中心
     pdfTranslate: PDF翻译
@@ -503,11 +504,11 @@ options:
       settings: 设置
       feedback: 发送反馈
   selectionToolbar:
-    title: 选择工具栏
+    title: 划词工具栏
     pageDescription: 设置选中文本时出现哪些操作，以及工具栏在哪些网站显示。
-    demoImageAlt: 选择工具栏演示
+    demoImageAlt: 划词工具栏演示
     enable:
-      title: 启用选择工具栏
+      title: 启用划词工具栏
       description: 在网页上选择文本时显示工具栏，快速翻译、朗读和使用 AI 指令
     actions:
       title: 操作
@@ -521,10 +522,10 @@ options:
       title: 显示
       opacity:
         title: 透明度
-        description: 调整选择工具栏及其展开内容窗的透明度
+        description: 调整划词工具栏及其展开内容窗的透明度
       disabledSites:
         title: 禁用网站
-        description: 配置需要禁用选择工具栏的网站
+        description: 配置需要禁用划词工具栏的网站
         enterUrlPattern: 输入网址模式
         urlPattern: 网址模式
     closeMenu:

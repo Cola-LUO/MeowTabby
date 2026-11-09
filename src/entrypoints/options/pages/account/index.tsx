@@ -1,6 +1,8 @@
 import type { BillingSession } from "@/utils/billing/types"
+import { IconArrowUpRight } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
+import meowLogo from "@/assets/icons/meowtabby.png?url&no-inline"
 import { Button } from "@/components/ui/base-ui/button"
 import { Input } from "@/components/ui/base-ui/input"
 import { Label } from "@/components/ui/base-ui/label"
@@ -674,7 +676,23 @@ export function AccountPage() {
 
   return (
     <PageLayout
-      title={i18n.t("options.account.title")}
+      title={
+        <span className="flex flex-wrap items-center justify-between gap-4">
+          <span>{i18n.t("options.account.title")}</span>
+          <a
+            className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#FFE4C1] px-2 py-1 text-xs leading-4 font-bold text-black transition-colors hover:bg-[#FFD597] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67127] active:bg-[#FFC674]"
+            href="https://netxmeow.top/meowtabby/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={meowLogo} alt="" className="size-5 shrink-0" />
+            <span className="underline decoration-1 underline-offset-2">
+              {i18n.t("popup.more.projectWebsite")}
+            </span>
+            <IconArrowUpRight aria-hidden="true" className="size-3.5" />
+          </a>
+        </span>
+      }
       description={
         <span className="whitespace-pre-line">{i18n.t("options.account.description")}</span>
       }

@@ -49,6 +49,15 @@ beforeEach(() => {
 })
 
 describe("AccountPage", () => {
+  it("在标题区域显示打开官网的按钮", async () => {
+    vi.mocked(getBillingSession).mockResolvedValue(null)
+    renderPage()
+    const website = await screen.findByRole("link", { name: "popup.more.projectWebsite" })
+    expect(website).toHaveAttribute("href", "https://netxmeow.top/meowtabby/")
+    expect(website).toHaveAttribute("target", "_blank")
+    expect(website.closest("header")).not.toBeNull()
+  })
+
   it("shows only login form when signed out, register appears after clicking register link", async () => {
     vi.mocked(getBillingSession).mockResolvedValue(null)
     renderPage()
