@@ -323,7 +323,7 @@ options:
   patterns:
     duplicate: 该模式已在列表中
   preference:
-    title: 偏好设置
+    title: 通用设置
     pageDescription: 设置翻译喵的外观与生效范围，以及配置的同步与备份方式。
     appearanceAndLanguage:
       title: 外观与语言
