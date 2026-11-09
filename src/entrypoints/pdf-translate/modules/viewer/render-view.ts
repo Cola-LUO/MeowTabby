@@ -177,7 +177,7 @@ export function renderBlocks(
       cluster.dataset.baseFontSize = String(boxFontSize)
       el.appendChild(cluster)
       // geo 用**原位框**（unionBox 的 y-up 矩形）而非显示变换后的 t：容量估算只关心宽/高，
-      // 且与 obstacles.ts 的 y-up 障碍表同口径（旋转页的显示坐标在容量估算里已不适用）
+      // 旋转页的显示坐标（含 rotate 变换）在容量估算里不适用，故此处始终用 y-up 原位几何
       return {
         box: cluster,
         idx,
