@@ -20,7 +20,7 @@ export interface ClusterLayoutInput {
   width: number
   /** 原位高（geo.h）：短译文要填满的目标 */
   minHeight: number
-  /** 可用高（≥ minHeight）：obstacles.availableHeightFor 的结果；盒高上界 */
+  /** 可用高（≥ minHeight）：容量上界；当前恒 = 原位高（targetOf 取 geo.h，不许长高） */
   availHeight: number
   /** 段落字号 × 0.9（下限 6），即 renderBlocks 写进盒的现行值 */
   baseFontSize: number

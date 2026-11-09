@@ -34,7 +34,6 @@ import {
 } from "./modules/viewer/debug-panel"
 import { SCALE_STEPS } from "./modules/viewer/fit-text"
 import { readMixedText } from "./modules/viewer/mixed-text"
-import { availableHeightFor, regionToRect, type Rect } from "./modules/viewer/obstacles"
 import { pageTypography } from "./modules/viewer/page-typography"
 import { createPageHost, type PageHost } from "./modules/viewer/pagehost"
 import { createParagraphHover } from "./modules/viewer/paragraph-hover"
@@ -375,26 +374,6 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   }
   let translator = makeTranslator()
   const pageViews = new Map<number, BlockView[]>()
-  const obstacleRects = new Map<number, Rect[]>()
-  const rotatedByPage = new Map<number, boolean>()
-
-  /** 任一簇盒的可用总高（y-up）：原位高 + 到下方最近障碍的距离（向下伸展的语义，
-   *  不限于合并组：普通块的长译文同样会向下长出去压人）。
-   *  返回 null（页/盒/障碍表缺、旋转页）→ trans-units 退回原位高（谁都不许长高，安全侧）。 */
-  function clusterAvailHeight(pageIdx: number, blockId: string, paraIdx: number): number | null {
-    if (rotatedByPage.get(pageIdx)) return null
-    const cluster = pageViews
-      .get(pageIdx)
-      ?.find((v) => v.blockId === blockId)
-      ?.clusters.find((c) => c.idx.includes(paraIdx))
-    const obstacles = obstacleRects.get(pageIdx)
-    if (!cluster || !obstacles) return null
-    // 排除自身簇盒（它当然"在自己的位置"）；其余簇盒在 obstacles 里同样是障碍
-    return availableHeightFor(
-      cluster.geo,
-      obstacles.filter((o) => o !== cluster.geo),
-    )
-  }
 
   /** 导出目标 = 视口中央所在的页（滚动跟随），而非最近推理完成的页 */
   function currentVisiblePage(): PageState | null {
@@ -616,11 +595,6 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     )
     paragraphHover.setGroups(update.groups)
     pageViews.set(st.index, views)
-    rotatedByPage.set(st.index, rotated)
-    obstacleRects.set(st.index, [
-      ...views.flatMap((v) => v.clusters.map((c) => c.geo)),
-      ...page.keepUp.map(regionToRect),
-    ])
     dispatchReady(update)
     updateAcceptance(st, page.regionsDown, page.blocks, { count: 0, len: 0 })
   }
@@ -637,7 +611,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     const scheduler = translator
     const jobs = translationJobs
     for (const batch of batches) {
-      const units = buildTranslationUnits(batch, pageViews, { availHeight: clusterAvailHeight })
+      const units = buildTranslationUnits(batch, pageViews)
       const direct = new Set(
         batch.flatMap((plan, index) =>
           plan.parts.length === 1 && plan.parts[0]?.paragraph === abstractHeading ? [index] : [],
@@ -671,8 +645,6 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     paragraphHover = createParagraphHover()
     flowFinished = false
     pageViews.clear()
-    obstacleRects.clear()
-    rotatedByPage.clear()
     for (const st of states) if (st.processed) applyPage(st)
     if (states.every((st) => st.processed)) finishFlow()
     syncExportTarget()

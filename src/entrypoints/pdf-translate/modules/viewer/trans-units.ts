@@ -21,7 +21,7 @@ export interface ClusterLayoutTarget {
   box: HTMLElement
   /** 原位高（geo.h） */
   minHeight: number
-  /** 可用高（≥ minHeight）：obstacles 算出、由 ClusterFitContext 注入 */
+  /** 可用高（≥ minHeight）：容量上界；当前恒 = 原位高（targetOf 直接取 geo.h，译文不许长高） */
   availHeight: number
   width: number
   baseFontSize: number
@@ -41,12 +41,6 @@ export interface Unit {
   /** 该单元回填后需要求解的簇盒（顺序与回填顺序一致）。普通块与合并组走同一条路径 ——
    *  改动前只有合并组受容量约束，普通块的长译文照样向下长出去压住别人。 */
   layoutTargets: ClusterLayoutTarget[]
-}
-
-/** 容量上下文（由 main.ts 注入；缺省一律按"盒的原位高"分配 = 谁都不许长高） */
-export interface ClusterFitContext {
-  /** 该簇盒的可用总高（CSS px，可含"到下方障碍的距离"）；返回 null 表示未知 → 退回原位高 */
-  availHeight?: (pageIndex: number, blockId: string, paraIdx: number) => number | null
 }
 
 type FillTarget = { view: BlockView; paraIdx: number; pageIndex: number }
@@ -69,7 +63,6 @@ function targetOf(cluster: BlockCluster): ClusterLayoutTarget {
 export function buildTranslationUnits(
   planned: DocumentUnit[],
   pageViews: Map<number, BlockView[]>,
-  _fit?: ClusterFitContext,
 ): Unit[] {
   const units: Unit[] = []
   const pushGroupUnit = (plan: DocumentUnit, texts: string[], targets: FillTarget[]) => {

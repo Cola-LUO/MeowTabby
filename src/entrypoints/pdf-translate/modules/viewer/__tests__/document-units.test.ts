@@ -110,7 +110,7 @@ describe("D文档单元回填现有原位盒", () => {
     units[0]!.fill("整条标题")
     expect(views[0]!.clusters[0]!.box.textContent).toBe("整条标题")
   })
-  it("外部提供扩展空间时仍锁定所有原位高度", () => {
+  it("合并组所有文字框锁定原位高度", () => {
     const a = setup(1, ["first"]),
       b = setup(2, ["second"])
     const units = buildTranslationUnits(
@@ -119,7 +119,6 @@ describe("D文档单元回填现有原位盒", () => {
         [1, a.views],
         [2, b.views],
       ]),
-      { availHeight: () => 100 },
     )
     expect(units[0]!.layoutTargets.map((t) => t.availHeight)).toEqual([20, 20])
     expect(units[0]!.groupBoxes?.map((t) => t.isLast)).toEqual([false, true])
@@ -138,7 +137,7 @@ describe("D文档单元回填现有原位盒", () => {
 })
 
 describe("保留合并组原有字符容量分配", () => {
-  function narrowGroup(frontHeight?: number) {
+  function narrowGroup() {
     const a = setup(1, ["first"], false, 60, 10)
     const b = setup(2, ["second"], false, 60, 10)
     const group = buildTranslationUnits(
@@ -147,7 +146,6 @@ describe("保留合并组原有字符容量分配", () => {
         [1, a.views],
         [2, b.views],
       ]),
-      frontHeight ? { availHeight: () => frontHeight } : undefined,
     )[0]!
     return { group, boxes: [a.views[0]!.clusters[0]!.box, b.views[0]!.clusters[0]!.box] }
   }
@@ -157,15 +155,15 @@ describe("保留合并组原有字符容量分配", () => {
     expect(boxes.map((box) => box.textContent)).toEqual(["甲译一句。乙译二", "句。丙译三句。"])
     expect(boxes[0]!.style.fontSize).toBe(`${9 * 0.81}px`)
   })
-  it("外部提供扩展空间时所有文字框仍沿用原位容量", () => {
-    const { group, boxes } = narrowGroup(40)
+  it("合并组所有文字框沿用原位容量（availHeight = 原位高）", () => {
+    const { group, boxes } = narrowGroup()
     group.fill("甲译一句。乙译二句。丙译三句。")
     expect(boxes.map((box) => box.textContent)).toEqual(["甲译一句。乙译二", "句。丙译三句。"])
     expect(boxes[0]!.style.fontSize).toBe(`${9 * 0.81}px`)
     expect(group.layoutTargets.map((t) => t.availHeight)).toEqual([10, 10])
   })
   it("实测后重排替换原文字，保持全部译文", () => {
-    const { group, boxes } = narrowGroup(40)
+    const { group, boxes } = narrowGroup()
     const translated = "甲译一句。乙译二句。丙译三句。"
     group.fill(translated)
     expect(group.refit!(0.66)).toBe(true)
