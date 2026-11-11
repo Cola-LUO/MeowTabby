@@ -4,6 +4,7 @@ import { useAtom, useAtomValue } from "jotai"
 import { Settings } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { browser } from "#imports"
+import meowLogoActive from "@/assets/icons/meowtabby-color.png?url&no-inline"
 import meowLogo from "@/assets/icons/meowtabby.png?url&no-inline"
 import {
   DropdownMenu,
@@ -27,6 +28,7 @@ import HiddenButton from "./components/hidden-button"
 import TranslateButton from "./translate-button"
 
 const meowLogoUrl = new URL(meowLogo, browser.runtime.getURL("/")).href
+const meowLogoActiveUrl = new URL(meowLogoActive, browser.runtime.getURL("/")).href
 const LONG_PRESS_DELAY_MS = 350
 const DRAG_START_DISTANCE_PX = 6
 const MIN_FLOATING_CONTAINER_TOP_PX = 30
@@ -416,7 +418,7 @@ export default function FloatingButton() {
           onMouseEnter={handleMouseEnter}
         >
           <img
-            src={meowLogoUrl}
+            src={translationState.enabled ? meowLogoActiveUrl : meowLogoUrl}
             alt={APP_NAME}
             className={cn(
               "h-8 w-8 rounded-full",

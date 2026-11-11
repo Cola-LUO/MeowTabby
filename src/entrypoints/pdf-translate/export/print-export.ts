@@ -16,6 +16,7 @@ export interface ExportPageData {
   cssW: number
   cssH: number
   leftCanvas: HTMLCanvasElement
+  sourceTextLayer: HTMLElement
   rightTransLayer: HTMLElement
 }
 
@@ -56,6 +57,73 @@ export async function buildPrintRoot(
   return { root, objectUrls, pageCssW, pageCssH }
 }
 
+/** 复用 PDF.js 的字形位置。完全透明的字可能被打印引擎省略。 */
+function copySourceText(p: ExportPageData): HTMLElement {
+  const layer = p.sourceTextLayer.cloneNode(true) as HTMLElement
+  const angle = Number(layer.dataset.mainRotation || 0)
+  const sideways = angle === 90 || angle === 270
+  layer.style.width = `${sideways ? p.cssH : p.cssW}px`
+  layer.style.height = `${sideways ? p.cssW : p.cssH}px`
+  layer.style.transformOrigin = "0 0"
+  const x = angle === 90 || angle === 180 ? p.cssW : 0
+  const y = angle === 180 || angle === 270 ? p.cssH : 0
+  layer.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`
+  for (const span of layer.querySelectorAll<HTMLElement>("span")) {
+    span.style.color = "rgba(0,0,0,0.004)"
+  }
+  return layer
+}
+
+/** 仅在导出副本中剔除白底下面的字。同一行横跨白底边缘时逐字判断。 */
+function omitCoveredText(layer: HTMLElement, translations: HTMLElement): void {
+  const covers = Array.from(translations.querySelectorAll<HTMLElement>(".trans-cluster"))
+    .filter((box) => getComputedStyle(box).backgroundColor !== "rgba(0, 0, 0, 0)")
+    .map((box) => box.getBoundingClientRect())
+  for (const span of layer.querySelectorAll("span")) {
+    const node = span.firstChild
+    if (!(node instanceof Text)) continue
+    const rect = span.getBoundingClientRect()
+    const nearby = covers.filter(
+      (b) =>
+        b.left < rect.right && rect.left < b.right && b.top < rect.bottom && rect.top < b.bottom,
+    )
+    if (!nearby.length) continue
+    if (
+      nearby.some(
+        (b) =>
+          b.left <= rect.left &&
+          b.right >= rect.right &&
+          b.top <= rect.top &&
+          b.bottom >= rect.bottom,
+      )
+    ) {
+      span.remove()
+      continue
+    }
+    const range = document.createRange()
+    const parts = document.createDocumentFragment()
+    let offset = 0
+    for (const char of node.data) {
+      range.setStart(node, offset)
+      offset += char.length
+      range.setEnd(node, offset)
+      const bounds = range.getBoundingClientRect()
+      const x = bounds.left + bounds.width / 2
+      const y = bounds.top + bounds.height / 2
+      if (nearby.some((b) => x >= b.left && x <= b.right && y >= b.top && y <= b.bottom)) {
+        const hidden = document.createElement("i")
+        hidden.style.font = "inherit"
+        hidden.style.setProperty("visibility", "hidden", "important")
+        hidden.textContent = char
+        parts.append(hidden)
+      } else {
+        parts.append(char)
+      }
+    }
+    span.replaceChildren(parts)
+  }
+}
+
 /** 构建单页 DOM（内部 async：canvas toBlob 是异步的） */
 async function buildPageWrapper(
   p: ExportPageData,
@@ -88,7 +156,7 @@ async function buildPageWrapper(
     leftPane.className = "print-pane print-pane-left"
     leftPane.style.cssText = `position:absolute;left:0;top:0;width:${p.cssW}px;height:${p.cssH}px`
     const img = await canvasToImgElement(p.leftCanvas, p.cssW, p.cssH, objectUrls)
-    leftPane.appendChild(img)
+    leftPane.append(img, copySourceText(p))
     inner.appendChild(leftPane)
   }
 
@@ -100,7 +168,8 @@ async function buildPageWrapper(
 
   // 右栏底层：canvas 原文图（keep 区域透出，译文 cluster 白底覆盖可翻译区）
   const rightCanvasImg = await canvasToImgElement(p.leftCanvas, p.cssW, p.cssH, objectUrls)
-  rightPane.appendChild(rightCanvasImg)
+  const source = copySourceText(p)
+  rightPane.append(rightCanvasImg, source)
 
   // 右栏顶层：译文层 clone
   // transLayer 本身是 position:absolute;inset:0;z-index:10，clone 后相对于 rightPane 铺满
@@ -109,6 +178,17 @@ async function buildPageWrapper(
   rightPane.appendChild(transClone)
 
   inner.appendChild(rightPane)
+  // 两层必须处于同一个已布局的页面中才能比较字和白底的位置。
+  wrapper.style.position = "fixed"
+  wrapper.style.left = "-99999px"
+  document.body.appendChild(wrapper)
+  try {
+    omitCoveredText(source, transClone)
+  } finally {
+    wrapper.remove()
+    wrapper.style.position = "relative"
+    wrapper.style.left = ""
+  }
   return wrapper
 }
 

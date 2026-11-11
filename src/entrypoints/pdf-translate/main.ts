@@ -425,6 +425,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       cssW: st.cssW,
       cssH: st.cssH,
       leftCanvas: st.left.canvas,
+      sourceTextLayer: st.left.selectLayer,
       rightTransLayer: st.right.transLayer,
     }
   }

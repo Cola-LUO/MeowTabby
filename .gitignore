@@ -79,6 +79,7 @@ reference/
 /.trae/documents/
 # Agent 配置与 skill 文档：本地开发辅助，不入公开仓库
 /.claude/
+/.agents/
 # 内部设计与实施计划：过程留档，不入公开仓库
 /specs/
 # 本地目录导读文档
