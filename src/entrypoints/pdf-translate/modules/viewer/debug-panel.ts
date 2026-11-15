@@ -2,6 +2,7 @@ import type { Region } from "@/modules/pdf-core/layout/model-runner"
 
 export interface DebugPanel {
   root: HTMLElement
+  actions: HTMLElement
   onBoxesVisibilityChange: ((visible: boolean) => void) | null
   regionsVisible(regions: Region[]): Region[]
   report(page: number, loadMs: number, inferMs: number, backend: string): void
@@ -119,16 +120,42 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
 
   root.append(row1, row2, row3)
 
-  // 左上角"高级选项"入口：默认只显示它，点开才浮出调试面板
+  // 左上角设置入口：两个操作默认折叠，展开后排在图标右侧。
+  const tools = doc.createElement("div")
+  tools.className = "pdf-tools"
+  const settingsBtn = doc.createElement("button")
+  settingsBtn.type = "button"
+  settingsBtn.className = "btn settings-toggle"
+  settingsBtn.title = "设置"
+  settingsBtn.setAttribute("aria-label", "设置")
+  settingsBtn.setAttribute("aria-expanded", "false")
+  settingsBtn.setAttribute("aria-controls", "pdf-tool-actions")
+  settingsBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8m4 0h4M4 12h2m4 0h10M4 18h11m4 0h1"/><circle cx="14" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>`
+  const actions = doc.createElement("div")
+  actions.id = "pdf-tool-actions"
+  actions.className = "pdf-tool-actions"
+  actions.hidden = true
+
+  function setActionsOpen(open: boolean): void {
+    actions.hidden = !open
+    settingsBtn.setAttribute("aria-expanded", String(open))
+  }
+  settingsBtn.addEventListener("click", () => setActionsOpen(actions.hidden === true))
+  doc.addEventListener("click", (event) => {
+    if (!tools.contains(event.target as Node)) setActionsOpen(false)
+  })
+
   const advBtn = doc.createElement("button")
   advBtn.className = "btn adv-toggle"
   advBtn.textContent = "高级选项"
-  doc.body.appendChild(advBtn)
+  actions.appendChild(advBtn)
+  tools.append(settingsBtn, actions)
+  doc.body.appendChild(tools)
 
   function openPanel(): void {
     root.classList.add("open")
     advBtn.style.display = "none"
-    // 通知 CSS 隐藏左上角其他常驻入口（刷新翻译），给面板让位
+    // 设置图标和两个操作一同让位，保持高级选项面板的覆盖逻辑。
     doc.body.classList.add("pdf-debug-open")
   }
   function closePanel(): void {
@@ -141,6 +168,7 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
 
   const panel: DebugPanel = {
     root,
+    actions,
     onFilterChange: null,
     onBoxesVisibilityChange: null,
     regionsVisible(regions) {

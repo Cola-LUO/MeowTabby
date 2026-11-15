@@ -559,12 +559,23 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     for (const item of [bodyItem, otherItem]) item.style.display = "none"
     bodyStatus.style.display = menuTarget ? "" : "none"
     if (menuTarget) {
-      const body =
-        menuTarget.block.bodyRole ??
-        (menuTarget.block.region?.className === "plain text" ? "body" : "other")
-      const label = CLASS_LABELS[menuTarget.block.region?.className ?? ""] ?? "未知类型"
-      bodyStatus.textContent = `当前段落：${label}${menuTarget.block.bodyRole ? "（已更正）" : ""}`
+      const originalBody = menuTarget.block.region?.className === "plain text" ? "body" : "other"
+      const originalLabel = CLASS_LABELS[menuTarget.block.region?.className ?? ""] ?? "未知类型"
+      const body = menuTarget.block.bodyRole ?? originalBody
+      const corrected = body !== originalBody
+      const label = corrected ? (body === "body" ? "正文" : "非正文") : originalLabel
+      bodyStatus.textContent = `当前段落：${label}`
+      if (corrected) {
+        const mark = document.createElement("sup")
+        mark.textContent = "*"
+        bodyStatus.appendChild(mark)
+      }
       const action = body === "body" ? otherItem : bodyItem
+      action.textContent = corrected
+        ? `恢复${originalLabel}`
+        : body === "body"
+          ? "不是正文"
+          : "设为正文"
       action.style.display = ""
     }
     // 仅有选中文字时展示"复制文本"及其下分隔线
@@ -950,7 +961,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   const refreshBtn = document.createElement("button")
   refreshBtn.className = "btn refresh-toggle"
   refreshBtn.textContent = "刷新翻译"
-  document.body.appendChild(refreshBtn)
+  panel.actions.appendChild(refreshBtn)
   // 设置快照只是刷新按钮的基准，不能阻塞文档分析启动。
   queue = (async () => {
     for (const st of states) await processPage(st)

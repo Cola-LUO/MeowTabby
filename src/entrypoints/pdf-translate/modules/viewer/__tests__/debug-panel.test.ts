@@ -1,8 +1,53 @@
 /** @vitest-environment jsdom */
-import { describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import { createDebugPanel } from "../debug-panel"
 
 describe("debug panel", () => {
+  beforeEach(() => {
+    document.body.replaceChildren()
+    document.body.className = ""
+  })
+
+  it("默认折叠按钮，点击设置展开，点击内部不收起，点击外部收起", () => {
+    createDebugPanel(document, { classes: [] })
+    const toggle = document.querySelector<HTMLButtonElement>('button[aria-label="设置"]')
+    expect(toggle).not.toBeNull()
+    const actions = document.getElementById(toggle!.getAttribute("aria-controls")!)!
+    expect(toggle!.querySelector("svg")).not.toBeNull()
+    expect(actions.hidden).toBe(true)
+    expect(toggle!.getAttribute("aria-expanded")).toBe("false")
+
+    toggle!.click()
+    expect(actions.hidden).toBe(false)
+    expect(toggle!.getAttribute("aria-expanded")).toBe("true")
+    actions.click()
+    expect(actions.hidden).toBe(false)
+
+    document.body.click()
+    expect(actions.hidden).toBe(true)
+    expect(toggle!.getAttribute("aria-expanded")).toBe("false")
+
+    toggle!.click()
+    toggle!.click()
+    expect(actions.hidden).toBe(true)
+  })
+
+  it("展开后仍可打开和收起高级选项覆盖面板", () => {
+    const p = createDebugPanel(document, { classes: [] })
+    document.body.appendChild(p.root)
+    document.querySelector<HTMLButtonElement>('button[aria-label="设置"]')!.click()
+    document.querySelector<HTMLButtonElement>(".adv-toggle")!.click()
+    expect(p.root.classList.contains("open")).toBe(true)
+    expect(document.body.classList.contains("pdf-debug-open")).toBe(true)
+
+    const close = Array.from(p.root.querySelectorAll("button")).find(
+      (b) => b.textContent === "收起",
+    )!
+    close.click()
+    expect(p.root.classList.contains("open")).toBe(false)
+    expect(document.body.classList.contains("pdf-debug-open")).toBe(false)
+  })
+
   it("渲染类别复选/滑杆/性能区，过滤生效", () => {
     const p = createDebugPanel(document, { classes: ["title", "figure"] })
     document.body.appendChild(p.root)
