@@ -680,7 +680,7 @@ export function AccountPage() {
         <span className="flex flex-wrap items-center justify-between gap-4">
           <span>{i18n.t("options.account.title")}</span>
           <a
-            className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#FFE4C1] px-2 py-1 text-xs leading-4 font-bold text-black transition-colors hover:bg-[#FFD597] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67127] active:bg-[#FFC674]"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#FFE4C1] px-2 py-1 text-xs leading-4 font-bold text-black transition-colors hover:bg-[#FFD597] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67127] active:bg-[#FFC674]"
             href="https://netxmeow.top/meowtabby/"
             target="_blank"
             rel="noopener noreferrer"
