@@ -48,6 +48,7 @@ import {
   applyTextZOrder,
   type BlockView,
 } from "./modules/viewer/render-view"
+import { mountSettingsToolbar } from "./modules/viewer/settings-toolbar"
 import { LINE_HEIGHT } from "./modules/viewer/text-metrics"
 import {
   buildTranslationUnits,
@@ -951,6 +952,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   refreshBtn.className = "btn refresh-toggle"
   refreshBtn.textContent = "刷新翻译"
   document.body.appendChild(refreshBtn)
+  mountSettingsToolbar(document)
   // 设置快照只是刷新按钮的基准，不能阻塞文档分析启动。
   queue = (async () => {
     for (const st of states) await processPage(st)
