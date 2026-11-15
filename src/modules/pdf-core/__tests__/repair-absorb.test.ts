@@ -53,12 +53,8 @@ it("向右吸收遇到超过 10 的空白时停止", () => {
   assert.equal(repaired!.x2, 172)
 })
 
-it("每侧吸收达到 25 字上限后停止", () => {
-  const items = [
-    item("anchor", 145, 20),
-    item("abcdefghijklmnopqrstuvwx", 167, 4),
-    item("YZ", 172, 3),
-  ]
+it("每侧允许吸收 30 字，超过上限后停止", () => {
+  const items = [item("anchor", 145, 20), item("a".repeat(30), 167, 4), item("Z", 172, 3)]
   const [repaired] = repairRegions([region(100, 160)], items)
   assert.equal(repaired!.x2, 172)
 })

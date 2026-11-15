@@ -5,7 +5,7 @@ import { buildLines } from "../assign/assign"
 /** 相邻文字项之间允许的最大间隙 */
 export const ABSORB_GAP = 10
 /** 每侧吸收字符数上限（逐碎片滚动判定，超限即停） */
-export const MAX_ABSORB_CHARS = 25
+export const MAX_ABSORB_CHARS = 30
 
 function centerIn(item: PdfTextItem, r: Region, margin = 0): boolean {
   const cx = item.x + item.w / 2,
