@@ -24,6 +24,8 @@ export interface DocumentGroup {
 }
 export interface FlowUpdate {
   ready: DocumentUnit[]
+  /** 已被新分组替代或重新等待的旧单元。 */
+  invalidated: DocumentUnit[]
   /** 仍待提交的成员，包括接续组之后被顺序屏障挡住的内容。 */
   pending: DocumentPart[]
   groups: DocumentGroup[]
@@ -32,7 +34,7 @@ export interface FlowUpdate {
 
 export function createDocumentFlow() {
   const pages: PageAnalysis[] = []
-  const submitted = new Set<string>()
+  let submitted = new Map<string, DocumentUnit>()
   let ended = false
 
   const collect = (complete: boolean): FlowUpdate => {
@@ -44,7 +46,6 @@ export function createDocumentFlow() {
       const ordered = new Set(page.order.seq)
       const blocks = [...page.order.seq, ...page.blocks.filter((b) => !ordered.has(b))]
       for (const block of blocks) {
-        if (ordered.has(block)) flat.push({ block, page: page.index })
         if (!rendersText(block)) continue
         const blockId = `b${page.blocks.indexOf(block)}`
         const refs = block.paras.map((paragraph, paraIdx) => ({
@@ -55,13 +56,43 @@ export function createDocumentFlow() {
           block,
           paragraph,
         }))
-        byBlock.set(block, refs)
+        // 标题原本共用一个显示框，人工设为正文后仍按整框接续，避免拆组回填同一框。
+        let candidate = block
+        if (
+          block.bodyRole === "body" &&
+          block.region?.className === "title" &&
+          block.paras.length > 1
+        ) {
+          const x = Math.min(...block.paras.map((p) => p.x))
+          const y = Math.min(...block.paras.map((p) => p.y))
+          candidate = {
+            ...block,
+            paras: [
+              {
+                ...block.paras[0]!,
+                x,
+                y,
+                w: Math.max(...block.paras.map((p) => p.x + p.w)) - x,
+                h: Math.max(...block.paras.map((p) => p.y + p.h)) - y,
+                text: block.paras.map((p) => p.text).join(" "),
+                lines: block.paras.flatMap((p) => p.lines),
+                lineCount: block.paras.reduce((sum, p) => sum + p.lineCount, 0),
+              },
+            ],
+          }
+        }
+        if (ordered.has(block)) flat.push({ block: candidate, page: page.index })
+        byBlock.set(candidate, refs)
         parts.push(...refs)
       }
     }
+    for (const part of parts) delete part.paragraph.soloCluster
     const planned = planFlatMerges(flat)
     const groups: DocumentGroup[] = planned.groups.map((g) => ({
-      parts: g.parts.map((p) => byBlock.get(p.block)![p.paraIdx]!),
+      parts: g.parts.flatMap((p) => {
+        const refs = byBlock.get(p.block)!
+        return p.block !== refs[0]?.block ? refs : [refs[p.paraIdx]!]
+      }),
       decisions: g.decisions,
     }))
     const groupOf = new Map<string, DocumentGroup>()
@@ -83,9 +114,8 @@ export function createDocumentFlow() {
     }
 
     const ready: DocumentUnit[] = []
-    for (let i = 0; i < boundary; i++) {
+    for (let i = 0; i < parts.length; i++) {
       const part = parts[i]!
-      if (submitted.has(part.id)) continue
       const group = groupOf.get(part.id)
       if (group) {
         // 组按首成员的阅读位置提交，各成员的原页码和矩形不变。
@@ -95,7 +125,6 @@ export function createDocumentFlow() {
           kind: "group",
           parts: group.parts,
         })
-        for (const member of group.parts) submitted.add(member.id)
         continue
       }
       const kind = part.block.region?.className === "title" ? "title" : "view"
@@ -108,17 +137,30 @@ export function createDocumentFlow() {
         previous.parts.push(part)
         previous.id += `|${part.id}`
       } else ready.push({ id: part.id, kind, parts: [part] })
-      submitted.add(part.id)
     }
+    // 更正可能把等待边界前移；已译且分组未变的内容继续保留，后续真正接续时再失效。
+    const beforeBoundary = new Set(parts.slice(0, boundary).map((part) => part.id))
+    const available = ready.filter(
+      (unit) => submitted.has(documentUnitKey(unit)) || beforeBoundary.has(unit.parts[0]!.id),
+    )
+    const next = new Map(available.map((unit) => [documentUnitKey(unit), unit]))
+    const changed = available.filter((unit) => !submitted.has(documentUnitKey(unit)))
+    const invalidated = [...submitted].filter(([key]) => !next.has(key)).map(([, unit]) => unit)
+    submitted = next
+    const committed = new Set(available.flatMap((unit) => unit.parts.map((part) => part.id)))
     return {
-      ready,
-      pending: parts.filter((p) => !submitted.has(p.id)),
+      ready: changed,
+      invalidated,
+      pending: parts.filter((p) => !committed.has(p.id)),
       groups,
       decisions: planned.decisions,
     }
   }
 
   return {
+    replan(): FlowUpdate {
+      return collect(ended)
+    },
     push(page: PageAnalysis): FlowUpdate {
       if (ended) throw new Error("文档已经结束，不能继续加入页面")
       if (page.index !== pages.length + 1) throw new Error(`必须先处理第 ${pages.length + 1} 页`)
@@ -131,4 +173,9 @@ export function createDocumentFlow() {
       return collect(true)
     },
   }
+}
+
+/** 原成员顺序和送翻内容相同即可复用译文与在途请求。 */
+export function documentUnitKey(unit: DocumentUnit): string {
+  return JSON.stringify([unit.kind, unit.parts.map((p) => [p.id, p.paragraph.text.trim()])])
 }

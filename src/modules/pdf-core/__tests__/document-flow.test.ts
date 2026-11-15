@@ -142,3 +142,90 @@ describe("文档按页推进与D末尾接续", () => {
     expect(update.ready[0]!.parts.map((p) => p.paragraph.x)).toEqual([40, 330])
   })
 })
+
+describe("人工更正正文身份", () => {
+  it("其它保留排序和独立翻译，只重交变化的完整合并组，支持恢复", () => {
+    const flow = createDocumentFlow()
+    const a = block([paragraph("continued")])
+    const b = block([paragraph("caption.")])
+    const c = block([paragraph("ends.")])
+    const unrelated = block([paragraph("Unchanged.")])
+    flow.push(page(1, [unrelated, a]))
+    flow.push(page(2, [b]))
+    flow.push(page(3, [c]))
+    flow.finish()
+    b.bodyRole = "other"
+    const update = flow.replan()
+    expect(texts(update.ready)).toEqual([["continued", "ends."], ["caption."]])
+    expect(update.invalidated.map((u) => u.parts.map((p) => p.paragraph.text))).toEqual([
+      ["continued", "caption."],
+      ["ends."],
+    ])
+    expect(flow.replan().ready).toEqual([])
+    expect(b.region?.className).toBe("plain text")
+    b.bodyRole = "body"
+    expect(texts(flow.replan().ready)).toEqual([["continued", "caption."], ["ends."]])
+  })
+  it("非正文独立块更正不重复提交，原图注可加入正文，后续页采用最新身份", () => {
+    const flow = createDocumentFlow()
+    const a = block([paragraph("continued")])
+    const caption = block([paragraph("caption")], "figure_caption")
+    flow.push(page(1, [a]))
+    flow.push(page(2, [caption]))
+    caption.bodyRole = "body"
+    expect(flow.replan().ready).toEqual([])
+    expect(texts(flow.push(page(3, [block([paragraph("ends.")])])).ready)).toEqual([
+      ["continued", "caption", "ends."],
+    ])
+    const done = block([paragraph("Done.")])
+    const independent = createDocumentFlow()
+    independent.push(page(1, [done]))
+    done.bodyRole = "other"
+    expect(independent.replan().ready).toEqual([])
+  })
+})
+
+it("长合并链更正更新完整新旧组", () => {
+  const flow = createDocumentFlow()
+  const blocks = ["a", "caption.", "c", "d", "ends."].map((t) => block([paragraph(t)]))
+  blocks.forEach((b, i) => flow.push(page(i + 1, [b])))
+  flow.finish()
+  blocks[1]!.bodyRole = "other"
+  const update = flow.replan()
+  expect(texts(update.ready)).toEqual([["a", "c", "d", "ends."], ["caption."]])
+  expect(texts(update.invalidated)).toEqual([
+    ["a", "caption."],
+    ["c", "d", "ends."],
+  ])
+})
+
+it("人工设为正文的多段标题按原共用框接续，全部原段都在组里", () => {
+  const flow = createDocumentFlow()
+  flow.push(page(1, [block([paragraph("continued")])]))
+  const title = block([paragraph("title one"), paragraph("title two", 40, 600)], "title")
+  title.bodyRole = "body"
+  flow.push(page(2, [title]))
+  const update = flow.push(page(3, [block([paragraph("ends.")])]))
+  expect(texts(update.ready)).toEqual([["continued", "title one", "title two", "ends."]])
+})
+
+it("处理中更正导致等待边界前移，分组未变的已译内容仍保留", () => {
+  const flow = createDocumentFlow()
+  const a = block([paragraph("continued")])
+  const b = block([paragraph("caption.")])
+  b.paras[0]!.fontSize = 30
+  const other = block([paragraph("another caption.")], "figure_caption")
+  flow.push(page(1, [a]))
+  expect(texts(flow.push(page(2, [b, other])).ready)).toEqual([
+    ["continued"],
+    ["caption."],
+    ["another caption."],
+  ])
+  b.bodyRole = "other"
+  const update = flow.replan()
+  expect(update.ready).toEqual([])
+  expect(update.invalidated).toEqual([])
+  const next = flow.push(page(3, [block([paragraph("ends.")])]))
+  expect(texts(next.ready)).toEqual([["continued", "ends."]])
+  expect(texts(next.invalidated)).toEqual([["continued"]])
+})

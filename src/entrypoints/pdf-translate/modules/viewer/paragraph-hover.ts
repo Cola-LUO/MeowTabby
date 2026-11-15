@@ -6,7 +6,7 @@ import { rendersText } from "@/modules/pdf-core/assign/assign"
 import { blockDisplayTransform } from "@/modules/pdf-core/pdf/coords-rot"
 
 type Rect = { x: number; y: number; w: number; h: number }
-type Pair = { id: string; source: Rect; box?: HTMLElement }
+type Pair = { block: AssignedBlock; id: string; source: Rect; box?: HTMLElement }
 type Page = {
   left: PageHost
   right: PageHost
@@ -20,6 +20,7 @@ export function createParagraphHover() {
   const pages = new Map<number, Page>()
   const groupOf = new Map<string, string[]>()
   let active: string | null = null
+  let selected: AssignedBlock | null = null
 
   const targetRect = (page: Page, box: HTMLElement): Rect => {
     const r = box.getBoundingClientRect()
@@ -39,10 +40,10 @@ export function createParagraphHover() {
     for (const page of pages.values()) {
       page.leftLayer.replaceChildren()
       page.rightLayer.replaceChildren()
-      if (!active) continue
-      const ids = groupOf.get(active) ?? [active]
+      if (!active && !selected) continue
+      const ids = active ? (groupOf.get(active) ?? [active]) : []
       for (const pair of page.pairs) {
-        if (!ids.includes(pair.id)) continue
+        if (selected ? pair.block !== selected : !ids.includes(pair.id)) continue
         for (const [layer, r] of [
           [page.leftLayer, pair.source],
           [page.rightLayer, pair.box ? targetRect(page, pair.box) : pair.source],
@@ -56,6 +57,32 @@ export function createParagraphHover() {
     }
   }
   return {
+    clearSelection() {
+      selected = null
+      draw()
+    },
+    pick(event: MouseEvent): { pageIndex: number; block: AssignedBlock } | null {
+      for (const [pageIndex, page] of pages) {
+        for (const host of [page.left, page.right]) {
+          if (!(event.target instanceof Node) || !host.root.contains(event.target)) continue
+          const bounds = host.root.getBoundingClientRect()
+          const x = event.clientX - bounds.left
+          const y = event.clientY - bounds.top
+          const pair = page.pairs.find((p) =>
+            contains(
+              host === page.left ? p.source : p.box ? targetRect(page, p.box) : p.source,
+              x,
+              y,
+            ),
+          )
+          if (!pair?.block.region || pair.block.behavior !== "translate") return null
+          selected = pair.block
+          draw()
+          return { pageIndex, block: pair.block }
+        }
+      }
+      return null
+    },
     setGroups(groups: DocumentGroup[]) {
       groupOf.clear()
       for (const group of groups) {
@@ -98,6 +125,7 @@ export function createParagraphHover() {
                   : d.top
           const view = views.find((v) => v.blockId === blockId)
           return {
+            block,
             id: `p${pageIndex}:${blockId}:s${paraIdx}`,
             source: {
               x,

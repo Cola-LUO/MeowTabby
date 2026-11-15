@@ -7,7 +7,11 @@ import {
   flipRegionY,
   type AssignedBlock,
 } from "@/modules/pdf-core/assign/assign"
-import { createDocumentFlow, type FlowUpdate } from "@/modules/pdf-core/document-flow"
+import {
+  createDocumentFlow,
+  type DocumentUnit,
+  type FlowUpdate,
+} from "@/modules/pdf-core/document-flow"
 import { LayoutModelRunner, type Region } from "@/modules/pdf-core/layout/model-runner"
 import { blockDisplayTransform } from "@/modules/pdf-core/pdf/coords-rot"
 import { loadPdf, type PDFDocumentProxy } from "@/modules/pdf-core/pdf/loader"
@@ -29,6 +33,7 @@ import {
 import {
   createDebugPanel,
   CLASS_COLORS,
+  CLASS_LABELS,
   FALLBACK_COLOR,
   type DebugPanel,
 } from "./modules/viewer/debug-panel"
@@ -44,7 +49,11 @@ import {
   type BlockView,
 } from "./modules/viewer/render-view"
 import { LINE_HEIGHT } from "./modules/viewer/text-metrics"
-import { buildTranslationUnits, type Unit } from "./modules/viewer/trans-units"
+import {
+  buildTranslationUnits,
+  createTranslationPlanState,
+  type Unit,
+} from "./modules/viewer/trans-units"
 import "./viewer.css"
 import "katex/dist/katex.min.css"
 
@@ -126,6 +135,7 @@ interface PageState {
   painted: boolean
   painting: Promise<void> | null
   analysis: PageAnalysis | null
+  bodyRoles: Map<string, "body" | "other">
 }
 
 /** 无 url 参数的空白页（合拢计划第 2 条）：提示 + "打开 PDF"按钮。
@@ -253,6 +263,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       painted: false,
       painting: null,
       analysis: null,
+      bodyRoles: new Map(),
     }
     states.push(st)
     stateByEl.set(left.root, st)
@@ -348,6 +359,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
 
   const MAX_CONCURRENT_PAGES = 2
   let analysisVersion = 0
+  let exportVersion = 0
   let translationVersion = 0
   let exporting = 0
   let flow = createDocumentFlow()
@@ -374,6 +386,9 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   }
   let translator = makeTranslator()
   const pageViews = new Map<number, BlockView[]>()
+  const translationPlans = createTranslationPlanState(pageViews)
+  const blockKey = (block: AssignedBlock) => JSON.stringify([block.region, block.minOrder])
+  let menuTarget: { pageIndex: number; block: AssignedBlock } | null = null
 
   /** 导出目标 = 视口中央所在的页（滚动跟随），而非最近推理完成的页 */
   function currentVisiblePage(): PageState | null {
@@ -417,6 +432,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   }
   function hideExportMenu(): void {
     exportMenu.style.display = "none"
+    paragraphHover.clearSelection()
   }
 
   /** 构建单页/全部页的导出数据（与 print-export 解耦的最小接口） */
@@ -435,17 +451,17 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     try {
       for (;;) {
         await queue
-        const version = analysisVersion
+        const version = exportVersion
         await Promise.all([...translationJobs])
-        if (version !== analysisVersion) continue
+        if (version !== exportVersion) continue
         for (const page of pages) await paintPage(page)
-        if (version !== analysisVersion) continue
+        if (version !== exportVersion) continue
         const result = await buildPrintRoot(
           pages.map(stateToExportData),
           kind,
           pages.length === 1 ? 0 : undefined,
         )
-        if (version === analysisVersion) return result
+        if (version === exportVersion) return result
         result.root.remove()
         result.objectUrls.forEach((url) => URL.revokeObjectURL(url))
       }
@@ -513,6 +529,20 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       setTimeout(hideExportToast, 2000)
     })
   })
+  function correctBody(role: "body" | "other"): void {
+    if (!menuTarget) return
+    const { pageIndex, block } = menuTarget
+    if (block.bodyRole === role) return
+    states[pageIndex - 1]!.bodyRoles.set(blockKey(block), role)
+    block.bodyRole = role
+    exportVersion++
+    dispatchReady(flow.replan())
+  }
+  const bodyStatus = document.createElement("div")
+  bodyStatus.className = "pdf-export-menu__header"
+  exportMenu.appendChild(bodyStatus)
+  const bodyItem = addMenuItem("设为正文", () => correctBody("body"), true)
+  const otherItem = addMenuItem("不是正文", () => correctBody("other"), true)
   const copySeparator = addMenuSeparator()
   addMenuHeader("导出该页为 PDF")
   addMenuItem("双语对照", () => void exportOnePage("bilingual"), true)
@@ -524,13 +554,26 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
 
   app.addEventListener("contextmenu", (e) => {
     e.preventDefault()
+    paragraphHover.clearSelection()
+    menuTarget = paragraphHover.pick(e)
+    for (const item of [bodyItem, otherItem]) item.style.display = "none"
+    bodyStatus.style.display = menuTarget ? "" : "none"
+    if (menuTarget) {
+      const body =
+        menuTarget.block.bodyRole ??
+        (menuTarget.block.region?.className === "plain text" ? "body" : "other")
+      const label = CLASS_LABELS[menuTarget.block.region?.className ?? ""] ?? "未知类型"
+      bodyStatus.textContent = `当前段落：${label}${menuTarget.block.bodyRole ? "（已更正）" : ""}`
+      const action = body === "body" ? otherItem : bodyItem
+      action.style.display = ""
+    }
     // 仅有选中文字时展示"复制文本"及其下分隔线
     const hasSelection = (window.getSelection()?.toString() ?? "").trim() !== ""
     copyMenuItem.style.display = hasSelection ? "" : "none"
     copySeparator.style.display = hasSelection ? "" : "none"
     exportMenu.style.display = "flex"
     exportMenu.style.left = `${Math.min(e.clientX, window.innerWidth - 250)}px`
-    exportMenu.style.top = `${Math.min(e.clientY, window.innerHeight - 230)}px`
+    exportMenu.style.top = `${Math.max(0, Math.min(e.clientY, window.innerHeight - exportMenu.offsetHeight))}px`
   })
   window.addEventListener("click", hideExportMenu)
   window.addEventListener("blur", hideExportMenu)
@@ -545,6 +588,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       items: st.items,
       regions: panel.regionsVisible(st.regions),
     })
+    for (const block of page.blocks) block.bodyRole = st.bodyRoles.get(blockKey(block))
     st.analysis = page
     if (st.index === 1 && !summaryChecked) {
       summaryChecked = true
@@ -594,13 +638,14 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       st.pageHu,
       st.rotate,
     )
-    paragraphHover.setGroups(update.groups)
     pageViews.set(st.index, views)
     dispatchReady(update)
     updateAcceptance(st, page.regionsDown, page.blocks, { count: 0, len: 0 })
   }
 
   function dispatchReady(update: FlowUpdate): void {
+    translationPlans.apply(update)
+    paragraphHover.setGroups(update.groups)
     // 首成员页码决定批次；跨多页的组只有一个请求，不让后文越过它。
     const batches: (typeof update.ready)[] = []
     for (const unit of update.ready) {
@@ -618,7 +663,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
           plan.parts.length === 1 && plan.parts[0]?.paragraph === abstractHeading ? [index] : [],
         ),
       )
-      const job = fillTranslations(units, version, scheduler, direct).then(() => {
+      const job = fillTranslations(units, version, scheduler, direct, batch).then(() => {
         if (version !== analysisVersion) return
         for (const page of states)
           if (page.analysis) {
@@ -637,6 +682,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   }
   function replayProcessedPages(clearTranslations: boolean): void {
     analysisVersion++
+    exportVersion++
     if (clearTranslations) {
       translationVersion++
       translator = makeTranslator()
@@ -646,6 +692,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     paragraphHover = createParagraphHover()
     flowFinished = false
     pageViews.clear()
+    translationPlans.clear()
     for (const st of states) if (st.processed) applyPage(st)
     if (states.every((st) => st.processed)) finishFlow()
     syncExportTarget()
@@ -657,11 +704,13 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     version: number,
     scheduler: ReturnType<typeof createTranslateScheduler>,
     direct: Set<number>,
+    plans: DocumentUnit[],
   ): Promise<void> {
     const requests = units.map((u) => u.request)
     const { issued, pages } = await scheduler.fill(
       requests.filter((_, i) => !direct.has(i)),
-      () => version === analysisVersion,
+      () => version === analysisVersion && plans.some((plan) => translationPlans.isCurrent(plan)),
+      (text) => plans.some((plan, i) => requests[i] === text && translationPlans.isCurrent(plan)),
     )
     if (version !== analysisVersion) return
     if (issued > 0)
@@ -671,7 +720,10 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     // 这样"装箱"与"排版"两个阶段用同一口径，不会出现"箱子说装得下、排版说装不下"。
     const solved: { box: HTMLElement; input: ClusterLayoutInput; result: ClusterLayoutResult }[] =
       []
+    const currentUnits: Unit[] = []
     units.forEach((u, i) => {
+      if (!translationPlans.isCurrent(plans[i]!)) return
+      currentUnits.push(u)
       const startScales = u.fill(direct.has(i) ? "摘要" : (scheduler.cache.get(requests[i]!) ?? ""))
       u.layoutTargets.forEach((t, k) => {
         // 可用高落成 data 属性：验收要核"盒高是否越过障碍边界"这个结构性不变量
@@ -681,7 +733,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       })
     })
     for (const s of solved) applyClusterLayout(s.box, s.result)
-    refitOverflowingUnits(units)
+    refitOverflowingUnits(currentUnits)
   }
 
   /** 求解输入：几何来自 target（renderBlocks 建盒时的原位几何），文本取盒内已回填的内容。
@@ -796,7 +848,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       box.style.cssText =
         `position:absolute;left:${r.x1}px;top:${r.y1}px;width:${r.x2 - r.x1}px;height:${r.y2 - r.y1}px;` +
         `border:1px solid ${color};background:${color}22`
-      box.title = `${r.className} ${(r.conf * 100).toFixed(0)}%`
+      box.title = `${CLASS_LABELS[r.className] ?? "未知类型"} ${(r.conf * 100).toFixed(0)}%`
       st.overlay.appendChild(box)
     }
   }

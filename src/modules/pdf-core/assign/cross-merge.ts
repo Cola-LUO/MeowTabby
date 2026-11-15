@@ -212,9 +212,13 @@ export function isOrderNode(b: AssignedBlock): boolean {
   return b.behavior !== "skip" && b.region !== null
 }
 
-/** 配对白名单：只有 plain text 的 translate 块参与合并（标题/图注不参与同段合并） */
+/** 可翻译文字块的人工正文身份优先；未更正时仅 plain text 参与接续。 */
 export function isMergeCandidate(b: AssignedBlock): boolean {
-  return b.behavior === "translate" && b.region?.className === "plain text" && b.paras.length > 0
+  return (
+    b.behavior === "translate" &&
+    (b.bodyRole === "body" || (b.bodyRole !== "other" && b.region?.className === "plain text")) &&
+    b.paras.length > 0
+  )
 }
 
 /** 块的 x 包络 / 顶边（均取块内全部段落） */

@@ -23,6 +23,8 @@ export interface Paragraph {
 }
 
 export interface AssignedBlock {
+  /** 人工正文身份，仅用于接续配对，不改变模型分类和排版。 */
+  bodyRole?: "body" | "other"
   region: Region | null
   behavior: "translate" | "keep" | "skip"
   paras: Paragraph[]

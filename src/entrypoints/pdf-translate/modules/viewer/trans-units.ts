@@ -1,5 +1,9 @@
 import type { BlockView, BlockCluster } from "./render-view"
-import type { DocumentUnit } from "@/modules/pdf-core/document-flow"
+import {
+  documentUnitKey,
+  type FlowUpdate,
+  type DocumentUnit,
+} from "@/modules/pdf-core/document-flow"
 import { requestTextForUnit } from "../translate/segment-utils"
 import { splitByCapacity, type PartBox } from "./fit-text"
 import { fillMixedText } from "./mixed-text"
@@ -66,6 +70,13 @@ export function buildTranslationUnits(
 ): Unit[] {
   const units: Unit[] = []
   const pushGroupUnit = (plan: DocumentUnit, texts: string[], targets: FillTarget[]) => {
+    targets = targets.filter(
+      (target, index) =>
+        targets.findIndex(
+          (other) =>
+            clusterOf(other.view, other.paraIdx) === clusterOf(target.view, target.paraIdx),
+        ) === index,
+    )
     const clusters = targets.map((tg) => clusterOf(tg.view, tg.paraIdx)!)
     const partBoxes: PartBox[] = targets.map((tg, k) => {
       const cl = clusters[k]!
@@ -160,4 +171,26 @@ export function buildTranslationUnits(
     })
   }
   return units
+}
+
+/** 局部更正仅清理失效组；身份对象用于拦住连续更正后迟到的旧回填。 */
+export function createTranslationPlanState(pageViews: Map<number, BlockView[]>) {
+  const current = new Map<string, DocumentUnit>()
+  return {
+    clear: () => current.clear(),
+    isCurrent: (plan: DocumentUnit) => current.get(documentUnitKey(plan)) === plan,
+    apply(update: FlowUpdate) {
+      for (const old of update.invalidated) {
+        current.delete(documentUnitKey(old))
+        for (const part of old.parts) {
+          const view = pageViews.get(part.pageIndex)?.find((v) => v.blockId === part.blockId)
+          const cluster = view?.clusters.find((c) => c.idx.includes(part.paraIdx))
+          if (!cluster) continue
+          cluster.box.replaceChildren()
+          cluster.box.style.backgroundColor = "transparent"
+        }
+      }
+      for (const plan of update.ready) current.set(documentUnitKey(plan), plan)
+    },
+  }
 }

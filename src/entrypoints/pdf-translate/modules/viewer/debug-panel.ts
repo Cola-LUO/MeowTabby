@@ -28,6 +28,19 @@ export const CLASS_COLORS: Record<string, string> = {
   isolate_formula: "#9c27b0",
   formula_caption: "#00bcd4",
 }
+
+export const CLASS_LABELS: Record<string, string> = {
+  title: "标题",
+  "plain text": "正文",
+  abandon: "其它",
+  figure: "图片",
+  figure_caption: "图注",
+  table: "表格",
+  table_caption: "表题",
+  table_footnote: "表注",
+  isolate_formula: "公式",
+  formula_caption: "公式标注",
+}
 /** 未登记类别的兜底色（叠加层框线与顶栏类别标签共用）：一眼看出"这类还没收录" */
 export const FALLBACK_COLOR = "#ff5252"
 
@@ -59,7 +72,7 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
       else conf.enabled.delete(cls)
       panel.onFilterChange?.()
     })
-    label.append(cb, doc.createTextNode(cls))
+    label.append(cb, doc.createTextNode(CLASS_LABELS[cls] ?? "未知类型"))
     row1.appendChild(label)
   }
 

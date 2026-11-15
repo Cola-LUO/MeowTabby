@@ -131,3 +131,51 @@ describe("paragraph hover", () => {
     expect(right.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(2)
   })
 })
+
+it("左右侧右键定位合并前原块，菜单期间只高亮该块，空白处不命中", () => {
+  const left = createPageHost(document, 500, 700, document.createElement("canvas"))
+  const right = createPageHost(document, 500, 700, document.createElement("canvas"))
+  const blocks = [0, 1].map((i) => ({
+    behavior: "translate",
+    minOrder: i,
+    region: {
+      x1: 20,
+      y1: 450,
+      x2: 120,
+      y2: 650,
+      className: "plain text",
+      conf: 0.9,
+      behavior: "translate",
+    },
+    paras: [
+      {
+        x: 20,
+        y: 600 - i * 100,
+        w: 100,
+        h: 30,
+        text: `part ${i}`,
+        lineCount: 1,
+        fontSize: 12,
+        lines: [],
+      },
+    ],
+  })) as AssignedBlock[]
+  const views = renderBlocks(right, blocks, () => {})
+  const hover = createParagraphHover()
+  hover.install(1, left, right, blocks, views, 500, 700, 0)
+  hover.setGroups([{ parts: [0, 1].map((i) => ({ id: `p1:b${i}:s0` })) }] as DocumentGroup[])
+  const pick = (target: HTMLElement, y: number) => {
+    const event = new MouseEvent("contextmenu", { clientX: 30, clientY: y })
+    target.dispatchEvent(event)
+    return hover.pick(event)
+  }
+  expect(pick(left.root, 175)?.block).toBe(blocks[1])
+  expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(1)
+  left.root.dispatchEvent(new MouseEvent("pointerleave"))
+  expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(1)
+  hover.clearSelection()
+  expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(0)
+  expect(pick(views[0]!.clusters[0]!.box, 75)?.block).toBe(blocks[0])
+  hover.clearSelection()
+  expect(pick(left.root, 350)).toBeNull()
+})

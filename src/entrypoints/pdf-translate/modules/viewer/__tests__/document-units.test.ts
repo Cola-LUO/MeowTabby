@@ -4,7 +4,7 @@ import type { DocumentPart, DocumentUnit } from "@/modules/pdf-core/document-flo
 import { describe, expect, it } from "vitest"
 import { createPageHost } from "../pagehost"
 import { renderBlocks } from "../render-view"
-import { buildTranslationUnits } from "../trans-units"
+import { buildTranslationUnits, createTranslationPlanState } from "../trans-units"
 
 function setup(pageIndex: number, texts: string[], title = false, width = 200, height = 20) {
   const paras: Paragraph[] = texts.map((text, i) => ({
@@ -183,4 +183,55 @@ it("等待中的多段标题保留单簇并透明显示原文", () => {
   )
   expect(views[0]!.clusters).toHaveLength(1)
   expect(views[0]!.clusters[0]!.box.style.backgroundColor).toBe("transparent")
+})
+
+it("局部更正保持无关框和请求，连续更正后拒绝旧回填身份", () => {
+  const { views, parts } = setup(1, ["a", "b", "c", "unrelated"])
+  const map = new Map([[1, views]])
+  const state = createTranslationPlanState(map)
+  const old = unit(parts.slice(0, 2), "group")
+  const c = unit([parts[2]!])
+  const other = unit([parts[3]!])
+  const update = (ready: DocumentUnit[], invalidated: DocumentUnit[] = []) => ({
+    ready,
+    invalidated,
+    pending: [],
+    groups: [],
+    decisions: [],
+  })
+  state.apply(update([old, c, other]))
+  const otherBox = views[0]!.clusters[3]!.box
+  otherBox.textContent = "保持原译文"
+  const ac = unit([parts[0]!, parts[2]!], "group")
+  const b = unit([parts[1]!])
+  state.apply(update([ac, b], [old, c]))
+  expect(state.isCurrent(old)).toBe(false)
+  expect(state.isCurrent(other)).toBe(true)
+  expect(views[0]!.clusters[3]!.box).toBe(otherBox)
+  expect(otherBox.textContent).toBe("保持原译文")
+  const restored = unit(parts.slice(0, 2), "group")
+  state.apply(update([restored, c], [ac, b]))
+  expect(state.isCurrent(old)).toBe(false)
+  expect(state.isCurrent(ac)).toBe(false)
+  expect(state.isCurrent(restored)).toBe(true)
+  buildTranslationUnits([restored], map)[0]!.fill("恢复后的译文")
+  expect(otherBox.textContent).toBe("保持原译文")
+})
+
+it("更正多段标题后，合并组只向共用标题框分配一次译文", () => {
+  const title = setup(1, ["title one", "title two"], true)
+  const next = setup(2, ["continuation"])
+  const plans = [unit([...title.parts, ...next.parts], "group")]
+  const units = buildTranslationUnits(
+    plans,
+    new Map([
+      [1, title.views],
+      [2, next.views],
+    ]),
+  )
+  expect(units[0]!.layoutTargets).toHaveLength(2)
+  units[0]!.fill("甲乙丙丁")
+  expect([title, next].map((p) => p.views[0]!.clusters[0]!.box.textContent).join("")).toBe(
+    "甲乙丙丁",
+  )
 })

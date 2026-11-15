@@ -197,3 +197,26 @@ it("已过期的排队批次拿到名额后不再发请求", async () => {
   expect(c.sent()).toEqual(["first"])
   expect((await stale).issued).toBe(0)
 })
+
+it("排队期间更正只取消失效文本，同批无关请求继续", async () => {
+  const controlled = createControlled()
+  const scheduler = createTranslateScheduler({
+    translate: controlled.translate,
+    maxConcurrentPages: 1,
+  })
+  const first = scheduler.fill(["blocking"])
+  await flush()
+  let changed = false
+  const queued = scheduler.fill(
+    ["old group", "unrelated"],
+    () => true,
+    (text) => !(changed && text === "old group"),
+  )
+  changed = true
+  controlled.pending()[0]!.ok("完成")
+  await first
+  await flush()
+  expect(controlled.sent()).toEqual(["blocking", "unrelated"])
+  controlled.pending()[1]!.ok("无关译文")
+  expect((await queued).issued).toBe(1)
+})

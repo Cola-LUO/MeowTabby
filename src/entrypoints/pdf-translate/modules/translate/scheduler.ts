@@ -26,7 +26,11 @@ export interface TranslateScheduler {
   readonly cache: Map<string, string>
   /** 把这一批（= 一页）里所有未缓存的文本**并行**送出。
    *  返回时：成功项已写入 cache，失败项已交给 onError 且未缓存。 */
-  fill(texts: string[], isCurrent?: () => boolean): Promise<FillResult>
+  fill(
+    texts: string[],
+    isCurrent?: () => boolean,
+    isTextCurrent?: (text: string) => boolean,
+  ): Promise<FillResult>
   /** 观测：当前在途批数 / 累计请求数（调试与单测用） */
   stats(): { pages: number; requests: number }
 }
@@ -74,7 +78,7 @@ export function createTranslateScheduler(opts: TranslateSchedulerOptions): Trans
 
   return {
     cache,
-    async fill(texts, isCurrent = () => true) {
+    async fill(texts, isCurrent = () => true, isTextCurrent = () => true) {
       // 纯数字无需送翻，保留原文供现有回填流程直接显示。
       for (const text of texts) {
         if (/^\d+$/.test(text.replace(/\s/g, ""))) cache.set(text, text)
@@ -84,7 +88,7 @@ export function createTranslateScheduler(opts: TranslateSchedulerOptions): Trans
       await acquirePage()
       try {
         if (!isCurrent()) return { issued: 0, pages }
-        const calls = missing.filter((text) => !cache.has(text)).map(request) // 页内全并行：一次全部发出
+        const calls = missing.filter((text) => !cache.has(text) && isTextCurrent(text)).map(request) // 页内全并行：一次全部发出
         const atIssue = pages // 发起时的在途页数（含本页），日志核对闸门用
         await Promise.all(calls.map((c) => c.p))
         return { issued: calls.filter((c) => c.issued).length, pages: atIssue }
