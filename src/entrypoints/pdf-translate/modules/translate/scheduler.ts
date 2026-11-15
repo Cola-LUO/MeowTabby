@@ -75,6 +75,10 @@ export function createTranslateScheduler(opts: TranslateSchedulerOptions): Trans
   return {
     cache,
     async fill(texts, isCurrent = () => true) {
+      // 纯数字无需送翻，保留原文供现有回填流程直接显示。
+      for (const text of texts) {
+        if (/^\d+$/.test(text.replace(/\s/g, ""))) cache.set(text, text)
+      }
       const missing = [...new Set(texts.filter((t) => t !== "" && !cache.has(t)))]
       if (missing.length === 0) return { issued: 0, pages }
       await acquirePage()

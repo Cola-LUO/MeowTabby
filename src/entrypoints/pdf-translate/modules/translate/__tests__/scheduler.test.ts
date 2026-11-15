@@ -47,6 +47,24 @@ function createControlled() {
 const flush = () => new Promise<void>((r) => setTimeout(r, 0))
 
 describe("createTranslateScheduler：页内并行 / 页间两页", () => {
+  it("纯数字及带空白的数字保留原文，只有其他文本发起请求", async () => {
+    const sent: string[] = []
+    const s = createTranslateScheduler({
+      translate: async (text) => {
+        sent.push(text)
+        return `T:${text}`
+      },
+    })
+    const numbers = ["123", "0", " 1 2 3 ", "1\t2\n3", "1\u00a02\u30003"]
+    const other = ["12.3", "-12", "第12页", "123abc", " \t "]
+    const result = await s.fill([...numbers, ...other])
+    expect(sent).toEqual(other)
+    expect(result.issued).toBe(other.length)
+    expect(s.stats().requests).toBe(other.length)
+    for (const text of numbers) expect(s.cache.get(text)).toBe(text)
+    expect((await s.fill(numbers)).issued).toBe(0)
+  })
+
   it("页内：一批文本同时送出（并行度 = 批大小）", async () => {
     const c = createControlled()
     const s = createTranslateScheduler({ translate: c.translate })
