@@ -75,43 +75,13 @@ body {
   background: rgba(255, 224, 82, 0.28);
 }
 
-/* ===== 左上角设置工具条：一个滑块图标，点开才在右侧露出两个入口 ===== */
-.pdf-settings-toolbar {
+/* ===== 左上角「高级选项」入口 ===== */
+.adv-toggle {
   position: fixed;
   top: 12px;
   left: 12px;
   z-index: 60;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
-.pdf-settings-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: #a67127;
-  color: #ffffff;
-  transition: filter 0.12s ease;
-}
-.pdf-settings-toggle:hover {
-  filter: brightness(0.98);
-}
-.pdf-settings-menu {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.pdf-settings-menu[hidden] {
-  display: none;
-}
-
-/* ===== 左上角「高级选项」入口 ===== */
 /* 可视化编辑器对「高级选项」按钮的调整。
    必须用 .btn.adv-toggle(0,2,0) 提高特异性：.btn(0,1,0) 在本文件里定义更靠后，
    同特异性下会覆盖 .adv-toggle 的 color/background，导致改色看似写了却不生效。 */
@@ -127,8 +97,14 @@ body {
   background: #a67127;
 }
 
-/* ===== 左上角「刷新翻译」入口：随「高级选项」一起收进设置工具条；
-   调试面板展开时让位隐藏（body.pdf-debug-open） ===== */
+/* ===== 左上角「刷新翻译」入口：与「高级选项」并排（adv-toggle 宽 74px @ left 12，
+   本按钮 left 94 留 8px 缝）；调试面板展开时让位隐藏（body.pdf-debug-open） ===== */
+.refresh-toggle {
+  position: fixed;
+  top: 12px;
+  left: 94px;
+  z-index: 60;
+}
 /* 同 .btn.adv-toggle 的特异性处理：压过后文 .btn 的默认配色 */
 .btn.refresh-toggle {
   border-radius: 6px;
