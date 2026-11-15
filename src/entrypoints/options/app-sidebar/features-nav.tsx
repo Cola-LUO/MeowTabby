@@ -27,7 +27,7 @@ export function FeaturesNav() {
               isActive={pathname === "/pdf-translate"}
               tooltip={i18n.t("options.tools.pdfTranslate")}
             >
-              <PdfIcon className="size-4" />
+              <PdfIcon className="size-4 [&>path:last-child]:stroke-current [&>path:last-child]:stroke-[6]" />
               <span>{i18n.t("options.tools.pdfTranslate")}</span>
               <NewBadge size="sm" className="-ml-1 -translate-y-1 bg-[#FFA72B] text-[#3D2500]" />
             </SidebarMenuButton>
@@ -53,7 +53,10 @@ export function FeaturesNav() {
               }
               tooltip={i18n.t("options.tools.translationHub")}
             >
-              <Icon icon="tabler:language-hiragana" />
+              <Icon
+                icon="tabler:language-hiragana"
+                className="text-neutral-500 dark:text-neutral-400"
+              />
               <span>{i18n.t("options.tools.translationHub")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

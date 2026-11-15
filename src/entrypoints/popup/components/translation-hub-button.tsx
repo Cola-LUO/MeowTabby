@@ -28,7 +28,7 @@ export function TranslationHubButton() {
   return (
     <Tooltip>
       <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClick} />}>
-        <Icon icon="tabler:language-hiragana" />
+        <Icon icon="tabler:language-hiragana" className="text-neutral-500 dark:text-neutral-400" />
       </TooltipTrigger>
       <TooltipContent className="max-w-[200px] text-wrap">
         {i18n.t("popup.hub.tooltip")}

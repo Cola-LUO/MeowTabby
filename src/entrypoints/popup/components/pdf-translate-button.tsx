@@ -26,8 +26,8 @@ export function PdfTranslateButton() {
   return (
     <Tooltip>
       <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClick} />}>
-        <span className="inline-flex h-5 items-center justify-center rounded-full bg-[#FFA72B] px-1.5 text-[#3D2500]">
-          <PdfIcon className="size-4" />
+        <span className="inline-flex h-5 w-[36.4px] shrink-0 items-center justify-center rounded-full bg-[#FFA72B] text-[#3D2500]">
+          <PdfIcon className="size-4 translate-y-[0.625px] [&>path:last-child]:stroke-current [&>path:last-child]:stroke-[6]" />
         </span>
       </TooltipTrigger>
       <TooltipContent className="max-w-[200px] text-wrap">
