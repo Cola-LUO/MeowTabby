@@ -55,7 +55,7 @@ export function FeaturesNav() {
             >
               <Icon
                 icon="tabler:language-hiragana"
-                className="text-neutral-500 dark:text-neutral-400"
+                className="text-neutral-900 dark:text-neutral-100"
               />
               <span>{i18n.t("options.tools.translationHub")}</span>
             </SidebarMenuButton>
