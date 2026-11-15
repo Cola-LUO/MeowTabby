@@ -167,9 +167,18 @@ body.pdf-debug-open .pdf-tools {
   cursor: pointer;
   user-select: none;
 }
-/* 第三行的「收起」固定贴最右 */
-.dbg-row3 .btn:last-child {
-  margin-left: auto;
+/* 第三行按钮以右侧定位，性能文字为按钮预留位置。 */
+.dbg-row3 {
+  position: relative;
+  min-height: 26px;
+  padding-right: 218px;
+}
+.dbg-row-actions {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 /* 第三行「导出本页JSON」按钮尺寸（来自可视化编辑器：140×26） */
 .dbg-row3 .btn:first-of-type {
@@ -205,19 +214,19 @@ body.pdf-debug-open .pdf-tools {
 .debug-panel .btn {
   color: var(--text-strong);
 }
-/* 置信度滑杆：左段(已填充)与滑块用品牌强调色，右段(未填充)用 #CECECE。
+/* 置信度滑杆：左段(已填充)与滑块圆环用品牌强调色，右段(未填充)用 #CECECE。
    原生 range 的"未填充轨道"色无法用 CSS 指定（实测 color / background / ::-webkit-slider-runnable-track
    的 color 均无效），故改 appearance:none 自行绘制轨道；分界位置由 --val（0~1）决定，
    由 debug-panel.ts 在 input 事件里写入。 */
 .debug-panel input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 16px;
+  height: 24px;
   background: transparent;
 }
 .debug-panel input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 3px;
+  height: 8px;
+  border-radius: 4px;
   background: linear-gradient(
     to right,
     var(--accent) 0 calc(var(--val, 0.5) * 100%),
@@ -227,12 +236,13 @@ body.pdf-debug-open .pdf-tools {
 .debug-panel input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--accent);
   border-radius: 50%;
-  background: var(--accent);
+  background: #ffffff;
   cursor: pointer;
-  margin-top: -4px; /* (轨道高 6 - 滑块 14) / 2 */
+  margin-top: -8px; /* (轨道高 8 - 滑块 24) / 2 */
 }
 
 /* ===== 错误横幅 ===== */
@@ -325,8 +335,9 @@ body.pdf-debug-open .pdf-tools {
   z-index: 9998;
   display: flex;
   flex-direction: column;
-  min-width: 240px;
-  padding: 4px;
+  min-width: 200px;
+  padding: 3px;
+  line-height: 1.4;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -334,9 +345,9 @@ body.pdf-debug-open .pdf-tools {
 }
 .pdf-export-menu__item {
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   text-align: left;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border: none;
   background: transparent;
   color: var(--text);
@@ -359,17 +370,17 @@ body.pdf-debug-open .pdf-tools {
   border-radius: 8px;
 }
 .pdf-export-menu__header {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  padding: 8px 12px 4px;
+  padding: 6px 10px 3px;
   cursor: default;
   user-select: none;
 }
 .pdf-export-menu__sub {
-  padding-left: 28px;
+  padding-left: 22px;
 }
 .pdf-export-menu__sep {
   height: 1px;
   background: var(--border);
-  margin: 4px 8px;
+  margin: 3px 6px;
 }

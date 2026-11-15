@@ -1,5 +1,5 @@
 import type { ClusterLayoutTarget } from "./modules/viewer/trans-units"
-import { TextLayer } from "pdfjs-dist"
+import { AnnotationMode, TextLayer } from "pdfjs-dist"
 import {
   isKeepOnlyItem,
   estimateBaseLeading,
@@ -330,7 +330,12 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     try {
       const page = await doc.getPage(st.index)
       const canvas = document.createElement("canvas")
-      const { width, height } = await renderPageToCanvas(page, canvas, RENDER_SCALE)
+      const { width, height } = await renderPageToCanvas(
+        page,
+        canvas,
+        RENDER_SCALE,
+        AnnotationMode.DISABLE,
+      )
       st.cssW = width
       st.cssH = height
       st.items = await getTextItems(page)
@@ -344,9 +349,9 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
       const t0 = performance.now()
       st.regions = await runner.predictPage(canvas, width, height)
       st.inferMs = performance.now() - t0
-      if (st.visible) copyCanvas(st, canvas)
+      if (st.visible) await paintPage(st)
       canvas.width = canvas.height = 0
-      panel.report(st.index, runner.loadMs, st.inferMs, runner.backend)
+      panel.report(st.index, doc.numPages, st.inferMs)
       applyPage(st)
       st.processed = true
     } catch (error) {
@@ -496,7 +501,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     await triggerPrint(root, filename, pageCssW, pageCssH, kind, objectUrls)
   }
 
-  // 菜单结构：复制文本（仅有选中文字时出现）│分隔线│导出该页为 PDF（双语对照/仅译文）│分隔线│导出全文为 PDF（双语对照/仅译文）
+  // 菜单结构：复制文本/段落操作│分隔线│导出该页为 PDF（双语对照/仅译文）│分隔线│导出全文为 PDF（双语对照/仅译文）
   function addMenuSeparator(): HTMLElement {
     const sep = document.createElement("div")
     sep.className = "pdf-export-menu__sep"
@@ -543,7 +548,7 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   exportMenu.appendChild(bodyStatus)
   const bodyItem = addMenuItem("设为正文", () => correctBody("body"), true)
   const otherItem = addMenuItem("不是正文", () => correctBody("other"), true)
-  const copySeparator = addMenuSeparator()
+  const actionsSeparator = addMenuSeparator()
   addMenuHeader("导出该页为 PDF")
   addMenuItem("双语对照", () => void exportOnePage("bilingual"), true)
   addMenuItem("仅译文", () => void exportOnePage("translation"), true)
@@ -578,12 +583,12 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
           : "设为正文"
       action.style.display = ""
     }
-    // 仅有选中文字时展示"复制文本"及其下分隔线
+    // 有选中文字或段落操作时，显示操作区与导出区之间的分隔线。
     const hasSelection = (window.getSelection()?.toString() ?? "").trim() !== ""
     copyMenuItem.style.display = hasSelection ? "" : "none"
-    copySeparator.style.display = hasSelection ? "" : "none"
+    actionsSeparator.style.display = hasSelection || menuTarget ? "" : "none"
     exportMenu.style.display = "flex"
-    exportMenu.style.left = `${Math.min(e.clientX, window.innerWidth - 250)}px`
+    exportMenu.style.left = `${Math.max(0, Math.min(e.clientX, window.innerWidth - exportMenu.offsetWidth))}px`
     exportMenu.style.top = `${Math.max(0, Math.min(e.clientY, window.innerHeight - exportMenu.offsetHeight))}px`
   })
   window.addEventListener("click", hideExportMenu)

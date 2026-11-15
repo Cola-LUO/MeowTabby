@@ -5,7 +5,7 @@ export interface DebugPanel {
   actions: HTMLElement
   onBoxesVisibilityChange: ((visible: boolean) => void) | null
   regionsVisible(regions: Region[]): Region[]
-  report(page: number, loadMs: number, inferMs: number, backend: string): void
+  report(page: number, totalPages: number, inferMs: number): void
   exportJson(page: number, regions: Region[]): void
   /** main 在每页应用后调用：记录"当前页"，导出按钮据此导出 */
   setPage(page: number): void
@@ -52,6 +52,7 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
   // 表现为"译文不出来，动一下滑杆才出来"（2026-09-18 用户报告）
   const conf = { threshold: 0.25, enabled: new Set(opts.classes) }
   const exportState: { page: number; regions: Region[] } = { page: -1, regions: [] }
+  let totalInferMs = 0
 
   // 三行布局容器
   const row1 = doc.createElement("div")
@@ -112,11 +113,13 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
   const btn = doc.createElement("button")
   btn.className = "btn"
   btn.textContent = "导出本页JSON"
-  row3.appendChild(btn)
   const closeBtn = doc.createElement("button")
   closeBtn.className = "btn"
   closeBtn.textContent = "收起"
-  row3.appendChild(closeBtn)
+  const rowActions = doc.createElement("div")
+  rowActions.className = "dbg-row-actions"
+  rowActions.append(btn, closeBtn)
+  row3.appendChild(rowActions)
 
   root.append(row1, row2, row3)
 
@@ -174,8 +177,9 @@ export function createDebugPanel(doc: Document, opts: { classes: string[] }): De
     regionsVisible(regions) {
       return regions.filter((r) => conf.enabled.has(r.className) && r.conf >= conf.threshold)
     },
-    report(page, loadMs, inferMs, backend) {
-      perf.textContent = `当前已推理至第${page}页 推理${Math.round(inferMs)}ms 后端${backend} 模型加载${Math.round(loadMs)}ms`
+    report(page, totalPages, inferMs) {
+      totalInferMs += inferMs
+      perf.textContent = `页面已检测至第${page}/${totalPages}页 本页用时${Math.round(inferMs)}ms 总用时${Math.round(totalInferMs)}ms`
     },
     exportJson(page, regions) {
       const json = JSON.stringify({ page, regions }, null, 2)

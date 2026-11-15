@@ -1,5 +1,6 @@
 import type { AssignedBlock } from "../../../../../src/modules/pdf-core/assign/assign"
 import type { PairDecision } from "../../../../../src/modules/pdf-core/assign/cross-merge"
+import { AnnotationMode } from "pdfjs-dist"
 import { requestTextForUnit } from "../../../../../src/entrypoints/pdf-translate/modules/translate/segment-utils"
 import {
   createDocumentFlow,
@@ -301,7 +302,12 @@ async function processOnePage(
 ): Promise<PageResult> {
   const page = await doc!.getPage(index)
   const canvas = document.createElement("canvas")
-  const { width: cssW, height: cssH } = await renderPageToCanvas(page, canvas, RENDER_SCALE)
+  const { width: cssW, height: cssH } = await renderPageToCanvas(
+    page,
+    canvas,
+    RENDER_SCALE,
+    AnnotationMode.DISABLE,
+  )
   const items = await getTextItems(page)
   const saved = pdfKey ? await readSlicePage(pdfKey, index, cssW, cssH) : null
   let regions = saved

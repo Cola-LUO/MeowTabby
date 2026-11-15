@@ -70,13 +70,17 @@ describe("debug panel", () => {
       ]),
     ).toHaveLength(2) // 0.4 通过默认阈值，0.2 被置信度滑杆过滤
   })
-  it("report() 更新性能显示", () => {
+  it("report() 显示本页检测耗时并累计总用时", () => {
     const p = createDebugPanel(document, { classes: [] })
     document.body.appendChild(p.root)
-    p.report(3, 1234, 567, "wasm")
-    expect(p.root.textContent).toContain("3")
-    expect(p.root.textContent).toContain("567")
-    expect(p.root.textContent).toContain("wasm")
+    p.report(1, 15, 567.4)
+    expect(p.root.querySelector(".perf")?.textContent).toBe(
+      "页面已检测至第1/15页 本页用时567ms 总用时567ms",
+    )
+    p.report(9, 15, 319.4)
+    expect(p.root.querySelector(".perf")?.textContent).toBe(
+      "页面已检测至第9/15页 本页用时319ms 总用时887ms",
+    )
   })
   it("setPage/setRegions 记录当前页，导出按钮可点击不抛错", () => {
     const p = createDebugPanel(document, { classes: [] })

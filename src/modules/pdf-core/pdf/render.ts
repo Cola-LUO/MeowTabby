@@ -1,4 +1,4 @@
-import type { PDFPageProxy } from "pdfjs-dist"
+import { AnnotationMode, type PDFPageProxy } from "pdfjs-dist"
 
 export const RENDER_SCALE = Math.min(
   (typeof devicePixelRatio !== "undefined" ? devicePixelRatio : 1) * 2,
@@ -10,12 +10,13 @@ export async function renderPageToCanvas(
   page: PDFPageProxy,
   canvas: HTMLCanvasElement,
   scale: number,
+  annotationMode = AnnotationMode.ENABLE,
 ): Promise<{ width: number; height: number }> {
   const vp = page.getViewport({ scale })
   canvas.width = Math.round(vp.width)
   canvas.height = Math.round(vp.height)
   const ctx = canvas.getContext("2d")!
-  await page.render({ canvasContext: ctx, viewport: vp }).promise
+  await page.render({ canvasContext: ctx, viewport: vp, annotationMode }).promise
   const vp1 = page.getViewport({ scale: 1 })
   return { width: vp1.width, height: vp1.height }
 }
