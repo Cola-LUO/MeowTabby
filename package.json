@@ -1,6 +1,6 @@
 {
   "name": "meowtabby",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "MeowTabby (翻译喵) - open-source browser extension for language learning on any website",
   "type": "module",
