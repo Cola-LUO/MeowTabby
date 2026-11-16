@@ -290,6 +290,9 @@ body.pdf-debug-open .pdf-tools {
   position: absolute;
 }
 .trans-cluster {
+  /* 白底底边额外向下盖住 2px，排版回填高度时仍保留。 */
+  box-sizing: content-box;
+  padding-bottom: 2px;
   color: #1a1a1a;
   line-height: 1.3;
   white-space: pre-wrap;
