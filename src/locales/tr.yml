@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: MeowTabby - Çevir ve Öğren
-extDescription: MeowTabby, dil engellerini aşmanıza ve farklı dillerdeki sayfalara göz atmanızı sağlayan açık kaynaklı bir tarayıcı uzantısıdır.
+extName: MeowTabby - Web ve PDF Çevirisi
+extDescription: MeowTabby, PDF'leri ve web sayfalarını orijinal metinle yan yana çeviren açık kaynaklı bir tarayıcı uzantısıdır.
 account:
   login: Giriş yap
   webApp: Web uygulaması

@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: "MeowTabby - Translate & Learn"
-extDescription: MeowTabby is an open source browser extension that helps you break language barriers and browse web pages in different languages.
+extName: "MeowTabby - Web & PDF Translation"
+extDescription: MeowTabby is an open-source browser extension that translates PDFs and web pages side by side with the original text.
 account:
   login: Log in
   webApp: Web app

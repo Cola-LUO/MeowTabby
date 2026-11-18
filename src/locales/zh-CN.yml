@@ -1,6 +1,6 @@
 name: 翻译喵
-extName: 翻译喵 - 翻译与学习
-extDescription: 翻译喵是一款开放源代码的浏览器插件，旨在帮助您突破语言障碍浏览不同语言的网页。
+extName: 翻译喵 - 网页和PDF翻译
+extDescription: 翻译喵是一款开放源代码的浏览器插件，支持网页与 PDF 的对照翻译，帮助你读懂外文网页和论文。
 account:
   login: 登录
   webApp: 网页应用

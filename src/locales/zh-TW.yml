@@ -1,6 +1,6 @@
 name: 翻译喵
-extName: 翻译喵 - 翻譯與學習
-extDescription: 翻译喵是一款開放原始碼的瀏覽器擴充功能，能協助使用者突破語言障礙瀏覽不同語言的網頁。
+extName: 翻譯喵 - 網頁和PDF翻譯
+extDescription: 翻譯喵是一款開放原始碼的瀏覽器擴充功能，支援網頁與 PDF 的對照翻譯，協助你讀懂外文網頁與論文。
 account:
   login: 登入
   webApp: 網頁應用程式

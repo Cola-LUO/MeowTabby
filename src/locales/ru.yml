@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: MeowTabby - Переводи и учись
-extDescription: MeowTabby — расширение браузера с открытым исходным кодом для преодоления языковых барьеров и просмотра страниц на разных языках.
+extName: MeowTabby - Перевод веб-страниц и PDF
+extDescription: MeowTabby — расширение браузера с открытым исходным кодом для перевода PDF и веб-страниц рядом с оригиналом.
 account:
   login: Войти
   webApp: Веб-приложение

@@ -94,3 +94,6 @@ reference/
 /tools/pdf-verify/archive/
 # 版面验证切片产物（本地生成，不入库）
 /tools/pdf-verify/slices/
+
+# 含审核测试账号凭据，仅本地保留（2026-11-17 起不入库）
+/assets/store/meowtabby/审核测试说明.txt

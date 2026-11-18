@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: MeowTabby - 번역하고 배우기
-extDescription: MeowTabby는 언어 장벽을 넘어 다양한 언어의 웹 페이지를 탐색할 수 있도록 도와주는 오픈 소스 브라우저 확장 프로그램입니다.
+extName: MeowTabby - 웹 및 PDF 번역
+extDescription: MeowTabby는 PDF와 웹 페이지를 원문과 나란히 번역하는 오픈 소스 브라우저 확장 프로그램입니다.
 account:
   login: 로그인
   webApp: 웹 앱

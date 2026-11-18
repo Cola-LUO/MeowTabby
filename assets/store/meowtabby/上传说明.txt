@@ -1,7 +1,9 @@
-MeowTabby · Edge 商店素材
+MeowTabby · 商店素材（Edge / Chrome）
 
 1. 详细说明（Description）
-打开 descriptions 文件夹，按商店页面语言选择同名 TXT，复制全文。zh_CN 是简体中文，zh_TW 是繁体中文，en 是英语。其余文件分别对应西班牙语（es）、日语（ja）、韩语（ko）、俄语（ru）、土耳其语（tr）和越南语（vi）。名称和短描述由扩展 ZIP 提供。
+descriptions 下按商店分两个文件夹：edge/ 给 Edge 商店用，chrome/ 给 Chrome 商店用。两套文案内容一致，只有开头提到的浏览器名称不同，各自维护，改一套不会影响另一套。
+按商店页面语言选择同名 TXT，复制全文。zh_CN 是简体中文，zh_TW 是繁体中文，en 是英语。其余文件分别对应西班牙语（es）、日语（ja）、韩语（ko）、俄语（ru）、土耳其语（tr）和越南语（vi）。
+名称和短描述由扩展 ZIP 提供，两种浏览器共用同一份构建来源，因此固定写成不点名的「浏览器」，无法按商店拆分。
 
 2. 图片
 Extension logo：上传 logo.png（300 × 300），可复制到所有语言。

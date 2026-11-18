@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: MeowTabby - Traduce y aprende
-extDescription: MeowTabby es una extensión de navegador de código abierto para superar barreras lingüísticas y navegar páginas en otros idiomas.
+extName: MeowTabby - Traducción web y PDF
+extDescription: MeowTabby es una extensión de navegador de código abierto que traduce PDF y páginas web junto al texto original.
 account:
   login: Iniciar sesión
   webApp: Aplicación web

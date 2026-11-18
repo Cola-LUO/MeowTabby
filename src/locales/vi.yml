@@ -1,6 +1,6 @@
 name: MeowTabby
-extName: MeowTabby - Dịch và học
-extDescription: MeowTabby là tiện ích mở rộng trình duyệt mã nguồn mở giúp bạn vượt rào cản ngôn ngữ và duyệt các trang web bằng ngôn ngữ khác.
+extName: MeowTabby - Dịch web và PDF
+extDescription: MeowTabby là tiện ích mở rộng trình duyệt mã nguồn mở, dịch PDF và trang web song song với bản gốc.
 account:
   login: Đăng nhập
   webApp: Ứng dụng web
