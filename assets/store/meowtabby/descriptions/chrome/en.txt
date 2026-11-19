@@ -3,3 +3,7 @@ Read a paper in Chrome with the original PDF on the left and the translation on 
 On web pages, switch between a bilingual view and the translation alone. Select a word for a translation, an explanation or spoken audio. On supported video players, read bilingual subtitles and export them. In the translation center, send the same passage to several services and compare their wording side by side.
 
 Use the built-in AI service with the credit available on your account, or enter your own API key and use your provider under its terms.
+
+MeowTabby is based on Read Frog and released under GPL-3.0.
+Source: https://github.com/Cola-LUO/MeowTabby
+Website: https://netxmeow.top/meowtabby/

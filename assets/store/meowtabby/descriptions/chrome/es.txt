@@ -3,3 +3,5 @@ Lee artículos en Chrome con el PDF original a la izquierda y la traducción a l
 En la web, alterna entre la vista bilingüe y la traducción. Selecciona una palabra para traducirla, ver una explicación o escucharla. En reproductores compatibles puedes leer subtítulos bilingües y exportarlos. El centro de traducción te permite comparar cómo traducen varios servicios el mismo pasaje.
 
 Puedes usar el servicio de IA integrado con el crédito disponible en tu cuenta o introducir tu propia clave API y utilizar el proveedor que elijas según sus condiciones.
+
+Basado en Read Frog y distribuido bajo GPL-3.0. Código fuente: https://github.com/Cola-LUO/MeowTabby

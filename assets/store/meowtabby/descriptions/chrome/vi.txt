@@ -3,3 +3,5 @@
 Trên trang web, bạn có thể chọn xem song ngữ hoặc chỉ xem bản dịch. Chọn một từ để dịch, xem giải thích hoặc nghe đọc. Với trình phát video được hỗ trợ, bạn có thể xem phụ đề song ngữ và xuất tệp phụ đề. Trong trung tâm dịch, hãy gửi cùng một đoạn văn đến nhiều dịch vụ để so sánh cách diễn đạt.
 
 Bạn có thể dùng dịch vụ AI tích hợp trong phạm vi số dư tài khoản, hoặc nhập khóa API riêng để sử dụng dịch vụ của nhà cung cấp theo điều khoản của họ.
+
+Phát triển dựa trên Read Frog, phát hành theo GPL-3.0. Mã nguồn: https://github.com/Cola-LUO/MeowTabby
