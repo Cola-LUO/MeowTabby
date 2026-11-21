@@ -1,12 +1,18 @@
 import type { PageHost } from "./pagehost"
 import type { BlockView } from "./render-view"
-import type { AssignedBlock } from "@/modules/pdf-core/assign/assign"
+import type { AssignedBlock, Paragraph } from "@/modules/pdf-core/assign/assign"
 import type { DocumentGroup } from "@/modules/pdf-core/document-flow"
 import { rendersText } from "@/modules/pdf-core/assign/assign"
 import { blockDisplayTransform } from "@/modules/pdf-core/pdf/coords-rot"
 
 type Rect = { x: number; y: number; w: number; h: number }
-type Pair = { block: AssignedBlock; id: string; source: Rect; box?: HTMLElement }
+type Pair = {
+  block: AssignedBlock
+  paragraph: Paragraph
+  id: string
+  source: Rect
+  box?: HTMLElement
+}
 type Page = {
   left: PageHost
   right: PageHost
@@ -61,7 +67,7 @@ export function createParagraphHover() {
       selected = null
       draw()
     },
-    pick(event: MouseEvent): { pageIndex: number; block: AssignedBlock } | null {
+    pick(event: MouseEvent) {
       for (const [pageIndex, page] of pages) {
         for (const host of [page.left, page.right]) {
           if (!(event.target instanceof Node) || !host.root.contains(event.target)) continue
@@ -75,10 +81,10 @@ export function createParagraphHover() {
               y,
             ),
           )
-          if (!pair?.block.region || pair.block.behavior !== "translate") return null
+          if (pair?.block.behavior !== "translate") return null
           selected = pair.block
           draw()
-          return { pageIndex, block: pair.block }
+          return { pageIndex, block: pair.block, paragraph: pair.paragraph }
         }
       }
       return null
@@ -126,6 +132,7 @@ export function createParagraphHover() {
           const view = views.find((v) => v.blockId === blockId)
           return {
             block,
+            paragraph: p,
             id: `p${pageIndex}:${blockId}:s${paraIdx}`,
             source: {
               x,

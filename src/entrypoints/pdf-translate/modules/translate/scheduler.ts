@@ -7,7 +7,7 @@
  *  纯调度层，不关心翻译实现（`translate` 注入，便于单测）。 */
 
 export interface TranslateSchedulerOptions {
-  translate: (text: string) => Promise<string>
+  translate: (text: string, forceRetranslation?: boolean) => Promise<string>
   /** 页间并发上限，默认 2（用户口径：不超过两页） */
   maxConcurrentPages?: number
   /** 单条失败回调（默认静默：失败不入缓存，后续重渲染会重试） */
@@ -31,6 +31,8 @@ export interface TranslateScheduler {
     isCurrent?: () => boolean,
     isTextCurrent?: (text: string) => boolean,
   ): Promise<FillResult>
+  /** 单段重译共用并发闸门，结果仅用于该段回填。 */
+  refresh(text: string, isCurrent: () => boolean): Promise<string | undefined>
   /** 观测：当前在途批数 / 累计请求数（调试与单测用） */
   stats(): { pages: number; requests: number }
 }
@@ -92,6 +94,17 @@ export function createTranslateScheduler(opts: TranslateSchedulerOptions): Trans
         const atIssue = pages // 发起时的在途页数（含本页），日志核对闸门用
         await Promise.all(calls.map((c) => c.p))
         return { issued: calls.filter((c) => c.issued).length, pages: atIssue }
+      } finally {
+        releasePage()
+      }
+    },
+    async refresh(text, isCurrent) {
+      if (text === "") return undefined
+      await acquirePage()
+      try {
+        if (!isCurrent()) return undefined
+        requests++
+        return await opts.translate(text, true)
       } finally {
         releasePage()
       }

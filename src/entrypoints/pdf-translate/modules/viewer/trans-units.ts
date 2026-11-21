@@ -1,4 +1,5 @@
 import type { BlockView, BlockCluster } from "./render-view"
+import type { Paragraph } from "@/modules/pdf-core/assign/assign"
 import {
   documentUnitKey,
   type FlowUpdate,
@@ -179,6 +180,12 @@ export function createTranslationPlanState(pageViews: Map<number, BlockView[]>) 
   return {
     clear: () => current.clear(),
     isCurrent: (plan: DocumentUnit) => current.get(documentUnitKey(plan)) === plan,
+    findByParagraph(paragraph: Paragraph) {
+      for (const plan of current.values()) {
+        if (plan.parts.some((part) => part.paragraph === paragraph)) return plan
+      }
+      return undefined
+    },
     apply(update: FlowUpdate) {
       for (const old of update.invalidated) {
         current.delete(documentUnitKey(old))

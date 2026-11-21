@@ -378,9 +378,14 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     const version = translationVersion
     const next = createTranslateScheduler({
       maxConcurrentPages: MAX_CONCURRENT_PAGES,
-      translate: async (text) => {
+      translate: async (text, forceRetranslation) => {
         if (version !== translationVersion) throw new Error("翻译设置已更新")
-        return await sendMessage("translatePdfRequest", { text, to, summary: pdfSummary })
+        return await sendMessage("translatePdfRequest", {
+          text,
+          to,
+          summary: pdfSummary,
+          forceRetranslation,
+        })
       },
       onError: (error, text) => {
         if (version === translationVersion)
@@ -392,6 +397,8 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   let translator = makeTranslator()
   const pageViews = new Map<number, BlockView[]>()
   const translationPlans = createTranslationPlanState(pageViews)
+  const renderedPlans = new WeakSet<DocumentUnit>()
+  const refreshingPlans = new WeakSet<DocumentUnit>()
   const blockKey = (block: AssignedBlock) => JSON.stringify([block.region, block.minOrder])
   let menuTarget: { pageIndex: number; block: AssignedBlock } | null = null
 
@@ -501,7 +508,6 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     await triggerPrint(root, filename, pageCssW, pageCssH, kind, objectUrls)
   }
 
-  // 菜单结构：复制文本/段落操作│分隔线│导出该页为 PDF（双语对照/仅译文）│分隔线│导出全文为 PDF（双语对照/仅译文）
   function addMenuSeparator(): HTMLElement {
     const sep = document.createElement("div")
     sep.className = "pdf-export-menu__sep"
@@ -526,6 +532,12 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     return btn
   }
 
+  let menuRefreshPlan: DocumentUnit | undefined
+  const refreshParagraphItem = addMenuItem("重新翻译此段", () => {
+    if (!menuRefreshPlan || !translationPlans.isCurrent(menuRefreshPlan)) return
+    refreshParagraph(menuRefreshPlan)
+  })
+  const refreshSeparator = addMenuSeparator()
   const copyMenuItem = addMenuItem("复制文本", () => {
     const text = window.getSelection()?.toString() ?? ""
     if (text === "") return
@@ -560,7 +572,13 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
   app.addEventListener("contextmenu", (e) => {
     e.preventDefault()
     paragraphHover.clearSelection()
-    menuTarget = paragraphHover.pick(e)
+    const hit = paragraphHover.pick(e)
+    menuTarget = hit?.block.region ? hit : null
+    menuRefreshPlan = hit ? translationPlans.findByParagraph(hit.paragraph) : undefined
+    const canRefresh = menuRefreshPlan && renderedPlans.has(menuRefreshPlan)
+    refreshParagraphItem.style.display = canRefresh ? "" : "none"
+    refreshParagraphItem.disabled = !!menuRefreshPlan && refreshingPlans.has(menuRefreshPlan)
+    refreshSeparator.style.display = refreshParagraphItem.style.display
     for (const item of [bodyItem, otherItem]) item.style.display = "none"
     bodyStatus.style.display = menuTarget ? "" : "none"
     if (menuTarget) {
@@ -687,9 +705,44 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
             collectClusterMetrics(page)
           }
       })
-      jobs.add(job)
-      void job.catch(reportError).finally(() => jobs.delete(job))
+      trackTranslationJob(jobs, job)
     }
+  }
+  function trackTranslationJob(jobs: Set<Promise<void>>, job: Promise<void>): void {
+    jobs.add(job)
+    void job.catch(reportError).finally(() => jobs.delete(job))
+  }
+
+  function refreshParagraph(plan: DocumentUnit): void {
+    if (refreshingPlans.has(plan)) return
+    const [unit] = buildTranslationUnits([plan], pageViews)
+    if (!unit) return
+    const version = analysisVersion
+    const isCurrent = () => version === analysisVersion && translationPlans.isCurrent(plan)
+    refreshingPlans.add(plan)
+    exportVersion++
+    const job = translator
+      .refresh(unit.request, isCurrent)
+      .then((text) => {
+        if (!isCurrent() || text === undefined) return
+        if (!text.trim()) throw new Error("译文为空")
+        renderTranslations([{ unit, text }])
+        for (const pageIndex of new Set(plan.parts.map((part) => part.pageIndex))) {
+          applyTextZOrder(pageViews.get(pageIndex) ?? [])
+          collectClusterMetrics(states[pageIndex - 1]!)
+        }
+      })
+      .catch((error: unknown) => {
+        if (!isCurrent()) return
+        console.warn("段落重译失败", error)
+        showExportToast("重新翻译失败，请重试")
+        setTimeout(hideExportToast, 3000)
+      })
+      .finally(() => {
+        refreshingPlans.delete(plan)
+        if (menuRefreshPlan === plan) refreshParagraphItem.disabled = false
+      })
+    trackTranslationJob(translationJobs, job)
   }
   function finishFlow(): void {
     if (flowFinished) return
@@ -731,25 +784,32 @@ async function start(app: HTMLElement, pdfUrl: string, to: string): Promise<void
     if (version !== analysisVersion) return
     if (issued > 0)
       console.info(`[translate] 并行送翻 ${issued} 条（在途批数 ${pages}/${MAX_CONCURRENT_PAGES}）`)
+    const translations = units.flatMap((unit, i) => {
+      const plan = plans[i]!
+      if (!translationPlans.isCurrent(plan)) return []
+      if (!direct.has(i)) renderedPlans.add(plan)
+      return [{ unit, text: direct.has(i) ? "摘要" : (scheduler.cache.get(unit.request) ?? "") }]
+    })
+    renderTranslations(translations)
+  }
+
+  function renderTranslations(translations: { unit: Unit; text: string }[]): void {
     // 回填 + 统一求解：普通块与合并组走同一条路径（三步：缩字号 → 拉行高 → 盒高/溢出）。
     // 合并单元的 fill 返回 splitByCapacity 给出的整组档位，作为求解起点（只允许继续降），
     // 这样"装箱"与"排版"两个阶段用同一口径，不会出现"箱子说装得下、排版说装不下"。
     const solved: { box: HTMLElement; input: ClusterLayoutInput; result: ClusterLayoutResult }[] =
       []
-    const currentUnits: Unit[] = []
-    units.forEach((u, i) => {
-      if (!translationPlans.isCurrent(plans[i]!)) return
-      currentUnits.push(u)
-      const startScales = u.fill(direct.has(i) ? "摘要" : (scheduler.cache.get(requests[i]!) ?? ""))
-      u.layoutTargets.forEach((t, k) => {
+    for (const { unit, text } of translations) {
+      const startScales = unit.fill(text)
+      unit.layoutTargets.forEach((t, k) => {
         // 可用高落成 data 属性：验收要核"盒高是否越过障碍边界"这个结构性不变量
         t.box.dataset.availHeight = String(t.availHeight)
         const input = layoutInputOf(t, Array.isArray(startScales) ? startScales[k] : undefined)
         solved.push({ box: t.box, input, result: solveClusterLayout(input) })
       })
-    })
+    }
     for (const s of solved) applyClusterLayout(s.box, s.result)
-    refitOverflowingUnits(currentUnits)
+    refitOverflowingUnits(translations.map(({ unit }) => unit))
   }
 
   /** 求解输入：几何来自 target（renderBlocks 建盒时的原位几何），文本取盒内已回填的内容。

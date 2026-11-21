@@ -200,6 +200,8 @@ it("局部更正保持无关框和请求，连续更正后拒绝旧回填身份"
     decisions: [],
   })
   state.apply(update([old, c, other]))
+  expect(state.findByParagraph(parts[1]!.paragraph)).toBe(old)
+  expect(state.findByParagraph(parts[2]!.paragraph)).toBe(c)
   const otherBox = views[0]!.clusters[3]!.box
   otherBox.textContent = "保持原译文"
   const ac = unit([parts[0]!, parts[2]!], "group")
@@ -207,6 +209,8 @@ it("局部更正保持无关框和请求，连续更正后拒绝旧回填身份"
   state.apply(update([ac, b], [old, c]))
   expect(state.isCurrent(old)).toBe(false)
   expect(state.isCurrent(other)).toBe(true)
+  expect(state.findByParagraph(parts[1]!.paragraph)).toBe(b)
+  expect(state.findByParagraph(parts[2]!.paragraph)).toBe(ac)
   expect(views[0]!.clusters[3]!.box).toBe(otherBox)
   expect(otherBox.textContent).toBe("保持原译文")
   const restored = unit(parts.slice(0, 2), "group")

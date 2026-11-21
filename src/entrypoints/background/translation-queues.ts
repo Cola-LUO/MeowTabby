@@ -826,7 +826,7 @@ export function setUpPdfTranslation(): void {
     baseRetryDelayMs: 1_000,
   })
   onMessage("translatePdfRequest", async ({ data }) => {
-    const { text, to, summary } = data
+    const { text, to, summary, forceRetranslation } = data
     const config = (await ensureInitializedConfig()) ?? DEFAULT_CONFIG
     const targetCode = (to && PDF_SRC_LANG_TO_TARGET_CODE[to]) || config.language.targetCode
     const langConfig = { ...config.language, targetCode }
@@ -867,7 +867,7 @@ export function setUpPdfTranslation(): void {
     return await pdfHostedRequestQueue.enqueue(
       thunk,
       Date.now(),
-      Sha256Hex("pdf-translate", targetCode, text),
+      forceRetranslation ? hostedRequestId : Sha256Hex("pdf-translate", targetCode, text),
     )
   })
   // 设置快照（viewer「刷新翻译」按钮用）：目标语 + 按能力解析出的 provider

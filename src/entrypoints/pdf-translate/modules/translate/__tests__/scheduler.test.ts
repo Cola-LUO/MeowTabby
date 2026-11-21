@@ -183,6 +183,40 @@ describe("按页排队后的去重", () => {
   })
 })
 
+it("点名重译发出新请求，原有缓存和其他段落仍保留", async () => {
+  const calls: [string, boolean | undefined][] = []
+  const scheduler = createTranslateScheduler({
+    translate: async (text, forceRetranslation) => {
+      calls.push([text, forceRetranslation])
+      return forceRetranslation ? "新译文" : `原译文：${text}`
+    },
+  })
+  await scheduler.fill(["chosen", "other"])
+  expect(await scheduler.refresh("chosen", () => true)).toBe("新译文")
+  expect(calls).toEqual([
+    ["chosen", undefined],
+    ["other", undefined],
+    ["chosen", true],
+  ])
+  expect(scheduler.cache.get("chosen")).toBe("原译文：chosen")
+  expect(scheduler.cache.get("other")).toBe("原译文：other")
+})
+
+it("重译使用同一个并发闸门，已失效的段落不再发请求", async () => {
+  const c = createControlled()
+  const scheduler = createTranslateScheduler({ translate: c.translate, maxConcurrentPages: 1 })
+  const first = scheduler.fill(["first"])
+  let current = true
+  const refresh = scheduler.refresh("stale", () => current)
+  await flush()
+  expect(c.sent()).toEqual(["first"])
+  current = false
+  c.pending()[0]!.ok("译文")
+  await first
+  expect(await refresh).toBeUndefined()
+  expect(c.sent()).toEqual(["first"])
+})
+
 it("已过期的排队批次拿到名额后不再发请求", async () => {
   const c = createControlled()
   const scheduler = createTranslateScheduler({ translate: c.translate, maxConcurrentPages: 1 })

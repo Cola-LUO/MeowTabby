@@ -160,6 +160,7 @@ it("左右侧右键定位合并前原块，菜单期间只高亮该块，空白�
       },
     ],
   })) as AssignedBlock[]
+  blocks[0]!.paras.push({ ...blocks[0]!.paras[0]!, y: 540, text: "another paragraph" })
   const views = renderBlocks(right, blocks, () => {})
   const hover = createParagraphHover()
   hover.install(1, left, right, blocks, views, 500, 700, 0)
@@ -169,13 +170,16 @@ it("左右侧右键定位合并前原块，菜单期间只高亮该块，空白�
     target.dispatchEvent(event)
     return hover.pick(event)
   }
-  expect(pick(left.root, 175)?.block).toBe(blocks[1])
+  const hit = pick(left.root, 175)
+  expect(hit?.block).toBe(blocks[1])
+  expect(hit?.paragraph).toBe(blocks[1]!.paras[0])
   expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(1)
   left.root.dispatchEvent(new MouseEvent("pointerleave"))
   expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(1)
   hover.clearSelection()
   expect(left.root.querySelectorAll(".paragraph-hover-highlight")).toHaveLength(0)
-  expect(pick(views[0]!.clusters[0]!.box, 75)?.block).toBe(blocks[0])
+  expect(pick(views[0]!.clusters[0]!.box, 75)?.paragraph).toBe(blocks[0]!.paras[0])
+  expect(pick(views[0]!.clusters[1]!.box, 135)?.paragraph).toBe(blocks[0]!.paras[1])
   hover.clearSelection()
   expect(pick(left.root, 350)).toBeNull()
 })
