@@ -76,8 +76,8 @@ describe("billing session bridge", () => {
     expect(session.setBillingSession).not.toHaveBeenCalled()
   })
 
-  it("does not respond after navigation outside the support path", async () => {
-    window.history.pushState({}, "", "/meowtabby/privacy/")
+  it("does not respond outside allowed paths and resumes after SPA navigation to an allowed path", async () => {
+    window.history.pushState({}, "", "/meowtabby/billingdashboard_9000/")
     window.dispatchEvent(
       new MessageEvent("message", {
         source: window,
@@ -87,6 +87,54 @@ describe("billing session bridge", () => {
     )
     await Promise.resolve()
     expect(session.getBillingSession).not.toHaveBeenCalled()
+
+    window.history.pushState({}, "", "/meowtabby/login/")
+    const response = new Promise<MessageEvent>((resolve) => {
+      const listener = (event: MessageEvent) => {
+        if (
+          event.data?.source === "meowtabby-support-extension" &&
+          event.data?.requestId === "five"
+        ) {
+          window.removeEventListener("message", listener)
+          resolve(event)
+        }
+      }
+      window.addEventListener("message", listener)
+    })
+    window.dispatchEvent(
+      new MessageEvent("message", {
+        source: window,
+        origin: window.location.origin,
+        data: { source: "meowtabby-support-page", type: "get", requestId: "five" },
+      }),
+    )
+    expect((await response).data.session).toEqual(value)
     window.history.pushState({}, "", "/meowtabby/support/")
+  })
+
+  it("notifies allowed pages of session changes without broadcasting session credentials", async () => {
+    const changeCallback = session.onBillingSessionChanged.mock.calls[0]?.[0]
+    expect(changeCallback).toBeTypeOf("function")
+
+    const response = new Promise<MessageEvent>((resolve) => {
+      const listener = (event: MessageEvent) => {
+        if (
+          event.data?.source === "meowtabby-support-extension" &&
+          event.data?.type === "changed"
+        ) {
+          window.removeEventListener("message", listener)
+          resolve(event)
+        }
+      }
+      window.addEventListener("message", listener)
+    })
+
+    changeCallback!(value)
+    const event = await response
+    expect(event.data).toEqual({
+      source: "meowtabby-support-extension",
+      type: "changed",
+    })
+    expect(event.data.session).toBeUndefined()
   })
 })

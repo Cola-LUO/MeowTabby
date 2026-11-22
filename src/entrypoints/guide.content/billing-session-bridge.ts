@@ -9,11 +9,16 @@ import {
 const REQUEST = "meowtabby-support-page"
 const RESPONSE = "meowtabby-support-extension"
 
-function onSupportPage() {
-  return (
-    window.location.pathname === "/meowtabby/support" ||
-    window.location.pathname === "/meowtabby/support/"
-  )
+const ALLOWED_PATHS = new Set([
+  "/meowtabby",
+  "/meowtabby/login",
+  "/meowtabby/support",
+  "/meowtabby/privacy",
+])
+
+function isAllowedAccountPath() {
+  const normalized = window.location.pathname.replace(/\/+$/, "") || "/"
+  return ALLOWED_PATHS.has(normalized)
 }
 
 function validSession(value: unknown): value is BillingSession {
@@ -28,13 +33,20 @@ function validSession(value: unknown): value is BillingSession {
 }
 
 export function startBillingSessionBridge() {
-  if (!onSupportPage()) return () => {}
-  const respond = (type: string, requestId: string, session: BillingSession | null) => {
-    if (!onSupportPage()) return
-    window.postMessage({ source: RESPONSE, type, requestId, session }, window.location.origin)
+  const respond = (type: string, requestId: string, session?: BillingSession | null) => {
+    if (!isAllowedAccountPath()) return
+    const payload =
+      type === "changed"
+        ? { source: RESPONSE, type }
+        : { source: RESPONSE, type, requestId, session: session ?? null }
+    window.postMessage(payload, window.location.origin)
   }
   const onMessage = async (event: MessageEvent) => {
-    if (event.source !== window || event.origin !== window.location.origin || !onSupportPage())
+    if (
+      event.source !== window ||
+      event.origin !== window.location.origin ||
+      !isAllowedAccountPath()
+    )
       return
     const data = event.data
     if (!data || data.source !== REQUEST || typeof data.requestId !== "string" || !data.requestId)
@@ -50,7 +62,7 @@ export function startBillingSessionBridge() {
     }
   }
   window.addEventListener("message", onMessage)
-  const unwatch = onBillingSessionChanged((session) => respond("changed", "", session))
+  const unwatch = onBillingSessionChanged(() => respond("changed", ""))
   return () => {
     window.removeEventListener("message", onMessage)
     unwatch()
