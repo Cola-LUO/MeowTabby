@@ -2,6 +2,7 @@
  *  不使用 innerHTML（模型返回不可信）；坏 LaTeX 兜底为原始文本。 */
 /** @vitest-environment jsdom */
 import { describe, expect, it } from "vitest"
+import { solveClusterLayout } from "../cluster-layout"
 import { appendMixedText, fillMixedText, parseMixed, readMixedText } from "../mixed-text"
 import { rowsNeeded } from "../text-metrics"
 
@@ -122,5 +123,29 @@ describe("readMixedText：读回带段界的文本（排版估算口径）", () 
 
   it("空盒返回空串", () => {
     expect(readMixedText(document.createElement("div"))).toBe("")
+  })
+
+  it("跳过 KaTeX 隐藏的 .katex-mathml 与零宽空格，避免公式段字号被误压到 0.66", () => {
+    const el = document.createElement("div")
+    const sample =
+      "其中的投影為參數矩陣 $W_i^Q \\in \\mathbb{R}^{d_{\\text{model}} \\times d_k}$、" +
+      "$W_i^K \\in \\mathbb{R}^{d_{\\text{model}} \\times d_k}$、" +
+      "$W_i^V \\in \\mathbb{R}^{d_{\\text{model}} \\times d_v}$ 以及 " +
+      "$W^O \\in \\mathbb{R}^{h d_v \\times d_{\\text{model}}}$。"
+    fillMixedText(el, [sample])
+    const measuredText = readMixedText(el)
+    expect(measuredText).not.toContain("\\mathbb")
+    expect(measuredText).not.toContain("\\text")
+    expect(measuredText).not.toContain("\\times")
+    expect(measuredText).not.toContain("\\in")
+    expect(measuredText).not.toContain("\u200b")
+    const layout = solveClusterLayout({
+      text: measuredText,
+      width: 430,
+      minHeight: 24,
+      availHeight: 24,
+      baseFontSize: 9,
+    })
+    expect(layout.scale).toBe(1)
   })
 })

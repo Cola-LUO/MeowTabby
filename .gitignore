@@ -68,6 +68,7 @@ reference/
 /tools/pdf-verify/.wxt/
 /tools/pdf-verify/dev/output/
 /开发周报.md
+/test_out_file
 
 # 本地测试和调试脚本
 /scripts/debug/

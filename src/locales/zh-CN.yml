@@ -16,7 +16,7 @@ billing:
   account:
     title: " "
     description: 登录、注册并管理翻译余额
-    balance: 余额
+    balance: 余额（元）
     points: 译点（1元=100译点）
     pointsValue: $1 译点
     recharge: 充值

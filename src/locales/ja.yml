@@ -16,7 +16,7 @@ billing:
   account:
     title: " "
     description: Log in, register, and manage your translation balance
-    balance: Balance
+    balance: 残高（人民元）
     points: Points (¥1 = 100 pts)
     pointsValue: $1 pts
     recharge: Recharge

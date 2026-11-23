@@ -136,11 +136,14 @@ export function readMixedText(el: HTMLElement): string {
   const visit = (node: Node): void => {
     for (const child of Array.from(node.childNodes)) {
       if (child.nodeType === 3) {
-        out += child.nodeValue ?? ""
+        // 剔除 KaTeX 插入的零宽空格，避免被文本度量误算为标点宽度
+        out += (child.nodeValue ?? "").replace(/\u200b/g, "")
         continue
       }
       if (child.nodeType !== 1) continue
       const e = child as HTMLElement
+      // 跳过 KaTeX 隐藏的 MathML/LaTeX 源码节点，只保留 .katex-html 视觉层文本
+      if (e.classList.contains("katex-mathml")) continue
       if (e.tagName === "BR") {
         out += "\n"
         continue
