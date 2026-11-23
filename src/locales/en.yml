@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -802,8 +804,6 @@ options:
       title: Customize page prompts
       description: Customizing different types of Prompts allows you to adjust the Prompt type yourself during translation. A Prompt represents the text that the user sends to the LLM.
       managePrompts: Manage prompts
-      communityPrompts: Get or share prompts from community
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Add prompt
       default: Default
       builtIn: Built-in
@@ -1037,6 +1037,7 @@ options:
           cancel: Cancel
           description: This will delete all cached AI segmentation results. The next time you play a video with AI segmentation enabled, it will re-process the subtitles.
   whatsNew:
+    trigger: Announcements
     title: Built-in AI Billing Info
     description: The built-in AI service uses official deepseek-v4.1-flash by default. During the testing period, it is currently charged at the official pricing with no markup. If needed, contact the author at luofchn@163.com. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:

@@ -17,6 +17,8 @@ billing:
     title: " "
     description: 登录、注册并管理翻译余额
     balance: 余额
+    points: 译点（1元=100译点）
+    pointsValue: $1 译点
     recharge: 充值
     rechargeGuide: 请联系管理员为你的账户充值，后续版本将支持自助支付。
     notLoggedIn: 未登录
@@ -802,8 +804,6 @@ options:
       title: 自定义网页提示词
       description: 自定义不同类型的 Prompt，可以在翻译时自行调整 Prompt 类型。Prompt 表示以用户身份发送给 LLM 的文本。
       managePrompts: 管理 Prompt
-      communityPrompts: 获取或分享社区 Prompt
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/820
       addPrompt: 添加 Prompt
       default: 通用
       builtIn: 内置
@@ -1037,6 +1037,7 @@ options:
           cancel: 取消
           description: 这将删除所有已缓存的 AI 断句结果。下次播放启用 AI 断句的视频时，将重新处理字幕。
   whatsNew:
+    trigger: 公告说明
     title: 内置AI费用说明
     description: 内置AI服务默认使用官方 deepseek-v4.1-flash，测试期间目前按官方定价原价使用，有需要可通过邮箱联系作者充值luofchn@outlook.com。服务无月费，按量付费，余额随时可退
   rateUs:

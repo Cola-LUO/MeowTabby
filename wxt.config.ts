@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import path from "node:path"
 import process from "node:process"
@@ -12,6 +12,7 @@ import {
 } from "./src/env/shared"
 
 const WXT_API_KEY_PATTERN = /^WXT_.*API_KEY/
+const ORT_JSEP_WASM = "ort-wasm-simd-threaded.jsep.wasm"
 const ALLOWED_BUNDLED_API_KEYS = new Set(["WXT_POSTHOG_API_KEY"])
 const useLocalPackages = isLocalPackagesEnabled(process.env)
 const shouldSkipEnvValidation = process.env.WXT_SKIP_ENV_VALIDATION === "true"
@@ -123,17 +124,30 @@ export default defineConfig({
       files.push({ absoluteSrc: model, relativeDest: "doclayout_yolo.onnx" })
     },
     "vite:build:extendConfig": (entrypoints, viteConfig) => {
+      const includesPdfTranslator = entrypoints.some(
+        (entrypoint) => entrypoint.name === "pdf-translate",
+      )
       const entrypoint = entrypoints.length === 1 ? entrypoints[0] : undefined
-      if (entrypoint?.type !== "content-script") return
+      const contentScript = entrypoint?.type === "content-script" ? entrypoint : undefined
+      if (!includesPdfTranslator && !contentScript) return
 
       const output = viteConfig.build?.rollupOptions?.output
       if (!output) return
 
       for (const outputOptions of Array.isArray(output) ? output : [output]) {
-        outputOptions.assetFileNames = (assetInfo) =>
-          assetInfo.names.some((name) => name.endsWith(".css"))
-            ? `content-scripts/${entrypoint.name}.[ext]`
-            : "assets/[name]-[hash].[ext]"
+        outputOptions.assetFileNames = (assetInfo) => {
+          if (includesPdfTranslator && assetInfo.names.includes(ORT_JSEP_WASM)) {
+            const publicWasm = readFileSync(path.resolve(__dirname, "public", ORT_JSEP_WASM))
+            if (typeof assetInfo.source === "string" || !publicWasm.equals(assetInfo.source)) {
+              throw new Error(`ONNX Runtime 的 ${ORT_JSEP_WASM} 与 public 中的版本不一致`)
+            }
+            // 让打包生成的备用 URL 和 wasmPaths 使用同一个根目录文件。
+            return ORT_JSEP_WASM
+          }
+          if (contentScript && assetInfo.names.some((name) => name.endsWith(".css")))
+            return `content-scripts/${contentScript.name}.[ext]`
+          return "assets/[name]-[hash].[ext]"
+        }
       }
     },
   },

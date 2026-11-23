@@ -10,23 +10,16 @@ interface PromptManagerProps {
   promptAtoms: PromptAtoms
   insertCells: PromptInsertCell[]
   builtInPrompts: BuiltInPrompt[]
-  /** Rendered at the start of the toolbar row, opposite the buttons. */
-  toolbarStart?: React.ReactNode
 }
 
 /**
  * The prompt list with its import/export/add toolbar, wired to one config field. Carries no
  * heading of its own — the caller frames it, as a card or as a page it drilled into.
  */
-export function PromptManager({
-  promptAtoms,
-  insertCells,
-  builtInPrompts,
-  toolbarStart,
-}: PromptManagerProps) {
+export function PromptManager({ promptAtoms, insertCells, builtInPrompts }: PromptManagerProps) {
   return (
     <PromptConfiguratorContext value={{ promptAtoms, insertCells, builtInPrompts }}>
-      <PromptList toolbarStart={toolbarStart} />
+      <PromptList />
     </PromptConfiguratorContext>
   )
 }

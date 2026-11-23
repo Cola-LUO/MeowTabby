@@ -63,6 +63,7 @@ describe("useUserAccountMenu (billing)", () => {
     await waitFor(() => expect(result.current.state).toBe(ACCOUNT_STATE.AUTHED))
     expect(result.current.email).toBe("a@b.c")
     await waitFor(() => expect(result.current.balanceYuan).toBe("2.5000"))
+    expect(result.current.points).toBe("250")
   })
 
   it("logout revokes server session and clears local storage", async () => {

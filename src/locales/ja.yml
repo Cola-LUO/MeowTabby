@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -680,8 +682,6 @@ options:
       title: カスタムページプロンプト
       description: 異なるタイプのプロンプトをカスタマイズすることで、翻訳時にプロンプトタイプを自ら調整できます。プロンプトとは、ユーザーがLLMに送信するテキストを指します。
       managePrompts: プロンプトを管理
-      communityPrompts: コミュニティからプロンプトを取得・共有
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: プロンプトを追加
       default: デフォルト
       builtIn: 組み込み
@@ -915,6 +915,7 @@ options:
           cancel: キャンセル
           description: すべてのキャッシュされたAI区切り結果が削除されます。次回AI区切りを有効にして動画を再生すると、字幕が再処理されます。
   whatsNew:
+    trigger: お知らせ
     title: 内蔵AI料金説明
     description: The built-in AI service uses official deepseek-v4.1-flash by default. During the testing period, it is currently charged at the official pricing with no markup. If needed, contact the author at luofchn@163.com. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:

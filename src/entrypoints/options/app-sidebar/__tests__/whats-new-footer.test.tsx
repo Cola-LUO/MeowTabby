@@ -1,12 +1,17 @@
 // @vitest-environment jsdom
 import type { ReactNode } from "react"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import * as React from "react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { UPDATES_CACHE_KEY, UPDATES_PAGE_URL } from "@/utils/updates/feed"
 import { WhatsNewFooter } from "../whats-new-footer"
 
-vi.mock("#imports", () => ({
+vi.mock("@/utils/i18n", () => ({
   i18n: { t: (key: string) => key },
+}))
+
+vi.mock("i18next", () => ({
+  default: { language: "zh-CN" },
 }))
 
 vi.mock("@/assets/icons/meowtabby.png?url", () => ({ default: "meow-logo.png" }))
@@ -108,25 +113,106 @@ function renderWhatsNewFooter() {
   return render(<WhatsNewFooter />)
 }
 
+beforeEach(() => {
+  localStorage.removeItem(UPDATES_CACHE_KEY)
+})
+
 afterEach(() => {
-  vi.clearAllMocks()
+  vi.restoreAllMocks()
+  localStorage.removeItem(UPDATES_CACHE_KEY)
 })
 
 describe("whatsNewFooter", () => {
-  it("renders the sidebar button with the what's-new title", () => {
-    renderWhatsNewFooter()
-    expect(screen.getByRole("button", { name: "options.whatsNew.title" })).toBeInTheDocument()
-  })
+  it("falls back to local copy and links to updates page when remote fetch fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"))
 
-  it("shows the brand block and fee notice when opened", () => {
     renderWhatsNewFooter()
-
-    const trigger = screen.getByRole("button", { name: "options.whatsNew.title" })
+    const trigger = screen.getByRole("button", { name: "options.whatsNew.trigger" })
     fireEvent.click(trigger)
 
     expect(screen.getByTestId("whats-new-popover-content")).toBeInTheDocument()
-    expect(screen.getByText("MeowTabby")).toBeInTheDocument()
+    const link = screen.getByRole("link")
+    expect(link).toHaveAttribute("href", UPDATES_PAGE_URL)
     expect(screen.getByText("options.whatsNew.description")).toBeInTheDocument()
     expect(screen.getByAltText("MeowTabby")).toHaveAttribute("src", "meow-logo.png")
+    expect(screen.queryByRole("button", { name: "Next" })).not.toBeInTheDocument()
+  })
+
+  it("renders remote single item with image and link without carousel controls", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          version: 1,
+          pageUrl: UPDATES_PAGE_URL,
+          items: [
+            {
+              id: "builtin-ai-pricing",
+              title: { zh: "内置AI费用说明", en: "Built-in AI Pricing" },
+              summary: { zh: "测试期间原价使用", en: "Official pricing" },
+              image: "/meowtabby/updates/builtin-ai-pricing.svg",
+              imageAlt: { zh: "费用横幅", en: "Pricing banner" },
+              extensionBanner: { enabled: true, order: 1 },
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    )
+
+    renderWhatsNewFooter()
+    fireEvent.click(screen.getByRole("button", { name: "options.whatsNew.trigger" }))
+
+    await waitFor(() => {
+      expect(screen.getByText("测试期间原价使用")).toBeInTheDocument()
+    })
+    expect(screen.getByText("内置AI费用说明")).toBeInTheDocument()
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      `${UPDATES_PAGE_URL}#builtin-ai-pricing`,
+    )
+    expect(screen.getByAltText("费用横幅")).toHaveAttribute(
+      "src",
+      "https://netxmeow.top/meowtabby/updates/builtin-ai-pricing.svg",
+    )
+    expect(screen.queryByRole("button", { name: "Next" })).not.toBeInTheDocument()
+  })
+
+  it("supports carousel navigation when multiple remote items are enabled", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          version: 1,
+          pageUrl: UPDATES_PAGE_URL,
+          items: [
+            {
+              id: "item-1",
+              title: { zh: "公告一", en: "Notice 1" },
+              summary: { zh: "内容一", en: "Body 1" },
+              image: "/meowtabby/updates/1.svg",
+              extensionBanner: { enabled: true, order: 1 },
+            },
+            {
+              id: "item-2",
+              title: { zh: "公告二", en: "Notice 2" },
+              summary: { zh: "内容二", en: "Body 2" },
+              image: "/meowtabby/updates/2.svg",
+              extensionBanner: { enabled: true, order: 2 },
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    )
+
+    renderWhatsNewFooter()
+    fireEvent.click(screen.getByRole("button", { name: "options.whatsNew.trigger" }))
+
+    await waitFor(() => {
+      expect(screen.getByText("内容一")).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+    expect(screen.getByText("内容二")).toBeInTheDocument()
+    expect(screen.getByRole("link")).toHaveAttribute("href", `${UPDATES_PAGE_URL}#item-2`)
   })
 })

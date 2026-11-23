@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -680,8 +682,6 @@ options:
       title: Пользовательские промпты страниц
       description: Настройка различных типов промптов позволяет вам самостоятельно изменять тип промпта во время перевода. Промпт — это текст, который пользователь отправляет LLM.
       managePrompts: Управление промптами
-      communityPrompts: Получайте или делитесь промптами с сообществом
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Добавить промпт
       default: По умолчанию
       builtIn: Встроенный
@@ -915,6 +915,7 @@ options:
           cancel: Отмена
           description: Все кэшированные результаты AI сегментации будут удалены. При следующем воспроизведении видео с включенной AI сегментацией субтитры будут обработаны заново.
   whatsNew:
+    trigger: Объявления
     title: Информация об оплате встроенного ИИ
     description: The built-in AI service uses official deepseek-v4.1-flash by default. During the testing period, it is currently charged at the official pricing with no markup. If needed, contact the author at luofchn@163.com. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:

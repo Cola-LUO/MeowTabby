@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -680,8 +682,6 @@ options:
       title: Lời nhắc trang tùy chỉnh
       description: Tùy chỉnh các loại Prompt khác nhau cho phép bạn tự điều chỉnh loại Prompt trong quá trình dịch. Prompt là văn bản mà người dùng gửi cho LLM.
       managePrompts: Quản lý prompt
-      communityPrompts: Nhận hoặc chia sẻ prompt từ cộng đồng
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Thêm Prompt
       default: Mặc định
       builtIn: Tích hợp sẵn
@@ -915,6 +915,7 @@ options:
           cancel: Hủy
           description: Tất cả kết quả AI phân đoạn đã lưu trong bộ nhớ đệm sẽ bị xóa. Lần tới khi phát video có bật AI phân đoạn, phụ đề sẽ được xử lý lại.
   whatsNew:
+    trigger: Thông báo
     title: Thông tin thu phí AI tích hợp
     description: The built-in AI service uses official deepseek-v4.1-flash by default. During the testing period, it is currently charged at the official pricing with no markup. If needed, contact the author at luofchn@163.com. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:

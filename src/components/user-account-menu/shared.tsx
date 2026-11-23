@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import guest from "@/assets/icons/avatars/guest.svg"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/base-ui/avatar"
 import { DropdownMenuItem } from "@/components/ui/base-ui/dropdown-menu"
+import { formatBalanceAsPoints } from "@/utils/billing/points"
 import { billingLogout, billingMe } from "@/utils/billing/rest"
 import {
   clearBillingSession,
@@ -95,6 +96,7 @@ export function useUserAccountMenu() {
     email: session?.email,
     displayName: displayName || "Guest",
     balanceYuan: meQuery.data?.balance,
+    points: formatBalanceAsPoints(meQuery.data?.balance),
     isPending: sessionPending,
     logout,
     openAccountSettings,
@@ -113,8 +115,10 @@ export function AccountNameWithBalance({
   return (
     <span className={cn("flex min-w-0 items-center gap-1.5", className)}>
       <span className="truncate font-medium">{account.displayName}</span>
-      {account.balanceYuan !== undefined && (
-        <span className="shrink-0 text-xs text-muted-foreground">¥{account.balanceYuan}</span>
+      {account.points !== undefined && (
+        <span className="shrink-0 text-xs text-muted-foreground">
+          {i18n.t("billing.account.pointsValue", [account.points])}
+        </span>
       )}
     </span>
   )

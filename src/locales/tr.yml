@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -680,8 +682,6 @@ options:
       title: Özel sayfa istemleri
       description: Farklı türde Promptları özelleştirmek, çeviri sırasında Prompt türünü kendiniz ayarlamanıza olanak tanır. Prompt, kullanıcının LLM'ye gönderdiği metni temsil eder.
       managePrompts: Promptları yönet
-      communityPrompts: Topluluktan prompt al veya paylaş
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Prompt ekle
       default: Varsayılan
       builtIn: Yerleşik
@@ -915,6 +915,7 @@ options:
           cancel: İptal
           description: Tüm önbelleğe alınmış AI bölümlendirme sonuçları silinecektir. AI bölümlendirme etkinleştirilmiş bir video oynatıldığında altyazılar yeniden işlenecektir.
   whatsNew:
+    trigger: Duyurular
     title: Yerleşik AI Ücret Bilgisi
     description: The built-in AI service uses official deepseek-v4.1-flash by default. During the testing period, it is currently charged at the official pricing with no markup. If needed, contact the author at luofchn@163.com. The service has no monthly fee, is pay-as-you-go, and the balance is refundable at any time.
   rateUs:

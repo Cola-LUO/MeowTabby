@@ -280,6 +280,9 @@ body.pdf-debug-open .pdf-tools {
 .select-layer ::selection {
   background: rgba(0, 90, 255, 0.25);
 }
+.select-layer br::selection {
+  background: transparent;
+}
 .select-line {
   color: transparent;
   overflow: hidden;

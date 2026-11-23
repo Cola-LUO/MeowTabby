@@ -17,6 +17,8 @@ billing:
     title: " "
     description: Log in, register, and manage your translation balance
     balance: Balance
+    points: Points (¥1 = 100 pts)
+    pointsValue: $1 pts
     recharge: Recharge
     rechargeGuide: To recharge your account, please contact the administrator. Self-service payment will be available in a future release.
     notLoggedIn: Not logged in
@@ -796,8 +798,6 @@ options:
       title: 自訂網頁提示詞
       description: 自訂不同類型的提示詞，可以在翻譯時自行調整提示詞類型。提示詞表示以使用者身分傳送給 LLM 的文字。
       managePrompts: 管理提示詞
-      communityPrompts: 取得或分享社群提示詞
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/820
       addPrompt: 新增提示詞
       default: 通用
       builtIn: 內建
@@ -1031,6 +1031,7 @@ options:
           cancel: 取消
           description: 這將刪除所有已快取的 AI 斷句結果。下次播放啟用 AI 斷句的影片時，將重新處理字幕。
   whatsNew:
+    trigger: 公告說明
     title: 內置AI收費說明
     description: 內置AI服務預設使用官方 deepseek-v4.1-flash，測試期間目前按官方定價原價使用，有需要可聯絡作者luofchn@163.com。服務無月費，按量付費，餘額隨時可退
   rateUs:

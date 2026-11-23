@@ -1,4 +1,3 @@
-import type { ReactNode } from "react"
 import { Icon } from "@iconify/react"
 import { useAtom, useSetAtom } from "jotai"
 import { Activity } from "react"
@@ -10,8 +9,7 @@ import { ExportPrompts } from "./export-prompts"
 import { ImportPrompts } from "./import-prompts"
 import { PromptGrid } from "./prompt-grid"
 
-/** `toolbarStart` fills the empty half of the toolbar row, opposite the buttons. */
-export function PromptList({ toolbarStart }: { toolbarStart?: ReactNode }) {
+export function PromptList() {
   const promptAtoms = usePromptAtoms()
   const [config, setConfig] = useAtom(promptAtoms.config)
   const setSelectedPrompts = useSetAtom(promptAtoms.selectedPrompts)
@@ -29,8 +27,7 @@ export function PromptList({ toolbarStart }: { toolbarStart?: ReactNode }) {
 
   return (
     <section className="w-full">
-      <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">{toolbarStart}</div>
+      <div className="mb-4 flex w-full flex-wrap items-center justify-end gap-3">
         <div className="flex items-center gap-3">
           <Activity mode={isExportMode ? "visible" : "hidden"}>
             <Button

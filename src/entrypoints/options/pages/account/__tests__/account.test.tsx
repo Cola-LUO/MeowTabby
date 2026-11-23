@@ -313,7 +313,9 @@ describe("AccountPage", () => {
     renderPage()
     await waitFor(() => {
       expect(screen.getByText("3.1400")).toBeTruthy()
+      expect(screen.getByText("314")).toBeTruthy()
     })
+    expect(screen.getByText("billing.account.points")).toBeTruthy()
     expect(screen.getByText("a@b.c")).toBeTruthy()
     // 邮箱/余额上方应有「账户信息」标题（与页面顶部「账户登录」同级样式）
     expect(screen.getByText("billing.account.infoTitle")).toBeTruthy()

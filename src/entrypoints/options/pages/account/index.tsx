@@ -6,6 +6,7 @@ import meowLogo from "@/assets/icons/meowtabby.png?url&no-inline"
 import { Button } from "@/components/ui/base-ui/button"
 import { Input } from "@/components/ui/base-ui/input"
 import { Label } from "@/components/ui/base-ui/label"
+import { formatBalanceAsPoints } from "@/utils/billing/points"
 import {
   billingForgotPassword,
   billingLogin,
@@ -612,6 +613,12 @@ function AccountOverview({ session }: { session: BillingSession }) {
             {meQuery.isPending ? "…" : (meQuery.data?.balance ?? "—")}
           </span>
         </div>
+        <div className="flex justify-between gap-4">
+          <span className="text-muted-foreground">{i18n.t("billing.account.points")}</span>
+          <span className="font-medium">
+            {meQuery.isPending ? "…" : (formatBalanceAsPoints(meQuery.data?.balance) ?? "—")}
+          </span>
+        </div>
       </div>
       {changingPassword ? (
         <ChangePasswordForm
@@ -680,16 +687,17 @@ export function AccountPage() {
         <span className="flex flex-wrap items-center justify-between gap-4">
           <span>{i18n.t("options.account.title")}</span>
           <a
-            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#FFE4C1] px-2 py-1 text-xs leading-4 font-bold text-black transition-colors hover:bg-[#FFD597] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67127] active:bg-[#FFC674]"
+            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs leading-4 font-medium text-foreground shadow-xs transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:bg-accent/80"
             href="https://netxmeow.top/meowtabby/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src={meowLogo} alt="" className="size-5 shrink-0" />
-            <span className="underline decoration-1 underline-offset-2">
-              {i18n.t("popup.more.projectWebsite")}
-            </span>
-            <IconArrowUpRight aria-hidden="true" className="size-3.5" />
+            <img src={meowLogo} alt="" className="size-4 shrink-0" />
+            <span>{i18n.t("popup.more.projectWebsite")}</span>
+            <IconArrowUpRight
+              aria-hidden="true"
+              className="size-3.5 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground"
+            />
           </a>
         </span>
       }
