@@ -18,6 +18,8 @@ export interface Paragraph {
   lineCount: number
   fontSize: number
   lines: ParaLine[]
+  /** 整段加粗（段内有效字符加粗占比达到阈值时写入 true） */
+  bold?: boolean
   /** 跨栏合并组的成员段标记 */
   soloCluster?: boolean
 }
@@ -286,6 +288,9 @@ interface ParagraphSplitOptions {
   detectHanging?: boolean
 }
 
+/** 整段加粗判定阈值：去空白后加粗字符占比 >= 80% */
+const BOLD_PARA_RATIO = 0.8
+
 const HANGING_START_RE = /^(?:[A-Z（(【[]|\d{1,3}[.．、)）])/
 
 function mergeParagraphs(
@@ -340,7 +345,15 @@ function mergeParagraphs(
       prevEnd = null
       text += " "
     }
-    paras.push({
+    let totalChars = 0
+    let boldChars = 0
+    for (const it of allItems) {
+      const len = it.str.replace(/\s+/g, "").length
+      if (len === 0) continue
+      totalChars += len
+      if (it.bold) boldChars += len
+    }
+    const para: Paragraph = {
       x: Math.min(...cur.map((l) => l.x)),
       y: bottom,
       w: Math.max(...cur.map((l) => l.x + l.w)) - Math.min(...cur.map((l) => l.x)),
@@ -349,7 +362,9 @@ function mergeParagraphs(
       lineCount: cur.length,
       fontSize: median(cur.map((l) => l.h)),
       lines: cur.map((l) => ({ x: l.x, w: l.w, h: l.h, text: l.text })),
-    })
+    }
+    if (totalChars > 0 && boldChars / totalChars >= BOLD_PARA_RATIO) para.bold = true
+    paras.push(para)
     cur = []
   }
   for (const ln of lines) {

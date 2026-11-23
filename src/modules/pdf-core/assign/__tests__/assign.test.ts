@@ -35,4 +35,61 @@ describe("assign 边缘行归属与段落盒", () => {
     const orphan = blocks.find((b) => b.region === null)
     expect(!orphan || orphan.paras.length === 0).toBe(true)
   })
+
+  it("整段加粗判定：有效字符加粗占比 >= 80% 时写入 para.bold = true，局部加粗则不写入", () => {
+    const regions: Region[] = [
+      {
+        x1: 40,
+        y1: 710,
+        x2: 500,
+        y2: 750,
+        className: "title",
+        behavior: "translate",
+        conf: 0.95,
+      },
+      {
+        x1: 40,
+        y1: 630,
+        x2: 500,
+        y2: 670,
+        className: "plain text",
+        behavior: "translate",
+        conf: 0.95,
+      },
+      {
+        x1: 40,
+        y1: 560,
+        x2: 500,
+        y2: 600,
+        className: "plain text",
+        behavior: "translate",
+        conf: 0.95,
+      },
+    ]
+    // 段落 1：全加粗（100%）
+    // 段落 2：9/10 有效字符加粗（90% >= 80%）
+    // 段落 3：仅 4/20 有效字符加粗（20% < 80%）
+    const items = [
+      {
+        str: "Attention Is All You Need",
+        x: 50,
+        y: 730,
+        w: 200,
+        h: 14,
+        order: 0,
+        fontName: "fb",
+        bold: true,
+      },
+      { str: "123456789", x: 50, y: 650, w: 90, h: 10, order: 1, fontName: "fb", bold: true },
+      { str: "0", x: 140, y: 650, w: 10, h: 10, order: 2, fontName: "fr" },
+      { str: "Name", x: 50, y: 580, w: 40, h: 10, order: 3, fontName: "fb", bold: true },
+      { str: "UniversityOfCity", x: 95, y: 580, w: 160, h: 10, order: 4, fontName: "fr" },
+    ]
+    const blocks = assignItems(items, regions, 595, 842)
+    const paras = blocks.filter((b) => b.region !== null).flatMap((b) => b.paras)
+    expect(paras).toHaveLength(3)
+    expect(paras[0]?.bold).toBe(true)
+    expect(paras[1]?.bold).toBe(true)
+    expect(paras[2]?.bold).toBeUndefined()
+  })
 })

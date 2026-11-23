@@ -56,6 +56,18 @@ function median(nums: number[]): number {
   return s.length % 2 ? s[mid]! : (s[mid]! + s[mid - 1]!) / 2
 }
 
+/** 簇加粗判定：组内各段按有效字符数加权，加粗占比 >= 80% 时整盒加粗 */
+function isClusterBold(group: Paragraph[]): boolean {
+  let totalWeight = 0
+  let boldWeight = 0
+  for (const p of group) {
+    const w = p.text.replace(/\s+/g, "").length || 1
+    totalWeight += w
+    if (p.bold) boldWeight += w
+  }
+  return totalWeight > 0 && boldWeight / totalWeight >= 0.8
+}
+
 /** 段落矩形并集（y-up） */
 function unionBox(paras: Paragraph[]): DisplayBox {
   const x = Math.min(...paras.map((p) => p.x))
@@ -162,6 +174,7 @@ export function renderBlocks(
       // 占位盒用 background-color 长属性：jsdom 不解析 shorthand "background:transparent"（测试环境），
       // 浏览器侧两者等价
       const bg = isPending ? "background-color:transparent" : "background:#fff"
+      const fontWeight = isClusterBold(group) ? "font-weight:700;" : ""
       const cluster = doc.createElement("div")
       cluster.className = "trans-cluster"
       // height 而非 min-height（overflow:hidden 语义，溢出由统一求解器接管）：
@@ -169,7 +182,7 @@ export function renderBlocks(
       // 回填后由 applyClusterLayout 覆盖 —— 内容永远不许把盒子撑大
       cluster.style.cssText =
         `position:absolute;left:${t.left}px;top:${t.top}px;` +
-        `width:${t.width}px;height:${t.height}px;${bg};font-size:${boxFontSize}px;` +
+        `width:${t.width}px;height:${t.height}px;${bg};font-size:${boxFontSize}px;${fontWeight}` +
         `pointer-events:auto;${rot}`
       // 原位高/字号落成 data 属性：验收（clustersOvergrown）与统一求解器都要用，
       // 而 jsdom 下 offsetHeight 恒 0，不能靠实测 DOM 反推几何

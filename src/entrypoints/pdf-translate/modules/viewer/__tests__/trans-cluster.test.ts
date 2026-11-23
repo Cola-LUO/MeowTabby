@@ -290,3 +290,20 @@ describe("distributeTextsSkip：带剔除段的译文映射（合并组成员由
     expect(out.filter((paras) => paras.some((t) => t !== "")).length).toBeGreaterThan(1)
   })
 })
+
+describe("renderBlocks：整段/整块加粗渲染", () => {
+  it("bold: true 的普通段落与整块加粗标题簇写入 font-weight: 700，普通段落不写", () => {
+    const boldPara: Paragraph = {
+      ...para(50, 700, 300, 14, "Attention Is All You Need", 14),
+      bold: true,
+    }
+    const normalPara: Paragraph = para(50, 660, 300, 10, "Normal body paragraph", 10)
+    const views = renderBlocks(
+      host(),
+      [translateBlock([boldPara], "title"), translateBlock([normalPara], "plain text")],
+      () => {},
+    )
+    expect(clusterBoxes(views[0]!)[0]!.style.fontWeight).toBe("700")
+    expect(clusterBoxes(views[1]!)[0]!.style.fontWeight).toBe("")
+  })
+})
